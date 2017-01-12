@@ -1,0 +1,33 @@
+{
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "created": 1483973872,
+  "body": [
+    {
+      "vocabulary": "DBpedia",
+      "value": "Precipitation (meteorology)",
+      "type": "Classification",
+      "id": "http://dbpedia.org/resource/Precipitation_(meteorology)"
+    }
+  ],
+  "motivation": null,
+  "creator": "marijn",
+  "type": "Annotation",
+  "target": [
+    {
+      "type": "Text",
+      "source": "urn:vangogh:let001",
+      "selector": {
+        "conformsTo": "http://tools.ietf.org/rfc/rfc3870",
+        "value": "urn:vangogh:let001:p.4",
+        "type": "FragmentSelector",
+        "refinedBy": {
+          "start": 54,
+          "type": "TextPositionSelector",
+          "text": "droppeltjes",
+          "end": 65
+        }
+      }
+    }
+  ],
+  "id": "urn:uuid:1761e15c-3510-4cd7-b2c5-ce319069bf89"
+}

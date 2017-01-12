@@ -1,0 +1,27 @@
+{
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "created": 1483949925,
+  "body": [
+    {
+      "vocabulary": "DBpedia",
+      "value": "Theo van Gogh (art dealer)",
+      "type": "Classification",
+      "id": "http://dbpedia.org/resource/Theo_van_Gogh_(art_dealer)"
+    }
+  ],
+  "motivation": "classifying",
+  "creator": "marijn",
+  "type": "Annotation",
+  "target": [
+    {
+      "type": "Text",
+      "source": "urn:vangogh:let001",
+      "selector": {
+        "conformsTo": "http://tools.ietf.org/rfc/rfc3870",
+        "value": "urn:vangogh:let001.receiver",
+        "type": "FragmentSelector"
+      }
+    }
+  ],
+  "id": "urn:uuid:8f62be7d-de56-464b-8d9a-5fb0b69fc00b"
+}

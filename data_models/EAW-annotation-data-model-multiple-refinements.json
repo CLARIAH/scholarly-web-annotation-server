@@ -1,0 +1,40 @@
+{
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "created": 1484220285,
+  "body": [
+    {
+      "vocabulary": "DBpedia",
+      "value": "Precipitation (meteorology)",
+      "type": "Classification",
+      "id": "http://dbpedia.org/resource/Precipitation_(meteorology)"
+    }
+  ],
+  "motivation": "classifying",
+  "creator": "marijn",
+  "type": "Annotation",
+  "target": [
+    {
+      "type": "Text",
+      "source": "urn:vangogh:let001",
+      "selector": {
+        "conformsTo": "http://tools.ietf.org/rfc/rfc3870",
+        "value": "urn:vangogh:let001:p.4",
+        "type": "FragmentSelector",
+        "refinedBy": [
+          {
+            "prefix": "had, en tusschen de ",
+            "suffix": " door toch nog al ee",
+            "type": "TextQuoteSelector",
+            "exact": "droppeltjes"
+          },
+          {
+            "start": 54,
+            "type": "TextPositionSelector",
+            "end": 65
+          }
+        ]
+      }
+    }
+  ],
+  "id": "urn:uuid:46c8fd5f-d038-497d-a7a3-1814b8d65201"
+}
