@@ -201,6 +201,10 @@ In that case [selector refinement](https://www.w3.org/TR/annotation-model/#refin
 }
 ```
 
+Discussion points:
+
++ Marijn: the W3C model seems to allow at most one selector and an additional level of refinement (so max 3 levels: `source`, `selector.value` and `refinedBy`). The nice thing here is that it allows specifying the top level resource (`urn:vangogh:let001`), the most specific targeted part that *contains* the selected text fragment (`urn:vangogh:let001:p.4`) and the text selection (*droppeltjes*). This allows search on all three parts to retrieve relevant annotations.
+
 ## <a name="multiple_refinedby"></a>Improving robustness: combining text position and text quote selection
 
 When using `refinedBy` in the W3C model, it is possible to use multiple refinements to indicate the same target. That is, all refinement selectors should represent the same target. 
@@ -252,7 +256,7 @@ The annotation below combines `TextPositionSelector` and `TextQuoteSelector` rep
 
 Discussion points:
 
-+ This allows bootstrapping the alignment between data about the target and the target itself. E.g. with a combination of text position and text quote it is possible to identify changes in how the resource is displayed. If the text in the displayed resource corresponding to the position selector no longer corresponds to the text in the quote selector, the client knows that display has changed and can look for the quoted text nearby the stored positions. 
++ Marijn: This allows bootstrapping the alignment between information about the target stored in the annotation and the target in the resource itself. E.g. with a combination of text position and text quote it is possible to identify changes in how the resource is displayed. If the text in the displayed resource corresponding to the position selector no longer corresponds to the text in the quote selector, the client knows that RDFa structure has changed and can look for the quoted text nearest to the stored positions. 
 
 
 ## Annotating Audiovisual Resources
@@ -290,17 +294,17 @@ The same data model can be used to annotate audiovisual resources, as long as th
 ```
 
 
-## Extensions to the W3C model
+## Additional properties
 
-Consider adding property capturing information about:
+The W3C model allows specifying agents involved in the annotation process:
 
-+ the annotation process:
-   + annotation client (e.g. client name and version, github repository)
-   + annotation server (e.g. server name and version, API location)
-   + location of resource viewer (i.e. URL of web site that displays the resource and embeds the annotation client)
-+ ontology/vocabulary used in the RDFa enriched resource (e.g. van Gogh letters ontology)
-+ research context:
-  + project motivating the task
-  + research question motivating task
-  + ...
- 
++ **annotation client**: e.g. client name and version, github repository,
++ **annotation server**: e.g. server name and version, API location,
++ **location of resource viewer**: i.e. URL of web site that displays the resource and embeds the annotation client.
+
+#### Extensions to the W3C model
+
+The W3C model allows for extensions to the basic framework. We could consider adding (or at least leaving room for) properties capturing information about:
+
++ **Ontology/vocabulary**: controlled vocabularies used in the RDFa enriched resource (e.g. van Gogh letters ontology). This could in principle be used by the annotation server to reason about relationships between stored annotations and the resources they target.
++ **Research context**: e.g. research project, questions, methodology, intention of use. This allows further interpretation of the annotations and why certain choices were made by the annotator.
