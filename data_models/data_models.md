@@ -1,6 +1,6 @@
 # RDFa Annotation Client
 
-I'm experimenting with this platform to try out getting feedback on our annotation data models. You can comment and/or edit. 
+For the RDFa Annotation Client and its communicating with the server (e.g. Alexandria) we need to establish a data model for the annotations. The idea is to base this on the [W3C Web Annotation Model](https://www.w3.org/TR/annotation-model/#web-annotation-framework).
 
 
 
@@ -40,7 +40,7 @@ Some discussion points:
 
 
 ## Fragment selector
-When the annotation targets a resource that is part of a larger resource, a fragment selector is used to refine the target. 
+When the annotation targets a resource that is part of a larger resource, a [fragment selector](https://www.w3.org/TR/annotation-model/#fragment-selector) is used to refine the target. 
 
 ```json
 {
@@ -75,8 +75,8 @@ When the annotation targets a resource that is part of a larger resource, a frag
 ## Text selectors
 Instead of selecting a fragment of the resource as target, a user can also select a text fragment as the target. There are two options for text selectors:
 
-1. text position selector: represents the target through the start and end offsets of the selected text in the resource, e.g. start at character offset 76, end at character offset 84.
-2. text quote selector: represents the target through the string of selected text, in combination with short strings before and after it to provide context.
+1. [text position selector](https://www.w3.org/TR/annotation-model/#text-quote-selector): represents the target through the start and end offsets of the selected text in the resource, e.g. start at character offset 76, end at character offset 84.
+2. [text quote selector](https://www.w3.org/TR/annotation-model/#text-position-selector): represents the target through the string of selected text, in combination with short strings before and after it to provide context.
 
 #### Text position selector
 ```json
@@ -145,9 +145,9 @@ Instead of selecting a fragment of the resource as target, a user can also selec
 
 ## Combining fragment and text selectors
 
-It is also possible that the selected text fragment is part of sub-resource of the whole or top-level resource, e.g. a passage (text selection) in a paragraph (sub-resource) in a letter (top-level resource). 
+It is also possible that the target is a selected text fragment that is part of sub-resource of the whole or top-level resource, e.g. a passage (text selection) in a paragraph (sub-resource) in a letter (top-level resource). 
 
-In that case, there is a `FragmentSelector` that is `refinedBy` a `TextPositionSelector` and/or a `TextQuoteSelector`. The annotation below targets the passage *droppeltjes* within the 4th `paragraph` of the `letter`:
+In that case [selector refinement](https://www.w3.org/TR/annotation-model/#refinement-of-selection) is used. In the above case, a `FragmentSelector` is `refinedBy` a `TextPositionSelector` and/or a `TextQuoteSelector`. The annotation below targets the passage *droppeltjes* within the 4th `paragraph` of the `letter`:
 
 ```json
 {
