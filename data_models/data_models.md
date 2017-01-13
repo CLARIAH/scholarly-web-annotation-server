@@ -1,4 +1,4 @@
-# RDFa Annotation Client
+# RDFa Annotation Client - Annotation Data Models
 
 For the RDFa Annotation Client and its communicating with the server (e.g. Alexandria) we need to establish a data model for the annotations. The idea is to base this on the [W3C Web Annotation Model](https://www.w3.org/TR/annotation-model/#web-annotation-framework).
 
@@ -296,11 +296,11 @@ The same data model can be used to annotate audiovisual resources, as long as th
 
 ## Additional properties
 
-The W3C model allows specifying agents involved in the annotation process:
-
-+ **annotation client**: e.g. client name and version, github repository,
-+ **annotation server**: e.g. server name and version, API location,
-+ **location of resource viewer**: i.e. URL of web site that displays the resource and embeds the annotation client.
++ **annotation context**: The W3C model allows specifying agents involved in the annotation process:
+  + **annotation client**: e.g. client name and version, github repository,
+  + **annotation server**: e.g. server name and version, API location,
+  + **location of resource viewer**: i.e. URL of web site that displays the resource and embeds the annotation client.
++ **Layer/Tier support**: for linguistic analysis and analysis of time-based media (e.g. video, audio), annotation tools offer annotations in tiers. Linguistic annotation is often in the form of different layers for part-of-speech tags, syllables, phonemes, phrases or named entities. This ties individual annotations together in an ordered list (e.g. the part-of-speech tags of all the words in a text, or the shot boundaries of a film). The W3C model supports the [collection of annotations as an ordered list](https://www.w3.org/TR/annotation-model/#collections). The *order* property enforces non-overlapping annotations, which fits with the typical understanding of tiered annotations in tools like [ELAN](https://tla.mpi.nl/tools/tla-tools/elan/), [Atlas.ti](http://atlasti.com/) and [NVivo](http://www.qsrinternational.com/).
 
 #### Extensions to the W3C model
 
