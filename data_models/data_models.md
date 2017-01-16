@@ -159,7 +159,7 @@ Discussion points:
 
 ## Combining fragment and text selectors
 
-It is also possible that the target is a selected text fragment that is part of sub-resource of the whole or top-level resource, e.g. a passage (text selection) in a paragraph (sub-resource) in a letter (top-level resource). 
+It is also possible that the target is a selected text fragment that is part of / sub-resource of the whole or top-level resource, e.g. a passage (text selection) in a paragraph (sub-resource) in a letter (top-level resource). 
 
 In that case [selector refinement](https://www.w3.org/TR/annotation-model/#refinement-of-selection) is used. In the above case, a `FragmentSelector` is `refinedBy` a `TextPositionSelector` and/or a `TextQuoteSelector`. The annotation below targets the passage *droppeltjes* within the 4th `paragraph` of the `letter`:
 
