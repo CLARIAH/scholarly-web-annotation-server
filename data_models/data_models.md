@@ -76,7 +76,7 @@ In the example below, the `receiver` metadata of the `letter` is the annotation 
 Discussion points:
 
 + Marijn: the reason to use a fragment selector is that the annotation target makes explicit that `urn:vangogh:let001.receiver` is part of `urn:vangogh:let001`. For retrieving annotations by resource, it's now trivial to ask the annotation server to return all annotations related to the letter `urn:vangogh:let001`. Of course, this doesn't solve retrieval of annotations for resource hierarchies with more than two levels (e.g. van Gogh letter collection > van Gogh letter > receiver, how to get all annotations for all letters in the collection from the annotation sesrver, assuming the annotation server has no knowledge of the resource hierarchy).
-+ The value of the `conformsTo` property is taken from a fixed list proposed by W3C. Perhaps it makes sense here to refer to include information from the *Van Gogh ontology* here.
++ The value of the `conformsTo` property is taken from a fixed list proposed by W3C. Perhaps it makes sense here to include information from the *Van Gogh ontology* here, to indicate that the selector targets a `Receiver` within a `Letter`.
 
 ## Text selectors
 Instead of selecting a fragment of the resource as target, a user can also select a text fragment as the target. There are two options for text selectors:
