@@ -1,6 +1,12 @@
 # IIIF Annotations
 
-Below is an example of an annotation in [IIIF](http://iiif.io/) format, taken from the British Library ([source](http://sanddragon.bl.uk/IIIFMetadataService/Cotton_MS_Claudius_B_IV.json)). Note that the annotation target is a canvas&mdash;referred to by the property `on`&mdash;and the `resource` property refers to the annotation body, which in this case is an image. 
+Below is an example of an annotation in [IIIF](http://iiif.io/) format, taken from the British Library ([source](http://sanddragon.bl.uk/IIIFMetadataService/Cotton_MS_Claudius_B_IV.json)). 
+
+Note that there are some differences between the IIIF Presentation API and the W3C Web Annotation framework:
+
++ the annotation target is a canvas, the body is an image. 
++ the annotation target is referred to by the `on` property in  IIIF, `target` in the Web Annotation model.
++  the annotation body is referred to by the `resource` property in IIIF, `body` in the Web Annotation model.
 
 More details are available in the [IIIF Presentation API specification](http://iiif.io/api/presentation/2.0/).
 
@@ -24,3 +30,5 @@ More details are available in the [IIIF Presentation API specification](http://i
     "on": "http://sanddragon.bl.uk/IIIFImageService/cotton_ms_clab4_f001r/canvas/canvas-1"
 }
 ```
+
+The IIIF protocol for [Image Resources](http://iiif.io/api/presentation/2.0/#image-resources) allows inclusion of properties from the [W3C Web Annotation framework](https://www.w3.org/TR/annotation-model/).
