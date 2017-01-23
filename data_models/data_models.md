@@ -258,7 +258,7 @@ The annotation below combines `TextPositionSelector` and `TextQuoteSelector` rep
 
 Discussion points:
 
-+ Marijn: This allows bootstrapping the alignment between information about the target stored in the annotation and the target in the resource itself. E.g. with a combination of text position and text quote it is possible to identify changes in how the resource is displayed. If the text in the displayed resource corresponding to the position selector no longer corresponds to the text in the quote selector, the client knows that RDFa structure has changed and can look for the quoted text nearest to the stored positions. 
++ Marijn: This allows bootstrapping the alignment between information about the target stored in the annotation and the target in the resource itself. E.g. with a combination of text position and text quote it is possible to identify changes in how the resource is displayed. If the text in the displayed resource corresponding to the position selector no longer corresponds to the text in the quote selector, the client knows that RDFa structure has changed and   nearest to the stored positions. 
 
 
 ## Annotating Audiovisual Resources
