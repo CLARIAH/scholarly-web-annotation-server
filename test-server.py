@@ -145,27 +145,6 @@ def get_annotations():
 
     return make_response(response_data)
 
-def request_delpher(request_url):
-    response = requests.get(request_url)
-    xml_string = re.sub("<\?xml.*?\?>", "", response.text)
-    return xmltodict.parse(xml_string, process_namespaces=False)
-
-@app.route('/api/delpher/retrieve/<urn>', methods=["GET"])
-def retrieve_delpher(urn):
-    base_url = "http://resolver.kb.nl/resolve"
-    query_params = "?urn="
-    request_url = "%s%s%s" % (base_url, query_params, urn)
-    print("GET %s" % (request_url))
-    return make_response(request_delpher(request_url))
-
-@app.route('/api/delpher/search/<query>', methods=['GET'])
-def search_delpher(query):
-    base_url = "http://jsru.kb.nl/sru/sru"
-    query_params = "?version=1.2&maximumRecords=50&operation=searchRetrieve&startRecord=0&recordSchema=ddd&x-collection=DDD_artikel&x-facets=&query="
-    request_url = "%s%s%s" % (base_url, query_params, query)
-    print("GET %s" % (request_url))
-    return make_response(request_delpher(request_url))
-
 @app.route("/api/login", methods=["POST"])
 def login():
     user_details = request.get_json()
