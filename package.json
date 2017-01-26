@@ -1,0 +1,54 @@
+{
+  "name": "annotate-rdfa",
+  "version": "1.0.0",
+  "description": "Annotation library for RDFa-enriched HTML representations of complex text objects.",
+  "main": "src/index.jsx",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:lint": "eslint . --ext .js --ext .jsx --ignore-path .eslintignore --cache",
+    "dev": "webpack -d --progress --colors --watch"
+  },
+  "keywords": [
+    "annotation",
+    "rdfa"
+  ],
+  "author": "Marijn Koolen",
+  "license": "ISC",
+  "babel": {
+    "presets": [
+      "es2015",
+      "react"
+    ]
+  },
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-cli": "^6.18.0",
+    "babel-core": "^6.18.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.16.0",
+    "css-loader": "^0.25.0",
+    "eslint": "^3.12.2",
+    "eslint-config-standard": "^6.2.1",
+    "eslint-plugin-promise": "^3.4.0",
+    "eslint-plugin-react": "^6.8.0",
+    "eslint-plugin-standard": "^2.0.1",
+    "jsx-loader": "^0.13.2",
+    "n3": "^0.9.0",
+    "rdflib": "^0.13.0",
+    "react": "^15.3.2",
+    "react-bootstrap": "^0.30.5",
+    "react-dom": "^15.3.2",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.2"
+  },
+  "dependencies": {
+    "flux": "^3.1.0",
+    "microevent": "^1.0.0",
+    "rdflib": "^0.13.0",
+    "react": "^15.3.2",
+    "react-autosuggest": "^7.0.1",
+    "react-dom": "^15.3.2",
+    "webpack": "^1.13.2"
+  }
+}
