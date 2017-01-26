@@ -5,7 +5,7 @@ Javascript annotation client for RDFa enriched web resources
 
 Clone the repository:
 ```
-git clone ...
+git clone https://github.com/marijnkoolen/rdfa-annotation-client.git
 ```
 
 Install the required npm packages:
