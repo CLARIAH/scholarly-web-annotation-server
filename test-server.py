@@ -47,6 +47,7 @@ def add_annotations_on_annotations(stored_annotations, target_annotations):
     new_ids = []
     new_annotations = []
     for annotation in stored_annotations:
+        if annotation['id'] in curr_ids: continue
         target_ids = []
         if 'target' in annotation:
             for target in annotation['target']:
