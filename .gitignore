@@ -1,5 +1,6 @@
 # generic ignore
 node_modules/
+npm-debug.log
 
 # specific ignore
 server.py
