@@ -31,16 +31,25 @@ def make_response(response_data):
     )
 
 def is_target(annotation, target_id):
-    if 'target' not in annotation:
+    targets = get_targets(annotation)
+    if not targets:
         return False
-    for target in annotation['target']:
+    for target in targets:
         if target['source'] == target_id:
             return True
-        if 'selector' not in target or 'value' not in target['selector']:
+        if 'selector' not in target or not target['selector'] or 'value' not in target['selector']:
             return False
         if target['selector']['value'] == target_id:
             return True
     return False
+
+def get_targets(annotation):
+    if 'target' not in annotation:
+        return []
+    if type(annotation['target']) == dict:
+        return [annotation['target']]
+    else:
+        return annotation['target']
 
 def add_annotations_on_annotations(stored_annotations, target_annotations):
     curr_ids = [target_annotation['id'] for target_annotation in target_annotations]
@@ -49,9 +58,8 @@ def add_annotations_on_annotations(stored_annotations, target_annotations):
     for annotation in stored_annotations:
         if annotation['id'] in curr_ids: continue
         target_ids = []
-        if 'target' in annotation:
-            for target in annotation['target']:
-                target_ids += [target['source']]
+        for target in get_targets(annotation):
+            target_ids += [target['source']]
         for target_id in target_ids:
             if target_id in curr_ids:
                 if annotation['id'] not in curr_ids and annotation['id'] not in new_ids:
