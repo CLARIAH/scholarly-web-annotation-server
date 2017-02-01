@@ -9,8 +9,8 @@ Note that there are some differences between the IIIF Presentation API and the W
 + The W3C Web Annotation model uses the <code>https://www.w3.org/ns/anno.jsonld</code> context.
 + The IIIF model uses the <code>http://iiif.io/api/presentation/2/context.json</code> context. 
 + the annotation target is a canvas, the body is an image.
-+ the annotation target is referred to by the `on` property in  IIIF, `target` in the Web Annotation model. Through their respective `@context`s, they both map to `oa:hasTarget`.
-+ the annotation body is referred to by the `resource` property in IIIF, `body` in the Web Annotation model. Through their respective `@context`s, they both map to `oa:hasBody`.
++ the annotation target is referred to by the `on` property in  IIIF, `target` in the Web Annotation model. Through their respective `@context`s, they both map to `oa:hasTarget` (see [Web Annotation Ontology](https://www.w3.org/ns/oa#)).
++ the annotation body is referred to by the `resource` property in IIIF, `body` in the Web Annotation model. Through their respective `@context`s, they both map to `oa:hasBody` (see [Web Annotation Ontology](https://www.w3.org/ns/oa#)).
 + [Segment selection](http://iiif.io/api/presentation/2.1/#segments) in a canvas is represented as an annotation.
 + Textual annotations can be incorporated as [Embedded content](http://iiif.io/api/presentation/2.1/#embedded-content) using RDF Content Representation. 
 + It is not clear whether annotations in IIIF can be nested. E.g. whether a textual annotation on a segment selection of an image requires two annotations or can be nested in a single annotation. 
