@@ -35,6 +35,7 @@ def is_target(annotation, target_id):
     if not targets:
         return False
     for target in targets:
+        print(target['source'], target_id)
         if target['source'] == target_id:
             return True
         if 'selector' not in target or not target['selector'] or 'value' not in target['selector']:
@@ -50,6 +51,25 @@ def get_targets(annotation):
         return [annotation['target']]
     else:
         return annotation['target']
+
+def resource_is_subresource(resource_id, annotation):
+    if 'body' not in annotation or type(annotation['body']) != dict:
+        return False
+    if annotation['body']['source'] != resource_id:
+        return False
+    if annotation['motivation'] != "linking":
+        return False
+    if annotation['body']['conformsTo'] != annotation['target']['conformsTo']:
+        return False
+    return True
+
+def get_resource_as_subresource_relations(resource_id, annotations):
+    relations = []
+    for annotation in annotations:
+        if resource_is_subresource(resource_id, annotation):
+            relations += [annotation]
+            relations += get_resource_as_subresource_relations(annotation['target']['source'], annotations)
+    return relations
 
 def add_annotations_on_annotations(stored_annotations, target_annotations):
     curr_ids = [target_annotation['id'] for target_annotation in target_annotations]
@@ -98,6 +118,8 @@ def get_annotations_by_target(target_id):
     done = False
     while not done:
         done = add_annotations_on_annotations(stored_annotations, target_annotations)
+    target_annotations += get_resource_as_subresource_relations(target_id, stored_annotations)
+    print(json.dumps(target_annotations, indent=4))
 
     return make_response(target_annotations)
 
