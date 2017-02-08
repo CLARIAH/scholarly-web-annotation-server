@@ -18,8 +18,8 @@ Note that there are some differences between the IIIF Presentation API and the W
 ## IIIF Resource Structure: Manifests, Sequences, ...
 
 + A `manifest` represents an object and one or more works (resources) embedded in that object. 
-+ The `sequences` property can be used to describe the order of part's-of a work, i.e. sub-resources of a resource. Each part is represented by a `canvas`. There can be multiple `sequences`. A `manifest` `MUST` embed a single sequence, additional `sequences` should be linked via an `URI`. A consequence of this approach is that a `manifest` can only represent a single `layer` of sub-resources.
-+ A `canvas` represents a single view (typically a page in IIIF context). It is a spatial (2D) concept and requires width and height. A `canvas` may contain non-image content (such as transcriptions, video/audio links) as annotations in an `oa:AnnotationList`.
++ The `sequences` property can be used to describe the order of part's-of a work, i.e. sub-resources of a resource. Each part is represented by a `canvas`. There can be multiple `sequences`. A `manifest` `MUST` embed a single sequence, additional `sequences` should be linked via an `URI`. **A consequence of this approach is that a `manifest` can only represent a single layer of sub-resources. Multi-level hierarchies have to be represented through manifests of manifests.**
++ A `canvas` represents a single view (typically a page in IIIF context). It is a spatial (2D) concept and requires width and height. Images are connected to a `canvas` via *annotations*. A `canvas` may contain non-image content (such as transcriptions, video/audio links) as annotations in an `oa:AnnotationList` via the `otherContent` property.
 + The `structures` property represents additional structural information in the form of `Range`s.
 
 Discussion:
