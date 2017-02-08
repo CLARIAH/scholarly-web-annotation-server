@@ -37,6 +37,16 @@ The IIIF Presentation API further allows incorporation of annotations based on t
 + [Segment selection](http://iiif.io/api/presentation/2.1/#segments) in a canvas is represented as an annotation.
 + Textual annotations can be incorporated as [Embedded content](http://iiif.io/api/presentation/2.1/#embedded-content) using RDF Content Representation. 
 
+## Example from e-codices
+
+Collection of collections:
+> http://www.e-codices.unifr.ch/metadata/iiif/collection.json
+
+Collection of manifests (the collection of manifests of Einsiedeln, Stiftsbibliothek):
+> http://www.e-codices.unifr.ch/metadata/iiif/collection/sbe.json
+
+Manifest (codex 109 in collection of Einsiedeln, Stiftsbibliothek):
+> http://www.e-codices.unifr.ch/metadata/iiif/sbe-0109/manifest.json
 
 **Below is old material**
 
