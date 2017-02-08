@@ -17,6 +17,8 @@ Note that there are some differences between the IIIF Presentation API and the W
 
 ## IIIF Resource Structure: Manifests, Sequences, ...
 
+This sections reviews [IIIF Presentation API section 5](http://iiif.io/api/presentation/2.1/#resource-structure) in the context of Web Annotations.
+
 + A `manifest` represents an object and one or more works (resources) embedded in that object. 
 + The `sequences` property can be used to describe the order of part's-of a work, i.e. sub-resources of a resource. Each part is represented by a `canvas`. There can be multiple `sequences`. A `manifest` `MUST` embed a single sequence, additional `sequences` should be linked via an `URI`. **A consequence of this approach is that a `manifest` can only represent a single layer of sub-resources. Multi-level hierarchies have to be represented through manifests of manifests.**
 + A `canvas` represents a single view (typically a page in IIIF context). It is a spatial (2D) concept and requires width and height. Images are connected to a `canvas` via *annotations* which `MUST` be indicated via a `motivation` with value `sc:painting` .  **Transcriptions of an image that are to be displayed `MUST` also use this same motivation. The reason is that it allows clients to determine elements are to be displayed as representations of a resource. Conceptually, this is very useful for separating annotations on a resource from annotations that indicate resource structure. **
