@@ -26,6 +26,8 @@ This sections reviews [IIIF Presentation API section 5](http://iiif.io/api/prese
 + An `Annotation List` contains annotations on an object and can (I think) be a mix of non-image representations of the object (via the `motivation: sc:painting`) and comments, i.e. annotations *on* the object.
 + A `range` is used to represented other, overlapping, structure of the object. A typical example in IIIF context is the overlapping hierarchies represented by page structure and logical structure (chapters, sections, articles) in a book or newspaper. The `members` property will probably be the only property to express membership, as `ranges` and `canvases` are likely to be deprecated in version 3.0 (see [section 5.6](http://iiif.io/api/presentation/2.1/#range)).
 + The `structures` property represents additional structural information in the form of `Range`s.
++ A `layer` represents a grouping of annotation lists (similar to groupings of annotation tiers in e.g. [ELAN](https://tla.mpi.nl/tools/tla-tools/elan/)?). Annotation lists can be part of multiple layers, so layers and annotation lists are many-to-many relations. 
++ A `collection` combines multiple manifests. **"Collection are used to list the manifests available for viewing, and to describe the structures, hierarchies or curated collections that the physical objects are part of. The collections may include both other collections and manifests, in order to form a hierarchy of objects with manifests at the leaf nodes of the tree."** ([IIIF Presentaiton API Section 5.8](http://iiif.io/api/presentation/2.1/#collection))
 
 Discussion:
 
