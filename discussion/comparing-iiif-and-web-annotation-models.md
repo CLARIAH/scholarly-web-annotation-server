@@ -33,6 +33,9 @@ Discussion:
 
 + Marijn: perhaps we can use the `manifest` concept as inspiration for representing resource structure (relations between a resource and its sub-resources).
 
+
+**Below is old material**
+
 ## Example from the British Library
 Below is an example of an annotation in [IIIF](http://iiif.io/) format, taken from the British Library ([source](http://sanddragon.bl.uk/IIIFMetadataService/Cotton_MS_Claudius_B_IV.json)).
 
