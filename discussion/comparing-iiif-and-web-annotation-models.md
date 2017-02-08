@@ -24,6 +24,7 @@ This sections reviews [IIIF Presentation API section 5](http://iiif.io/api/prese
 + A `canvas` represents a single view (typically a page in IIIF context). It is a spatial (2D) concept and requires width and height. Images are connected to a `canvas` via *annotations* which `MUST` be indicated via a `motivation` with value `sc:painting` .  **Transcriptions of an image that are to be displayed `MUST` also use this same motivation. The reason is that it allows clients to determine elements are to be displayed as representations of a resource. Conceptually, this is very useful for separating annotations on a resource from annotations that indicate resource structure. **
 + A `canvas` may contain non-image content (such as transcriptions, video/audio links) as annotations in an `oa:AnnotationList` via the `otherContent` property.
 + An `Annotation List` contains annotations on an object and can (I think) be a mix of non-image representations of the object (via the `motivation: sc:painting`) and comments, i.e. annotations *on* the object.
++ A `range` is used to represented other, overlapping, structure of the object. A typical example in IIIF context is the overlapping hierarchies represented by page structure and logical structure (chapters, sections, articles) in a book or newspaper.
 + The `structures` property represents additional structural information in the form of `Range`s.
 
 Discussion:
