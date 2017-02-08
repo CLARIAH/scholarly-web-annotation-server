@@ -4,6 +4,8 @@
 
 The [IIIF Presentation API (version 2.1)](http://iiif.io/api/presentation/2.1/) specifies how [Advanced Association Features](http://iiif.io/api/presentation/2.1/#advanced-association-features) can be incorporated as annotations based on the proposed [Open Annotation Model](http://www.openannotation.org/spec/core/), which has been superseded by the [Web Annotation Model](https://www.w3.org/TR/annotation-model/).
 
+There is international interest to extend IIIF to IXIF to cover any media type. See this [blog post at the Netherlands Institute for Sound and Vision](https://www.beeldengeluid.nl/en/blogs/research-amp-development-en/201604/interweaving-online-media-ixif). Some first steps are described in a [gist by Tom Crane of the Wellcome library](https://gist.github.com/tomcrane/7f86ac08d3b009c8af7c).
+
 Note that there are some differences between the IIIF Presentation API and the W3C Web Annotation framework:
 
 + The W3C Web Annotation model uses the <code>https://www.w3.org/ns/anno.jsonld</code> context.
@@ -13,7 +15,7 @@ Note that there are some differences between the IIIF Presentation API and the W
 + the annotation body is referred to by the `resource` property in IIIF, `body` in the Web Annotation model. Through their respective `@context`s, they both map to `oa:hasBody` (see [Web Annotation Ontology](https://www.w3.org/ns/oa#)).
 + [Segment selection](http://iiif.io/api/presentation/2.1/#segments) in a canvas is represented as an annotation.
 + Textual annotations can be incorporated as [Embedded content](http://iiif.io/api/presentation/2.1/#embedded-content) using RDF Content Representation. 
-+ It is not clear whether annotations in IIIF can be nested. E.g. whether a textual annotation on a segment selection of an image requires two annotations or can be nested in a single annotation. 
+
 
 ## IIIF Resource Structure: Manifests, Sequences, ...
 
