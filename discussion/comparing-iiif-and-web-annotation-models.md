@@ -6,17 +6,6 @@ The [IIIF Presentation API (version 2.1)](http://iiif.io/api/presentation/2.1/) 
 
 There is international interest to extend IIIF to IXIF to cover any media type. See this [blog post at the Netherlands Institute for Sound and Vision](https://www.beeldengeluid.nl/en/blogs/research-amp-development-en/201604/interweaving-online-media-ixif). Some first steps are described in a [gist by Tom Crane of the Wellcome library](https://gist.github.com/tomcrane/7f86ac08d3b009c8af7c).
 
-Note that there are some differences between the IIIF Presentation API and the W3C Web Annotation framework:
-
-+ The W3C Web Annotation model uses the <code>https://www.w3.org/ns/anno.jsonld</code> context.
-+ The IIIF model uses the <code>http://iiif.io/api/presentation/2/context.json</code> context. 
-+ the annotation target is a canvas, the body is an image.
-+ the annotation target is referred to by the `on` property in  IIIF, `target` in the Web Annotation model. Through their respective `@context`s, they both map to `oa:hasTarget` (see [Web Annotation Ontology](https://www.w3.org/ns/oa#)).
-+ the annotation body is referred to by the `resource` property in IIIF, `body` in the Web Annotation model. Through their respective `@context`s, they both map to `oa:hasBody` (see [Web Annotation Ontology](https://www.w3.org/ns/oa#)).
-+ [Segment selection](http://iiif.io/api/presentation/2.1/#segments) in a canvas is represented as an annotation.
-+ Textual annotations can be incorporated as [Embedded content](http://iiif.io/api/presentation/2.1/#embedded-content) using RDF Content Representation. 
-
-
 ## IIIF Resource Structure: Manifests, Sequences, ...
 
 This sections reviews [IIIF Presentation API section 5](http://iiif.io/api/presentation/2.1/#resource-structure) in the context of Web Annotations.
@@ -34,6 +23,19 @@ This sections reviews [IIIF Presentation API section 5](http://iiif.io/api/prese
 Discussion:
 
 + Marijn: perhaps we can use the `manifest` concept as inspiration for representing resource structure (relations between a resource and its sub-resources).
+
+
+## Advanced Association Features
+
+The IIIF Presentation API further allows incorporation of annotations based on the W3C Web Annotation framework:
+
++ The W3C Web Annotation model uses the <code>https://www.w3.org/ns/anno.jsonld</code> context.
++ The IIIF model uses the <code>http://iiif.io/api/presentation/2/context.json</code> context. 
++ the annotation target is a canvas, the body is an image.
++ the annotation target is referred to by the `on` property in  IIIF, `target` in the Web Annotation model. Through their respective `@context`s, they both map to `oa:hasTarget` (see [Web Annotation Ontology](https://www.w3.org/ns/oa#)).
++ the annotation body is referred to by the `resource` property in IIIF, `body` in the Web Annotation model. Through their respective `@context`s, they both map to `oa:hasBody` (see [Web Annotation Ontology](https://www.w3.org/ns/oa#)).
++ [Segment selection](http://iiif.io/api/presentation/2.1/#segments) in a canvas is represented as an annotation.
++ Textual annotations can be incorporated as [Embedded content](http://iiif.io/api/presentation/2.1/#embedded-content) using RDF Content Representation. 
 
 
 **Below is old material**
