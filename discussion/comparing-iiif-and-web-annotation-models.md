@@ -15,6 +15,11 @@ Note that there are some differences between the IIIF Presentation API and the W
 + Textual annotations can be incorporated as [Embedded content](http://iiif.io/api/presentation/2.1/#embedded-content) using RDF Content Representation. 
 + It is not clear whether annotations in IIIF can be nested. E.g. whether a textual annotation on a segment selection of an image requires two annotations or can be nested in a single annotation. 
 
+## Manifests and sequences
+
++ A `manifest` represents an object and one or more works (resources) embedded in that object. 
++ The `sequences` property can be used to describe the order of part's-of a work, i.e. sub-resources of a resource. Each part is represented by a `canvas`. There can be multiple `sequences`. A `manifest` `MUST` embed a single sequence, additional `sequences` should be linked via an `URI`. A consequence of this approach is that a `manifest` can only represent a single `layer` of sub-resources.
++ The `structures` property represents additional structural information in the form of `Range`s.
 
 ## Example from the British Library
 Below is an example of an annotation in [IIIF](http://iiif.io/) format, taken from the British Library ([source](http://sanddragon.bl.uk/IIIFMetadataService/Cotton_MS_Claudius_B_IV.json)).
