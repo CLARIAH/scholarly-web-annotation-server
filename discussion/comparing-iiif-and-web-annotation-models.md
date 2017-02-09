@@ -4,7 +4,30 @@
 
 The [IIIF Presentation API (version 2.1)](http://iiif.io/api/presentation/2.1/) specifies how [Advanced Association Features](http://iiif.io/api/presentation/2.1/#advanced-association-features) can be incorporated as annotations based on the proposed [Open Annotation Model](http://www.openannotation.org/spec/core/), which has been superseded by the [Web Annotation Model](https://www.w3.org/TR/annotation-model/).
 
-Note that there are some differences between the IIIF Presentation API and the W3C Web Annotation framework:
+There is international interest to extend IIIF to IXIF to cover any media type. See this [blog post at the Netherlands Institute for Sound and Vision](https://www.beeldengeluid.nl/en/blogs/research-amp-development-en/201604/interweaving-online-media-ixif). Some first steps are described in a [gist by Tom Crane of the Wellcome library](https://gist.github.com/tomcrane/7f86ac08d3b009c8af7c).
+
+## IIIF Resource Structure: Manifests, Sequences, ...
+
+This sections reviews [IIIF Presentation API section 5](http://iiif.io/api/presentation/2.1/#resource-structure) in the context of Web Annotations.
+
++ A `manifest` represents an object and one or more works (resources) embedded in that object. 
++ The `sequences` property can be used to describe the order of part's-of a work, i.e. sub-resources of a resource. Each part is represented by a `canvas`. There can be multiple `sequences`. A `manifest` `MUST` embed a single sequence, additional `sequences` should be linked via an `URI`. **A consequence of this approach is that a `manifest` can only represent a single layer of sub-resources. Multi-level hierarchies have to be represented through manifests of manifests.**
++ A `canvas` represents a single view (typically a page in IIIF context). It is a spatial (2D) concept and requires width and height. Images are connected to a `canvas` via *annotations* which `MUST` be indicated via a `motivation` with value `sc:painting` .  **Transcriptions of an image that are to be displayed `MUST` also use this same motivation. The reason is that it allows clients to determine elements are to be displayed as representations of a resource. Conceptually, this is very useful for separating annotations on a resource from annotations that indicate resource structure. **
++ A `canvas` may contain non-image content (such as transcriptions, video/audio links) as annotations in an `oa:AnnotationList` via the `otherContent` property.
++ An `Annotation List` contains annotations on an object and can (I think) be a mix of non-image representations of the object (via the `motivation: sc:painting`) and comments, i.e. annotations *on* the object.
++ A `range` is used to represented other, overlapping, structure of the object. A typical example in IIIF context is the overlapping hierarchies represented by page structure and logical structure (chapters, sections, articles) in a book or newspaper. The `members` property will probably be the only property to express membership, as `ranges` and `canvases` are likely to be deprecated in version 3.0 (see [section 5.6](http://iiif.io/api/presentation/2.1/#range)).
++ The `structures` property represents additional structural information in the form of `Range`s.
++ A `layer` represents a grouping of annotation lists (similar to groupings of annotation tiers in e.g. [ELAN](https://tla.mpi.nl/tools/tla-tools/elan/)?). Annotation lists can be part of multiple layers, so layers and annotation lists are many-to-many relations. 
++ A `collection` combines multiple manifests. **"Collection are used to list the manifests available for viewing, and to describe the structures, hierarchies or curated collections that the physical objects are part of. The collections may include both other collections and manifests, in order to form a hierarchy of objects with manifests at the leaf nodes of the tree."** ([IIIF Presentaiton API Section 5.8](http://iiif.io/api/presentation/2.1/#collection))
+
+Discussion:
+
++ Marijn: perhaps we can use the `manifest` concept as inspiration for representing resource structure (relations between a resource and its sub-resources).
+
+
+## Advanced Association Features
+
+The IIIF Presentation API further allows incorporation of annotations based on the W3C Web Annotation framework:
 
 + The W3C Web Annotation model uses the <code>https://www.w3.org/ns/anno.jsonld</code> context.
 + The IIIF model uses the <code>http://iiif.io/api/presentation/2/context.json</code> context. 
@@ -13,8 +36,19 @@ Note that there are some differences between the IIIF Presentation API and the W
 + the annotation body is referred to by the `resource` property in IIIF, `body` in the Web Annotation model. Through their respective `@context`s, they both map to `oa:hasBody` (see [Web Annotation Ontology](https://www.w3.org/ns/oa#)).
 + [Segment selection](http://iiif.io/api/presentation/2.1/#segments) in a canvas is represented as an annotation.
 + Textual annotations can be incorporated as [Embedded content](http://iiif.io/api/presentation/2.1/#embedded-content) using RDF Content Representation. 
-+ It is not clear whether annotations in IIIF can be nested. E.g. whether a textual annotation on a segment selection of an image requires two annotations or can be nested in a single annotation. 
 
+## Example from e-codices
+
+Collection of collections:
+> http://www.e-codices.unifr.ch/metadata/iiif/collection.json
+
+Collection of manifests (the collection of manifests of Einsiedeln, Stiftsbibliothek):
+> http://www.e-codices.unifr.ch/metadata/iiif/collection/sbe.json
+
+Manifest (codex 109 in collection of Einsiedeln, Stiftsbibliothek):
+> http://www.e-codices.unifr.ch/metadata/iiif/sbe-0109/manifest.json
+
+**Below is old material**
 
 ## Example from the British Library
 Below is an example of an annotation in [IIIF](http://iiif.io/) format, taken from the British Library ([source](http://sanddragon.bl.uk/IIIFMetadataService/Cotton_MS_Claudius_B_IV.json)).
