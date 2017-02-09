@@ -12,7 +12,7 @@ import uuid
 import time
 import json
 import os
-import requests
+#import requests
 import xmltodict
 import re
 from flask import Flask, Response, request
@@ -35,7 +35,6 @@ def is_target(annotation, target_id):
     if not targets:
         return False
     for target in targets:
-        print(target['source'], target_id)
         if target['source'] == target_id:
             return True
         if 'selector' not in target or not target['selector'] or 'value' not in target['selector']:
@@ -63,13 +62,39 @@ def resource_is_subresource(resource_id, annotation):
         return False
     return True
 
-def get_resource_as_subresource_relations(resource_id, annotations):
+def resource_has_subresource(resource_id, annotation):
+    if 'target' not in annotation or type(annotation['target']) != dict:
+        return False
+    if annotation['target']['source'] != resource_id:
+        return False
+    if annotation['motivation'] != "linking":
+        return False
+    if annotation['target']['conformsTo'] != annotation['body']['conformsTo']:
+        return False
+    return True
+
+def get_superresource_relations(resource_id, annotations):
     relations = []
     for annotation in annotations:
         if resource_is_subresource(resource_id, annotation):
             relations += [annotation]
-            relations += get_resource_as_subresource_relations(annotation['target']['source'], annotations)
+            relations += get_superresource_relations(annotation['target']['source'], annotations)
     return relations
+
+def get_subresource_relations(resource_id, annotations):
+    relations = []
+    for annotation in annotations:
+        if resource_has_subresource(resource_id, annotation):
+            relations += [annotation]
+            relations += get_subresource_relations(annotation['body']['source'], annotations)
+    return relations
+
+def get_resource_ids(target_annotations):
+    resource_ids = []
+    for annotation in target_annotations:
+        resource_ids.append(annotation['target']['source'])
+        resource_ids.append(annotation['body']['source'])
+    return resource_ids
 
 def add_annotations_on_annotations(stored_annotations, target_annotations):
     curr_ids = [target_annotation['id'] for target_annotation in target_annotations]
@@ -109,17 +134,20 @@ def get_annotations_by_target(target_id):
     except FileNotFoundError:
         stored_annotations = []
 
-    target_annotations = []
+    target_annotations = get_subresource_relations(target_id, stored_annotations)
+    resource_ids = get_resource_ids(target_annotations)
 
-    for annotation in stored_annotations:
-        if is_target(annotation, target_id):
-            target_annotations += [annotation]
+    for resource_id in resource_ids:
+        for annotation in stored_annotations:
+            if annotation in target_annotations:
+                continue
+            if is_target(annotation, resource_id):
+                target_annotations += [annotation]
 
     done = False
     while not done:
         done = add_annotations_on_annotations(stored_annotations, target_annotations)
-    target_annotations += get_resource_as_subresource_relations(target_id, stored_annotations)
-    print(json.dumps(target_annotations, indent=4))
+    #print(json.dumps(target_annotations, indent=4))
 
     return make_response(target_annotations)
 
