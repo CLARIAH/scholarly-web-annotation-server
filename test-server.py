@@ -15,10 +15,27 @@ import os
 #import requests
 import xmltodict
 import re
+from annotation import validate_annotation
 from flask import Flask, Response, request
+from flask import jsonify
 
 app = Flask(__name__, static_url_path='', static_folder='public')
 app.add_url_rule('/', 'root', lambda: app.send_static_file('testletter.html'))
+
+class InvalidAnnotation(Exception):
+    status_code = 400
+
+    def __init__(self, message, status_code=None, payload=None):
+        Exception.__init__(self)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
 
 def make_response(response_data):
     return Response(
@@ -124,6 +141,12 @@ def update_annotation(annotations, updated_annotation):
             annotations.remove(annotation)
             annotations.insert(index, updated_annotation)
 
+@app.errorhandler(InvalidAnnotation)
+def handle_invalid_annotation(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
+
 @app.route('/api/annotations/target/<target_id>', methods=['GET'])
 def get_annotations_by_target(target_id):
     annotations_file = "data/annotations.json"
@@ -191,6 +214,9 @@ def get_annotations():
 
     if request.method == 'POST':
         new_annotation = request.get_json()
+        validation = validate_annotation(new_annotation)
+        if validation.valid == False:
+            raise InvalidAnnotation(validation.message, status_code=400)
         new_annotation['id'] = uuid.uuid4().urn
         new_annotation['created'] = int(time.time())
         annotations.append(new_annotation)
