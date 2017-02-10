@@ -15,27 +15,12 @@ import os
 #import requests
 import xmltodict
 import re
-from annotation import validate_annotation
+from annotation import validate_annotation, InvalidAnnotation, AnnotationDoesNotExistError
 from flask import Flask, Response, request
 from flask import jsonify
 
 app = Flask(__name__, static_url_path='', static_folder='public')
 app.add_url_rule('/', 'root', lambda: app.send_static_file('testletter.html'))
-
-class InvalidAnnotation(Exception):
-    status_code = 400
-
-    def __init__(self, message, status_code=None, payload=None):
-        Exception.__init__(self)
-        self.message = message
-        if status_code is not None:
-            self.status_code = status_code
-        self.payload = payload
-
-    def to_dict(self):
-        rv = dict(self.payload or ())
-        rv['message'] = self.message
-        return rv
 
 def make_response(response_data):
     return Response(
@@ -46,6 +31,12 @@ def make_response(response_data):
             'Access-Control-Allow-Origin': '*'
         }
     )
+
+def find_annotation(annotations, annotation_id):
+    for index, annotation in enumerate(annotations):
+        if annotation['id'] == annotation_id:
+            return annotation
+    return None
 
 def is_target(annotation, target_id):
     targets = get_targets(annotation)
@@ -141,6 +132,12 @@ def update_annotation(annotations, updated_annotation):
             annotations.remove(annotation)
             annotations.insert(index, updated_annotation)
 
+@app.errorhandler(AnnotationDoesNotExistError)
+def handle_no_such_annotation(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
+
 @app.errorhandler(InvalidAnnotation)
 def handle_invalid_annotation(error):
     response = jsonify(error.to_dict())
@@ -183,20 +180,23 @@ def get_annotation_by_id(annotation_id):
     except FileNotFoundError:
         annotations = []
 
-    response_data = annotations
+    response_data = None
 
-    for index, annotation in enumerate(annotations):
-        if annotation['id'] == annotation_id:
-            if request.method == 'GET':
-                response_data = annotation
-            if request.method == 'PUT':
-                edited_annotation = request.get_json()
-                update_annotation(annotations, edited_annotation)
-                response_data = edited_annotation
-                print("updating annotation")
-            if request.method == 'DELETE':
-                annotations.remove(annotation)
-                print("removing annotation")
+    annotation = find_annotation(annotations, annotation_id)
+    if not annotation:
+        raise AnnotationDoesNotExistError(annotation_id, status_code=404)
+    response_data = annotation
+    if request.method == 'PUT':
+        edited_annotation = request.get_json()
+        validation = validate_annotation(edited_annotation)
+        if validation.status == False:
+            raise InvalidAnnotation(validation.message, status_code=400)
+        update_annotation(annotations, edited_annotation)
+        response_data = edited_annotation
+        print("updating annotation")
+    if request.method == 'DELETE':
+        annotations.remove(annotation)
+        print("removing annotation")
 
     with open(annotations_file, 'w') as f:
         f.write(json.dumps(annotations, indent=4, separators=(',', ': ')))
@@ -219,6 +219,7 @@ def get_annotations():
             raise InvalidAnnotation(validation.message, status_code=400)
         new_annotation['id'] = uuid.uuid4().urn
         new_annotation['created'] = int(time.time())
+        #print(new_annotation)
         annotations.append(new_annotation)
         response_data = new_annotation
 
