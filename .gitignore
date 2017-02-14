@@ -1,6 +1,7 @@
 # generic ignore
 node_modules/
 npm-debug.log
+*.pyc
 
 # specific ignore
 server.py
