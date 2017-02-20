@@ -1,6 +1,8 @@
 import json
-import time
+import datetime
+import pytz
 import uuid
+from rfc3987 import parse as parse_IRI
 from collections import defaultdict
 
 class AnnotationValidator(object):
@@ -20,13 +22,20 @@ class AnnotationValidator(object):
 
         if 'target' not in annotation:
             raise InvalidAnnotation(message='annotation MUST have at least one target')
-        if type(annotation['target']) != list:
-            targets = [annotation['target']]
-        else:
-            targets = annotation['target']
-        for target in targets:
-            if type(target) == dict and 'id' not in target:
-                raise InvalidAnnotation(message='External annotation targets MUST have an "id" property')
+        for target in self.as_list(annotation['target']):
+            target_id = None
+            if type(target) == str: target_id = target
+            elif type(target) == dict:
+                if 'id' in target: target_id = target['id']
+                elif 'source' in target: target_id = target['source']
+            else:
+                # there is no identifier for the target
+                raise InvalidAnnotation(message='External annotation target MUST have an IRI identifier')
+            try:
+                # id must be an IRI
+                parse_IRI(target_id, rule="IRI")
+            except ValueError:
+                raise InvalidAnnotation(message='annotation target id MUST be an IRI')
         return True
 
     def as_list(self, value):
@@ -38,7 +47,7 @@ class Annotation(object):
 
     def __init__(self, annotation):
         annotation['id'] = uuid.uuid4().urn
-        annotation['created'] = int(time.time())
+        annotation['created'] = datetime.datetime.now(pytz.utc).isoformat()
         self.validator = AnnotationValidator()
         self.validator.validate(annotation)
         self.type = self.determine_type(annotation)
@@ -74,12 +83,14 @@ class Annotation(object):
         if type(target) == str:
             return target
         if type(target) == dict:
-            return target['id']
+            if 'id' in target:
+                return target['id']
+            return target['source']
 
     def update(self, updated_annotation):
         self.validator.validate(updated_annotation)
         if self.id == updated_annotation['id']:
-            updated_annotation['modified'] = int(time.time())
+            updated_annotation['modified'] = datetime.datetime.now(pytz.utc).isoformat()
             self.data = updated_annotation
         else:
             raise InvalidAnnotation(message="ID of updated annotation does not match ID of existing annotation")
@@ -108,24 +119,34 @@ class AnnotationStore(object):
         for annotation in annotations:
             self.add(annotation)
 
+    def add_bulk(self, annotations):
+        added = []
+        for annotation in annotations:
+            added += [self.add(annotation)]
+        return added
+
     def add(self, annotation):
         # make a new annotation object
         anno = Annotation(annotation)
         # do nothing if annotation already exists
         if self.exists(anno.id):
-            return False
+            return None
         # add annotation to index
         self.index[anno.id] = anno
         # add annotation targets to target_index
         for target_id in anno.get_target_ids():
             self.target_index[target_id] += [anno.id]
+        return anno.data
+
+    def get(self, annotation_id):
+        try:
+            return self.index[annotation_id].data
+        except KeyError:
+            raise AnnotationDoesNotExistError(annotation_id)
 
     def remove(self, annotation_id):
-        # check if annotation exists
-        if not self.exists(annotation_id):
-            raise AnnotationDoesNotExistError(annotation_id)
+        annotation = self.get(annotation_id) # raises if not exists
         # first remove annotation from target_index
-        annotation = self.get(annotation_id)
         for target_id in self.index[annotation_id].get_target_ids():
             self.target_index[target_id].remove(annotation_id)
             if self.target_index[target_id] == []:
@@ -138,15 +159,12 @@ class AnnotationStore(object):
         try:
             annotation = self.index[updated_annotation['id']]
             annotation.update(updated_annotation)
-        except IndexError:
+            return annotation.data
+        except KeyError:
             raise AnnotationDoesNotExistError(updated_annotation['id'])
-        return annotation
 
     def ids(self):
         return list(self.index.keys())
-
-    def get(self, annotation_id):
-        return self.index[annotation_id]
 
     def get_type(self, annotation_id):
         return self.index[annotation_id].type
