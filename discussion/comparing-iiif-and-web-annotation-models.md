@@ -32,7 +32,10 @@ Below is an attempt to model the structure of a van Gogh letter in representatio
 #### The whole letter as collection:
 ```json
 {
-  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@context": [
+    "http://iiif.io/api/presentation/2/context.json",
+    "http://wellcomelibrary.org/ixif/0/context.json"
+  ],
   "@id": "urn:vangogh:letter001.collection",
   "@type": "sc:Collection",
   "label": "Letter Level Collection for Van Gogh letter",
@@ -70,14 +73,21 @@ Below is an attempt to model the structure of a van Gogh letter in representatio
 }
 ```
 
+**Note**:
+
++ There are two contexts, one for properties borrowed from IIIF, one for properties taken from the draft IXIF model.
+
 #### The sender as manifest:
 
 ```json
 {
-  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@context": [
+    "http://iiif.io/api/presentation/2/context.json",
+    "http://wellcomelibrary.org/ixif/0/context.json"
+  ],
   "@id": "urn:vangogh:letter001:sender.manifest",
   "@type": "sc:Manifest",
-  "label": "Sender Level Manifest for Van Gogh letter",
+  "label": "Sender Level Manifest for Van Gogh letter 001",
   "viewingHint": "top",
   "description": "Description of Sender",
   "attribution": "Provided by Huygens/ING",
@@ -87,8 +97,9 @@ Below is an attempt to model the structure of a van Gogh letter in representatio
   ],
   "mediaSequences": [
     {
-      "@id": "
+      "@id": "urn:vangogh:letter001:sender.sequence",
       "type": "ixif:mediaSequence",
+      "label": "Letter 001 Sender sequence"
       "elements": [
         {
           "@id": "urn:vangogh:letter001.sender",
@@ -117,6 +128,14 @@ Below is an attempt to model the structure of a van Gogh letter in representatio
 
 + the `sequence` property is used by viewers to determine which sequences represent image view. We shouldn't reuse `sequence` for other purposes because in the IIIF model, that has the explicit semantics of "coherent sequence of images". There current placeholder and hint as suggested by Tom Crane, so that image viewers have something to display.
 + the `mediaSequence` is not part of IIIF but a proposed IXIF property. It is used to represent media objects that are not (necessarily) images.
+
+
+#### The translation as sub-collection:
+
+```json
+{
+ "@context": 
+```
 
 ## Advanced Association Features
 
