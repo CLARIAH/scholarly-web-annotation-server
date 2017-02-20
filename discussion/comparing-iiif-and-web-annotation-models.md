@@ -47,27 +47,27 @@ Below is an attempt to model the structure of a van Gogh letter in representatio
     {
       "@id": "urn:vangogh:letter001:sender.manifest",
       "@type": "sc:Manifest",
-      "label": "Sender manifest",
+      "label": "Letter 001 Sender manifest",
     },
     {
       "@id": "urn:vangogh:letter001:receiver.manifest",
       "@type": "sc:Manifest",
-      "label": "Receiver manifest",
+      "label": "Letter 001 Receiver manifest",
     },
     {
       "@id": "urn:vangogh:letter001:date.manifest",
       "@type": "sc:Manifest",
-      "label": "Date manifest",
+      "label": "Letter 001 Date manifest",
     },
     {
       "@id": "urn:vangogh:letter001:p:1.manifest",
       "@type": "sc:Manifest",
-      "label": "ParagraphInLetter 1 manifest",
+      "label": "Letter 001 ParagraphInLetter 1 manifest",
     },
     {
       "@id": "urn:vangogh:letter001:trans.collection",
       "@type": "sc:Collection",
-      "label": "Translation collection",
+      "label": "Letter 001 Translation collection",
     },
   ]
 }
@@ -104,7 +104,7 @@ Below is an attempt to model the structure of a van Gogh letter in representatio
         {
           "@id": "urn:vangogh:letter001.sender",
           "type": "vg:Sender",
-          "label": "Sender"
+          "label": "Letter 001 Sender"
         }
       ]
     }
@@ -134,7 +134,41 @@ Below is an attempt to model the structure of a van Gogh letter in representatio
 
 ```json
 {
- "@context": 
+  "@context": [
+    "http://iiif.io/api/presentation/2/context.json",
+    "http://wellcomelibrary.org/ixif/0/context.json"
+  ],
+  "@id": "urn:vangogh:letter001:trans.collection",
+  "@type": "sc:Collection",
+  "label": "Translation Level Collection for Van Gogh letter 001",
+  "viewingHint": "top",
+  "description": "Description of Translation of van Gogh Letter 001",
+  "attribution": "Provided by Huygens/ING",
+
+  "members": [
+    {
+      "@id": "urn:vangogh:letter001:trans:p1.manifest",
+      "@type": "sc:Manifest",
+      "label": "Letter 001 Translation Paragraph 1 manifest",
+    },
+    {
+      "@id": "urn:vangogh:letter001:trans:p2.manifest",
+      "@type": "sc:Manifest",
+      "label": "Letter 001 Translation Paragraph 2 manifest",    },
+    {
+      "@id": "urn:vangogh:letter001:trans:p3.manifest",
+      "@type": "sc:Manifest",
+      "label": "Letter 001 Translation Paragraph 3 manifest",    },
+    {
+      "@id": "urn:vangogh:letter001:trans:p4.manifest",
+      "@type": "sc:Manifest",
+      "label": "Letter 001 Translation Paragraph 4 manifest",    },
+    {
+      "@id": "urn:vangogh:letter001:trans:p5.manifest",
+      "@type": "sc:Manifest",
+      "label": "Letter 001 Translation Paragraph 5 manifest",    },
+  ]
+} 
 ```
 
 ## Advanced Association Features
