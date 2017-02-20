@@ -4,7 +4,7 @@
 
 The [IIIF Presentation API (version 2.1)](http://iiif.io/api/presentation/2.1/) specifies how [Advanced Association Features](http://iiif.io/api/presentation/2.1/#advanced-association-features) can be incorporated as annotations based on the proposed [Open Annotation Model](http://www.openannotation.org/spec/core/), which has been superseded by the [Web Annotation Model](https://www.w3.org/TR/annotation-model/).
 
-There is international interest to extend IIIF to IXIF to cover any media type. See this [blog post at the Netherlands Institute for Sound and Vision](https://www.beeldengeluid.nl/en/blogs/research-amp-development-en/201604/interweaving-online-media-ixif). Some first steps are described in a [gist by Tom Crane of the Wellcome library](https://gist.github.com/tomcrane/7f86ac08d3b009c8af7c).
+There is international interest to extend IIIF to IXIF to cover any media type. See this [blog post at the Netherlands Institute for Sound and Vision](https://www.beeldengeluid.nl/en/blogs/research-amp-development-en/201604/interweaving-online-media-ixif). Some first steps are described in a [gist by Tom Crane of the Wellcome library](https://gist.github.com/tomcrane/7f86ac08d3b009c8af7c). The Wellcome library also worked on the [Universal Viewer](https://universalviewer.io/), which supports IXIF "out of the box".
 
 ## IIIF Resource Structure: Manifests, Sequences, ...
 
@@ -24,6 +24,99 @@ Discussion:
 
 + Marijn: perhaps we can use the `manifest` concept as inspiration for representing resource structure (relations between a resource and its sub-resources).
 
+
+## Resource Hierarchies as Collections and Manifests
+
+Below is an attempt to model the structure of a van Gogh letter in representations of IIIF collections and manifests.
+
+#### The whole letter as collection:
+```json
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "urn:vangogh:letter001.collection",
+  "@type": "sc:Collection",
+  "label": "Letter Level Collection for Van Gogh letter",
+  "viewingHint": "top",
+  "description": "Description of Letter",
+  "attribution": "Provided by Huygens/ING",
+
+  "members": [
+    {
+      "@id": "urn:vangogh:letter001:sender.manifest",
+      "@type": "sc:Manifest",
+      "label": "Sender manifest",
+    },
+    {
+      "@id": "urn:vangogh:letter001:receiver.manifest",
+      "@type": "sc:Manifest",
+      "label": "Receiver manifest",
+    },
+    {
+      "@id": "urn:vangogh:letter001:date.manifest",
+      "@type": "sc:Manifest",
+      "label": "Date manifest",
+    },
+    {
+      "@id": "urn:vangogh:letter001:p:1.manifest",
+      "@type": "sc:Manifest",
+      "label": "ParagraphInLetter 1 manifest",
+    },
+    {
+      "@id": "urn:vangogh:letter001:trans.collection",
+      "@type": "sc:Collection",
+      "label": "Translation collection",
+    },
+  ]
+}
+```
+
+#### The sender as manifest:
+
+```json
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "urn:vangogh:letter001:sender.manifest",
+  "@type": "sc:Manifest",
+  "label": "Sender Level Manifest for Van Gogh letter",
+  "viewingHint": "top",
+  "description": "Description of Sender",
+  "attribution": "Provided by Huygens/ING",
+  "metadata": [
+    { "label": "type", "value": "Sender" },
+    { "label": "property", "value": "hasMetadataItem" }
+  ],
+  "mediaSequences": [
+    {
+      "@id": "
+      "type": "ixif:mediaSequence",
+      "elements": [
+        {
+          "@id": "urn:vangogh:letter001.sender",
+          "type": "vg:Sender",
+          "label": "Sender"
+        }
+      ]
+    }
+  ],
+  "sequences": [
+  {
+    "@id": "http://wellcomelibrary.org/iiif/ixif-message/sequence/seq",
+    "@type": "sc:Sequence",
+    "label": "Unsupported extension. This manifest is being used as a wrapper for non-IIIF content (e.g., audio, video) and is unfortunately incompatible with IIIF viewers.",
+    "compatibilityHint": "displayIfContentUnsupported",
+    "canvases": [
+      {
+        //... a placeholder image for other viewers to look at...
+      }
+    ]
+  }
+}
+```
+
+**Note**: 
+
++ the `sequence` property is used by viewers to determine which sequences represent image view. We shouldn't reuse `sequence` for other purposes because in the IIIF model, that has the explicit semantics of "coherent sequence of images". There current placeholder and hint as suggested by Tom Crane, so that image viewers have something to display.
++ the `mediaSequence` is not part of IIIF but a proposed IXIF property. It is used to represent media objects that are not (necessarily) images.
 
 ## Advanced Association Features
 
