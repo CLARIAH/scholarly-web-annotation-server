@@ -1,5 +1,15 @@
 # IIIF Annotations
 
+This document describes the IIIF Presentation API as a potential vehicle for RDFa enriched multimedia resource annotation.
+
+Table of Contents:
+
++ [Background](#background)
++ [IIIF Resource Representation](#iiif_representation)
++ [Resource Hierarchies as IIIF Collections and Manifests](#iiif_model)
++ [Existing IIIF Image Collection Examples](#iiif_examples)
+
+<a name="background"></a>
 ## IIIF and Web Annotations
 
 The [IIIF Presentation API (version 2.1)](http://iiif.io/api/presentation/2.1/) specifies how [Advanced Association Features](http://iiif.io/api/presentation/2.1/#advanced-association-features) can be incorporated as annotations based on the proposed [Open Annotation Model](http://www.openannotation.org/spec/core/), which has been superseded by the [Web Annotation Model](https://www.w3.org/TR/annotation-model/).
@@ -24,8 +34,8 @@ Discussion:
 
 + Marijn: perhaps we can use the `manifest` concept as inspiration for representing resource structure (relations between a resource and its sub-resources).
 
-
-## Resource Hierarchies as Collections and Manifests
+<a name="iiif_model"></a>
+## Resource Hierarchies as IIIF Collections and Manifests
 
 Below is an attempt to model the structure of a van Gogh letter in representations of IIIF collections and manifests.
 
@@ -183,7 +193,10 @@ The IIIF Presentation API further allows incorporation of annotations based on t
 + [Segment selection](http://iiif.io/api/presentation/2.1/#segments) in a canvas is represented as an annotation.
 + Textual annotations can be incorporated as [Embedded content](http://iiif.io/api/presentation/2.1/#embedded-content) using RDF Content Representation. 
 
-## Example from e-codices
+<a name="iiif_examples"></a>
+## Existing IIIF Image Collection Examples
+
+#### Example from e-codices
 
 Collection of collections:
 > http://www.e-codices.unifr.ch/metadata/iiif/collection.json
@@ -194,9 +207,7 @@ Collection of manifests (the collection of manifests of Einsiedeln, Stiftsbiblio
 Manifest (codex 109 in collection of Einsiedeln, Stiftsbibliothek):
 > http://www.e-codices.unifr.ch/metadata/iiif/sbe-0109/manifest.json
 
-**Below is old material**
-
-## Example from the British Library
+#### Example from the British Library
 Below is an example of an annotation in [IIIF](http://iiif.io/) format, taken from the British Library ([source](http://sanddragon.bl.uk/IIIFMetadataService/Cotton_MS_Claudius_B_IV.json)).
 
 More details are available in the [IIIF Presentation API specification](http://iiif.io/api/presentation/2.0/).
