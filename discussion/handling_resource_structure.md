@@ -75,8 +75,9 @@ Example:
 ```
 
 + *pros*: 
-	+ *Simplicity*: single data structure for exchange
-	+ *Interpretation*: annotations require less context for interpretation
+	+ *Simplicity*: It uses a single data structure for exchange.
+	+ *Interpretation*: annotations require less context for interpretation.
+	+ *Standards*: Only the W3C Web Annotation standard is used. No home-grown models are used.
 + *cons*:
 	+ *Separation of concerns*: server cannot reason over structure outside of annotations, should check for consistency across annotations with targets that share structural elements. 
 	+ *Conciseness*: annotations contain more structural information than necessary for many contexts
@@ -142,16 +143,16 @@ Example structural relation:
 ```
 
 
-*pros*:
++ *pros*:
+	+ *Simplicity*: all representations are W3C annotations.
+	+ *Redundancy*: Each relation is stored only once, resulting in low redundancy.
+	+ *Conciseness*: Lazy storing of resource structure, i.e. only the structural relations of annotated (sub-)resources are stored. 
+	+ *Standards*: Only the W3C Web Annotation standard is used. No home-grown models are used.
 
-+ *Simplicity*: all representations are W3C annotations.
-+ *Redundancy*: Each relation is stored only once, resulting in low redundancy.
-+ *Conciseness*: Lazy storing of resource structure, i.e. only the structural relations of annotated (sub-)resources are stored. 
-
-*Cons*:
-
-+ *Conciseness*: each structural relation is sent as a separate representation with unnecessary W3C annotation metadata. 
-+ *Separation of concerns*: The representations do no reflect the different natures of annotations and structural relations.
++ *Cons*:
+	+ *Conciseness*: each structural relation is sent as a separate representation with unnecessary W3C annotation metadata. 
+	+ *Separation of concerns*: The representations do no reflect the different natures of annotations and structural relations.
+	+ *Standards*: The Web Annotation model is used differently from its intended purpose, namely to describe structural information.
 
 
 
@@ -166,7 +167,7 @@ There are multiple options for exchanging structural information between annotat
 + *Pro-active, complete, composite*: client sends whole resource structure to server, either upon loading a resource, regardless of whether a user makes an annotation, 
 + *Lazy, complete, composite*: client sends whole resource structure to server together with a new or updated annotation, regardless of which (sub-)resource is the annotation target. 
 
-#### 3. Structural representation via Annotatable Thing Ontology:
+#### 1. Structural representation via Annotatable Thing Ontology:
 
 ```json
 {
@@ -221,6 +222,12 @@ There are multiple options for exchanging structural information between annotat
   ]
 }
 ```
+
++ *Pros*:
+	+ *Simplicity*: the structural representation can lean entirely on the ontology used to describe the resource (responsibility of the resource server).
+	+ *Conciseness*: the structural representation only contains structural information. In the above example it is possible to leave out the `@type` information to leave only the relationship information.
++ *Cons*:
+	+ *Standards*: It introduces a new ontology. **Note**: it is possible for resource/edition servers to use existing ontologies (e.g. Schema.org) 
 
 #### 2. Structural representation via IIIF
 
