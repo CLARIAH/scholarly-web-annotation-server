@@ -226,6 +226,13 @@ There are multiple options for exchanging structural information between annotat
 
 An example has been worked out in the IIIF analysis document, in the section [IIIF Collections and Manifests](https://github.com/marijnkoolen/rdfa-annotation-client/blob/master/discussion/comparing-iiif-and-web-annotation-models.md#iiif_model).
 
++ *Pros*:
+	+ *Standards*: makes use of existing standard for representing structure. 
++ *Cons*:
+	+ *Standards*: uses standard for other than intended purpose (IIIF Presentation API is intended for image viewers to understand structure of images representing an object).
+	+ *Simplicity*: It introduces two types of structural elements, i.e. collections and manifests.
+	+ *Conciseness*: The IIIF model generates a lot of overhead to represent simple relationships, mainly because it is intended to provide display information in manifests.
+
 
 #### 3. Structural representation via [Schema.org]()
 
