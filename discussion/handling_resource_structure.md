@@ -38,7 +38,7 @@ There are two general approaches to representing the resource structure in the c
 3. **Structure as separate model**: representing structural relation information in a separate data model.
 
 
-#### 1. Embedded
+### 1. Embedded
 
 Each annotation contains the structure information about the resource in the annotation target, using selectors and refinements.
 
@@ -86,7 +86,7 @@ Example:
 
 
 
-#### 2. Structure as annotation
+### 2. Structure as annotation
 
 A structural relation between a resource and a sub-resource is represented as an annotation.
 
@@ -155,7 +155,7 @@ Example structural relation:
 
 
 
-#### 3. Structure as Separate Model
+### 3. Structure as Separate Model
 
 Structural information is represented in a different data structure, based on e.g. the Annotatable Thing ontology, or using an existing data model such as the [IIIF Presentation model](http://iiif.io/api/presentation/2.1/) or [Schema.org](http://schema.org).
 
@@ -166,11 +166,7 @@ There are multiple options for exchanging structural information between annotat
 + *Pro-active, complete, composite*: client sends whole resource structure to server, either upon loading a resource, regardless of whether a user makes an annotation, 
 + *Lazy, complete, composite*: client sends whole resource structure to server together with a new or updated annotation, regardless of which (sub-)resource is the annotation target. 
 
-Examples:
-
-1. Structural representation via [IIIF Collections and Manifests](https://github.com/marijnkoolen/rdfa-annotation-client/blob/master/discussion/comparing-iiif-and-web-annotation-models.md#iiif_model).
-2. Structural representation via [Schema.org]()
-3. Structural representation via Annotatable Thing Ontology:
+#### 3. Structural representation via Annotatable Thing Ontology:
 
 ```json
 {
@@ -226,14 +222,85 @@ Examples:
 }
 ```
 
-#### Using Schema.org to enrich resources
+#### 2. Structural representation via IIIF
 
-An alternative to using our own annotatable thing ontology is to rely on [Schema.org](http://schema.org/). For instance, the van Gogh correspondence can be modelled using a combination of two schemas:
+An example has been worked out in the IIIF analysis document, in the section [IIIF Collections and Manifests](https://github.com/marijnkoolen/rdfa-annotation-client/blob/master/discussion/comparing-iiif-and-web-annotation-models.md#iiif_model).
 
-+ [Message](http://schema.org/Message)
-+ [TranslationOfWork](http://bib.schema.org/workTranslation)
-+ [Painting](http://schema.org/Painting) (for paintings mentioned in letters)
 
+#### 3. Structural representation via [Schema.org]()
+
+An alternative to using our own annotatable thing ontology is to rely on [Schema.org](http://schema.org/). For instance, the van Gogh correspondence can be modelled using a combination of a number of pre-defined schemas:
+
++ [Message](http://schema.org/Message), [TranslationOfWork](http://bib.schema.org/workTranslation) and [Painting](http://schema.org/Painting) (for paintings mentioned in letters)
+
+```json
+{
+  "@context": "http://schema.org/",
+  "@type": "Message",
+  "id": "urn:vangogh:letter001",
+  "sender": {
+    "@type": "Person"
+    "id": "urn:vangogh:letter001.sender",
+  },
+  "recipient": {
+    "@type": "Person"
+    "id": "urn:vangogh:letter001.receiver",
+  },
+  "dateCreated": "1872-09-29",
+  "hasPart": [
+    {
+      "id": "urn:vangogh:letter001:p.1",
+    },
+    {
+      "id": "urn:vangogh:letter001:p.2",
+    },
+    {
+      "id": "urn:vangogh:letter001:p.3",
+    },
+    {
+      "id": "urn:vangogh:letter001:p.4",
+    },
+    {
+      "id": "urn:vangogh:letter001:p.5",
+    },
+    {
+      "id": "urn:vangogh:letter001:p.6",
+    },
+    {
+      "id": "urn:vangogh:letter001:p.7",
+    } 
+    {
+	  "@type": "TranslationOfWork",
+	  "id": "urn:vangogh:letter001.translation",
+	  "hasPart": [
+        {
+          {
+            "id": "urn:vangogh:letter001:p.1",
+		  },
+		  {
+		    "id": "urn:vangogh:letter001:p.2",
+		  },
+		  {
+		    "id": "urn:vangogh:letter001:p.3",
+		  },
+		  {
+		    "id": "urn:vangogh:letter001:p.4",
+		  },
+		  {
+		    "id": "urn:vangogh:letter001:p.5",
+		  },
+		  {
+		    "id": "urn:vangogh:letter001:p.6",
+		  },
+		  {
+		    "id": "urn:vangogh:letter001:p.7",
+		  } 
+        }
+      ]
+    }
+  ]
+}
+```
 
 ## Further reading
 
