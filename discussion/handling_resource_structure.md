@@ -35,6 +35,38 @@ Desirable characteristics:
 
 Each annotation contains the structure information about the resource in the annotation target, using selectors and refinements.
 
+Example:
+
+```json
+{
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "created": 1483949925,
+  "body": [
+    {
+      "vocabulary": "DBpedia",
+      "value": "Theo van Gogh (art dealer)",
+      "purpose": "classifying",
+      "id": "http://dbpedia.org/resource/Theo_van_Gogh_(art_dealer)"
+    }
+  ],
+  "motivation": "classifying",
+  "creator": "marijn",
+  "type": "Annotation",
+  "target": [
+    {
+      "type": "Text",
+      "source": "urn:vangogh:let001",
+      "selector": {
+        "conformsTo": "http://boot.huygens.knaw.nl/annotate/vangoghontology.ttl#",
+        "value": "urn:vangogh:let001.receiver",
+        "type": "FragmentSelector"
+      }
+    }
+  ],
+  "id": "urn:uuid:8f62be7d-de56-464b-8d9a-5fb0b69fc00b"
+}
+```
+
 + *pros*: 
 	+ *Simplicity*: single data structure for exchange
 	+ *Interpretation*: annotations require less context for interpretation
@@ -44,20 +76,84 @@ Each annotation contains the structure information about the resource in the ann
 	+ *Redundancy*: high duplication of structural information, all annotations on resource X contain the same structural information
 	+ *Multiple parents*: annotations on the same resource made in a different contexts show different parentage (is maybe a positive aspect?). The server needs to break down the hierarchy of structural information to allow for traversal from multiple parents. 
 
+
+
+
 #### Structure represented as annotation
 
 A structural relation between a resource and a sub-resource is represented as an annotation.
 
+Example annotation:
+
+```json
+{
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "created": 1483949925,
+  "body": [
+    {
+      "vocabulary": "DBpedia",
+      "value": "Theo van Gogh (art dealer)",
+      "purpose": "classifying",
+      "id": "http://dbpedia.org/resource/Theo_van_Gogh_(art_dealer)"
+    }
+  ],
+  "motivation": "classifying",
+  "creator": "marijn",
+  "type": "Annotation",
+  "target": [
+    {
+      "id": "urn:vangogh:let001.receiver",
+      "type": "Text"
+    }
+  ],
+  "id": "urn:uuid:8f62be7d-de56-464b-8d9a-5fb0b69fc00b"
+}
+```
+
+Example structural relation:
+
+```json
+{
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "created": 1483949925,
+  "body": [
+    {
+      "vocabulary": "http://boot.huygens.knaw.nl/annotate/vangoghontology.ttl#",
+      "id": "urn:vangogh:let001.receiver"
+    }
+  ],
+  "motivation": "linking",
+  "creator": "marijn",
+  "type": "Annotation",
+  "target": [
+    {
+      "id": "urn:vangogh:let001",
+    }
+  ],
+  "id": "urn:uuid:8f62be7d-de56-464b-8d9a-5fb0b70fc00b"
+}
+```
+
+
 *pros*:
 
 + *Simplicity*: all representations are W3C annotations.
++ *Redundancy*: Each relation is stored only once, resulting in low redundancy.
++ *Conciseness*: Lazy storing of resource structure, i.e. only the structural relations of annotated (sub-)resources are stored. 
 
 *Cons*:
 
++ *Conciseness*: each structural relation is sent as a separate representation with unnecessary W3C annotation metadata. 
 + *Separation of concerns*: The representations do no reflect the different natures of annotations and structural relations.
+
+
 
 #### Separate representations
 
-Structural information is represented in a different data structure, based on e.g. the Annotatable Thing ontology, IIIF Presentation model of FRBRoo.
-	+ Client sends structural relations between each part and whole separately
-	+ Client sends whole structure in on representation
+Structural information is represented in a different data structure, based on e.g. the Annotatable Thing ontology, or using an existing data model such as the [IIIF Presentation model](http://iiif.io/api/presentation/2.1/) or [FRBRoo](http://www.ifla.org/files/assets/cataloguing/FRBRoo/frbroo_v_2.4.pdf).
+
+There are multiple options for exchanging structural information between annotation server and client:
+
++ *Lazy, partial, atomic*: client sends only structural relations between annotated target and its ancestors, each parent-child relation as separate data structure. The server stores each relation directly.
++ *Lazy, partial, composite*: client sends only structural relations between annotated target and its ancestors, all parent-child relations in one hierarchical data structure. The server parses the hierarchy and stores individual relations.
++ *Complete, composite*: client sends whole resource structure to server, either upon loading a resource (*pro-active*: even without a user making an annotation), or together with a new or updated annotation (*lazy*), regardless of which sub-resource is the annotation target. 
