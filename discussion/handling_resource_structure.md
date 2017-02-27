@@ -31,7 +31,14 @@ Desirable characteristics:
 
 ## Representing Structure and Annotations
 
-#### All-in-one annotation
+There are two general approaches to representing the resource structure in the context of annotation:
+
+1. **Embedded**: embedding structural relation information in annotation targets.
+2. **Structure as annotation**: representing structural relation information as separate annotation.
+3. **Structure as separate model**: representing structural relation information in a separate data model.
+
+
+#### 1. Embedded
 
 Each annotation contains the structure information about the resource in the annotation target, using selectors and refinements.
 
@@ -79,7 +86,7 @@ Example:
 
 
 
-#### Structure represented as annotation
+#### 2. Structure as annotation
 
 A structural relation between a resource and a sub-resource is represented as an annotation.
 
@@ -148,20 +155,21 @@ Example structural relation:
 
 
 
-#### Separate representations
+#### 3. Structure as Separate Model
 
-Structural information is represented in a different data structure, based on e.g. the Annotatable Thing ontology, or using an existing data model such as the [IIIF Presentation model](http://iiif.io/api/presentation/2.1/) or [FRBRoo](http://www.ifla.org/files/assets/cataloguing/FRBRoo/frbroo_v_2.4.pdf).
+Structural information is represented in a different data structure, based on e.g. the Annotatable Thing ontology, or using an existing data model such as the [IIIF Presentation model](http://iiif.io/api/presentation/2.1/) or [Schema.org](http://schema.org).
 
 There are multiple options for exchanging structural information between annotation server and client:
 
 + *Lazy, partial, atomic*: client sends only structural relations between annotated target and its ancestors, each parent-child relation as separate data structure. The server stores each relation directly.
 + *Lazy, partial, composite*: client sends only structural relations between annotated target and its ancestors, all parent-child relations in one hierarchical data structure. The server parses the hierarchy and stores individual relations.
-+ *Complete, composite*: client sends whole resource structure to server, either upon loading a resource (*pro-active*: even without a user making an annotation), or together with a new or updated annotation (*lazy*), regardless of which sub-resource is the annotation target. 
++ *Pro-active, complete, composite*: client sends whole resource structure to server, either upon loading a resource, regardless of whether a user makes an annotation, 
++ *Lazy, complete, composite*: client sends whole resource structure to server together with a new or updated annotation, regardless of which (sub-)resource is the annotation target. 
 
 Examples:
 
 1. Structural representation via [IIIF Collections and Manifests](https://github.com/marijnkoolen/rdfa-annotation-client/blob/master/discussion/comparing-iiif-and-web-annotation-models.md#iiif_model).
-2. Structural representation via [FRBRoo]()
+2. Structural representation via [Schema.org]()
 3. Structural representation via Annotatable Thing Ontology:
 
 ```json
@@ -224,9 +232,12 @@ An alternative to using our own annotatable thing ontology is to rely on [Schema
 
 + [Message](http://schema.org/Message)
 + [TranslationOfWork](http://bib.schema.org/workTranslation)
++ [Painting](http://schema.org/Painting) (for paintings mentioned in letters)
 
 
 ## Further reading
+
+#### FRBR
 
 + [FRBR in JSON-LD markup examples](http://json-ld.org/spec/ED/json-ld-syntax/20100529/#markup-examples)
 + [Expression of Core FRBR Concepts in RDF](http://vocab.org/frbr/)
@@ -234,4 +245,15 @@ An alternative to using our own annotatable thing ontology is to rely on [Schema
 + [Essential FRBR in OWL2 DL Ontology (FRBR DL)](http://www.sparontologies.net/ontologies/frbr)
 + [IFLA overview page for FRBRoo](http://www.ifla.org/node/10171)
 + [Definition of Object-Oriented FRBR](http://www.ifla.org/files/assets/cataloguing/FRBRoo/frbroo_v_2.4.pdf)
-+ [Example of scholarly article in JSON-LD using FRBR as context](http://linter.structured-data.org/examples/schema.org/ScholarlyArticle/)
+
+#### Europeana Data Model
+
++ [EDM documentation](http://pro.europeana.eu/share-your-data/data-guidelines/edm-documentation)
++ [record properties](http://labs.europeana.eu/api/record), [JSON-LD version](http://labs.europeana.eu/api/record-jsonld)
++ [hierarchical records](http://labs.europeana.eu/api/hierarchical-records)
+
+#### Schema.org
+
++ [Overview of schemas](http://schema.org/docs/schemas.html)
++ [Data Model](http://schema.org/docs/datamodel.html)
++ Example: [Scholarly article](http://schema.org/ScholarlyArticle)
