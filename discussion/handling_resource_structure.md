@@ -218,7 +218,15 @@ Examples:
 }
 ```
 
-Further reading:
+#### Using Schema.org to enrich resources
+
+An alternative to using our own annotatable thing ontology is to rely on [Schema.org](http://schema.org/). For instance, the van Gogh correspondence can be modelled using a combination of two schemas:
+
++ [Message](http://schema.org/Message)
++ [TranslationOfWork](http://bib.schema.org/workTranslation)
+
+
+## Further reading
 
 + [FRBR in JSON-LD markup examples](http://json-ld.org/spec/ED/json-ld-syntax/20100529/#markup-examples)
 + [Expression of Core FRBR Concepts in RDF](http://vocab.org/frbr/)
@@ -226,3 +234,4 @@ Further reading:
 + [Essential FRBR in OWL2 DL Ontology (FRBR DL)](http://www.sparontologies.net/ontologies/frbr)
 + [IFLA overview page for FRBRoo](http://www.ifla.org/node/10171)
 + [Definition of Object-Oriented FRBR](http://www.ifla.org/files/assets/cataloguing/FRBRoo/frbroo_v_2.4.pdf)
++ [Example of scholarly article in JSON-LD using FRBR as context](http://linter.structured-data.org/examples/schema.org/ScholarlyArticle/)
