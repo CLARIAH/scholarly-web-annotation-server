@@ -157,3 +157,17 @@ There are multiple options for exchanging structural information between annotat
 + *Lazy, partial, atomic*: client sends only structural relations between annotated target and its ancestors, each parent-child relation as separate data structure. The server stores each relation directly.
 + *Lazy, partial, composite*: client sends only structural relations between annotated target and its ancestors, all parent-child relations in one hierarchical data structure. The server parses the hierarchy and stores individual relations.
 + *Complete, composite*: client sends whole resource structure to server, either upon loading a resource (*pro-active*: even without a user making an annotation), or together with a new or updated annotation (*lazy*), regardless of which sub-resource is the annotation target. 
+
+Examples:
+
+1. Structural representation via [IIIF Collections and Manifests](https://github.com/marijnkoolen/rdfa-annotation-client/blob/master/discussion/comparing-iiif-and-web-annotation-models.md#iiif_model).
+2. Structural representation via [FRBRoo]()
+
+Further reading:
+
++ [FRBR in JSON-LD markup examples](http://json-ld.org/spec/ED/json-ld-syntax/20100529/#markup-examples)
++ [Expression of Core FRBR Concepts in RDF](http://vocab.org/frbr/)
++ [Bibliographic Framework as Web of Data](https://www.loc.gov/bibframe/pdf/marcld-report-11-21-2012.pdf)
++ [Essential FRBR in OWL2 DL Ontology (FRBR DL)](http://www.sparontologies.net/ontologies/frbr)
++ [IFLA overview page for FRBRoo](http://www.ifla.org/node/10171)
++ [Definition of Object-Oriented FRBR](http://www.ifla.org/files/assets/cataloguing/FRBRoo/frbroo_v_2.4.pdf)
