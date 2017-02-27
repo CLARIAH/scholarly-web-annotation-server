@@ -186,7 +186,7 @@ There are multiple options for exchanging structural information between annotat
       "@id": "urn:vangogh:letter001.date", 
       "@type": "Date", 
     },
-  ]
+  ],
   "hasPart": [
 	{
       "@id": "urn:vangogh:letter001:p.1", 
