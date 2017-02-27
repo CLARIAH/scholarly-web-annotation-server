@@ -7,7 +7,15 @@
 
 ## Requirements
 
-+ each 
+Desirable characteristics:
+
++ *Simplicity*: number and complexity of data structures needed for exchange.
++ *Interpretation*: the extent to which an annotation is interpretable independently of the annotated resource.
++ *Separation of concerns*: the structural relations between annotatable resources are needed for aggregating annotations on a requested resource, they are provided by the responsible agent of the edition server. The annotations are created by the users of the annotated resource and bear on the resources themselves, not necessarily on their structural relations. The annotation server should treat structural relations between resources differently from annotations on resources. This separation of concerns should ideally be reflected in the data structures used for representing structure and annotation. 
++ *Conciseness*: annotation targets should contain no more information than necessary for identification
++ *Redundancy*: the amount of duplication of structural information across representations in the annotation server.
++ *Multiple parents*: a resource can be part of multiple collections (resource re-use). It should be possible to represent multiple parentage in the annotation server, so that annotations can be aggregated for different parents. 
+
 
 ## Architecture and Responsibilities
 
