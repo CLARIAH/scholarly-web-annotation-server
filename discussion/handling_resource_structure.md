@@ -272,27 +272,25 @@ An alternative to using our own annotatable thing ontology is to rely on [Schema
 	  "id": "urn:vangogh:letter001.translation",
 	  "hasPart": [
         {
-          {
-            "id": "urn:vangogh:letter001:p.1",
-		  },
-		  {
-		    "id": "urn:vangogh:letter001:p.2",
-		  },
-		  {
-		    "id": "urn:vangogh:letter001:p.3",
-		  },
-		  {
-		    "id": "urn:vangogh:letter001:p.4",
-		  },
-		  {
-		    "id": "urn:vangogh:letter001:p.5",
-		  },
-		  {
-		    "id": "urn:vangogh:letter001:p.6",
-		  },
-		  {
-		    "id": "urn:vangogh:letter001:p.7",
-		  } 
+          "id": "urn:vangogh:letter001:p.1",
+		},
+		{
+		  "id": "urn:vangogh:letter001:p.2",
+		},
+		{
+		  "id": "urn:vangogh:letter001:p.3",
+		},
+		{
+		  "id": "urn:vangogh:letter001:p.4",
+		},
+		{
+		  "id": "urn:vangogh:letter001:p.5",
+		},
+		{
+		  "id": "urn:vangogh:letter001:p.6",
+		},
+		{
+		  "id": "urn:vangogh:letter001:p.7",
         }
       ]
     }
