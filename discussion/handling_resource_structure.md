@@ -162,6 +162,61 @@ Examples:
 
 1. Structural representation via [IIIF Collections and Manifests](https://github.com/marijnkoolen/rdfa-annotation-client/blob/master/discussion/comparing-iiif-and-web-annotation-models.md#iiif_model).
 2. Structural representation via [FRBRoo]()
+3. Structural representation via Annotatable Thing Ontology:
+
+```json
+{
+  "@context": "http://boot.huygens.knaw.nl/annotate/vangoghontology.ttl#", 
+  "@type": "Letter", 
+  "id": "urn:vangogh:letter001", 
+  "hasMetadataItem": [
+	{
+      "@id": "urn:vangogh:letter001.sender", 
+      "@type": "Sender", 
+    },
+	{
+      "@id": "urn:vangogh:letter001.receiver", 
+      "@type": "Receiver", 
+    },
+	{
+      "@id": "urn:vangogh:letter001.date", 
+      "@type": "Date", 
+    },
+  ]
+  "hasPart": [
+	{
+      "@id": "urn:vangogh:letter001:p.1", 
+      "@type": "ParagraphInLetter", 
+    },
+	{
+      "@id": "urn:vangogh:letter001:p.2", 
+      "@type": "ParagraphInLetter", 
+    },
+	{
+      "@id": "urn:vangogh:letter001:p.3", 
+      "@type": "ParagraphInLetter", 
+    },
+	{
+      "@id": "urn:vangogh:letter001.translation", 
+      "@type": "Translation", 
+      "hasPart": [
+		{
+	      "@id": "urn:vangogh:letter001:translation:p.1", 
+	      "@type": "ParagraphInLetter", 
+	    },
+		{
+	      "@id": "urn:vangogh:letter001:translation:p.2", 
+	      "@type": "ParagraphInLetter", 
+	    },
+		{
+	      "@id": "urn:vangogh:letter001:translation:p.3", 
+	      "@type": "ParagraphInLetter", 
+	    },
+	  ]
+    },
+  ]
+}
+```
 
 Further reading:
 
