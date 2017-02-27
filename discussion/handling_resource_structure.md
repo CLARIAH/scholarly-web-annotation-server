@@ -239,11 +239,9 @@ An alternative to using our own annotatable thing ontology is to rely on [Schema
   "@type": "Message",
   "id": "urn:vangogh:letter001",
   "sender": {
-    "@type": "Person"
     "id": "urn:vangogh:letter001.sender",
   },
   "recipient": {
-    "@type": "Person"
     "id": "urn:vangogh:letter001.receiver",
   },
   "dateCreated": "1872-09-29",
