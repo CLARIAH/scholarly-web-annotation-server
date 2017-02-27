@@ -44,7 +44,20 @@ Each annotation contains the structure information about the resource in the ann
 	+ *Redundancy*: high duplication of structural information, all annotations on resource X contain the same structural information
 	+ *Multiple parents*: annotations on the same resource made in a different contexts show different parentage (is maybe a positive aspect?). The server needs to break down the hierarchy of structural information to allow for traversal from multiple parents. 
 
-2. **Structure represented as annotation**:
-3. **Separate representations**: structural information is represented in a different data structure, based on e.g. the Annotatable Thing ontology, IIIF Presentation model of FRBRoo.
+#### Structure represented as annotation
+
+A structural relation between a resource and a sub-resource is represented as an annotation.
+
+*pros*:
+
++ *Simplicity*: all representations are W3C annotations.
+
+*Cons*:
+
++ *Separation of concerns*: The representations do no reflect the different natures of annotations and structural relations.
+
+#### Separate representations
+
+Structural information is represented in a different data structure, based on e.g. the Annotatable Thing ontology, IIIF Presentation model of FRBRoo.
 	+ Client sends structural relations between each part and whole separately
 	+ Client sends whole structure in on representation
