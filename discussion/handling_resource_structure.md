@@ -202,10 +202,24 @@ There are multiple options for exchanging structural information between annotat
       "@type": "ParagraphInLetter", 
     },
   ],
+  "hasNote": [
+	{
+      "@id": "urn:vangogh:letter001:note.1", 
+      "@type": "Note", 
+    },
+	{
+      "@id": "urn:vangogh:letter001:note.2", 
+      "@type": "Note", 
+    },
+	{
+      "@id": "urn:vangogh:letter001:note.3", 
+      "@type": "Note", 
+    },
+  ],
   "hasEnrichment": [
 	{
       "@id": "urn:vangogh:letter001.translation", 
-      "@type": "Translation", 
+      "@type": "CreativeWork Translation", 
       "hasPart": [
 		{
 	      "@id": "urn:vangogh:letter001:translation:p.1", 
@@ -220,6 +234,20 @@ There are multiple options for exchanging structural information between annotat
 	      "@type": "ParagraphInLetter", 
 	    },
 	  ]
+	  "hasNote": [
+		{
+	      "@id": "urn:vangogh:letter001:note.1", 
+	      "@type": "Note", 
+	    },
+		{
+	      "@id": "urn:vangogh:letter001:note.2", 
+	      "@type": "Note", 
+	    },
+		{
+	      "@id": "urn:vangogh:letter001:note.3", 
+	      "@type": "Note", 
+	    },
+	  ],
     },
   ]
 }
