@@ -201,6 +201,8 @@ There are multiple options for exchanging structural information between annotat
       "@id": "urn:vangogh:letter001:p.3", 
       "@type": "ParagraphInLetter", 
     },
+  ],
+  "hasEnrichment": [
 	{
       "@id": "urn:vangogh:letter001.translation", 
       "@type": "Translation", 
