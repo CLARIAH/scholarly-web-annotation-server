@@ -233,7 +233,7 @@ There are multiple options for exchanging structural information between annotat
 	      "@id": "urn:vangogh:letter001:translation:p.3", 
 	      "@type": "ParagraphInLetter", 
 	    },
-	  ]
+	  ],
 	  "hasNote": [
 		{
 	      "@id": "urn:vangogh:letter001:note.1", 
