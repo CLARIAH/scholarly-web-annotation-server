@@ -16,7 +16,7 @@ Desirable characteristics:
 + *Redundancy*: the amount of duplication of structural information across representations in the annotation server.
 + *Multiple parents*: a resource can be part of multiple collections (resource re-use). It should be possible to represent multiple parentage in the annotation server, so that annotations can be aggregated for different parents. 
 + *Open standards*: the extent to which open standards are used in the exchange protocol. Open standards are preferred.
-+ *Model fitness*: Existing standards may not always be a perfect fit for the scenario that needs to be modelled. It is preferred use models that fit the domain and scenario and allow communicating the appropriate semantics.
++ *Model fitness*: Existing standards may not always be a perfect fit for the scenario that needs to be modelled. It is preferred use models that fit the domain and scenario and allow communicating the appropriate and necessary semantics.
 
 
 ## Architecture and Responsibilities
@@ -258,8 +258,9 @@ There are multiple options for exchanging structural information between annotat
 + *Pros*:
 	+ *Simplicity*: the structural representation can lean entirely on the ontology used to describe the resource (responsibility of the resource server).
 	+ *Conciseness*: the structural representation only contains structural information. In the above example it is possible to leave out the `@type` information to leave only the relationship information.
+	+ *Standards*: In a way this is the most flexible and open, as it allows use of different ontologies. The main point is that the server should know how to interpret relationships like `hasEnrichment` and `hasNote`, but perhaps it needs nothing more than to use these as edge labels.
 + *Cons*:
-	+ *Open standards*: It introduces a new ontology. **Note**: it is possible for resource/edition servers to use existing ontologies (e.g. Schema.org) 
+	+ *Open standards*: It introduces a new ontology. **Note**: it is possible for resource/edition servers to use existing ontologies (e.g. Schema.org). 
 
 #### 2. Structural representation via IIIF
 
