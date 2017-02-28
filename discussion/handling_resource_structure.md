@@ -236,15 +236,15 @@ There are multiple options for exchanging structural information between annotat
 	  ],
 	  "hasNote": [
 		{
-	      "@id": "urn:vangogh:letter001:note.1", 
+	      "@id": "urn:vangogh:letter001:translation:note.1", 
 	      "@type": "Note", 
 	    },
 		{
-	      "@id": "urn:vangogh:letter001:note.2", 
+	      "@id": "urn:vangogh:letter001:translation:note.2", 
 	      "@type": "Note", 
 	    },
 		{
-	      "@id": "urn:vangogh:letter001:note.3", 
+	      "@id": "urn:vangogh:letter001:translation:note.3", 
 	      "@type": "Note", 
 	    },
 	  ],
