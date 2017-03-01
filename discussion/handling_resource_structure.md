@@ -43,12 +43,14 @@ The annotation client should be able to:
 + retrieve existing annotations on a top-level resource in the browser window as well as annotations on any of its annotatable sub-resources, and annotations on top of those annotations (stacked annotations). 
 + retrieve and process information from the ontology that is used to describe the structure of the resource, and be able to 1) identify annotatable and non-annotatable elements, as well as make identify which (sub-)resources can only be annotated as a whole.
 
-Domain constraints:
+### 2.1 Domain constraints
 
 + Resources and annotations are considered different types, whereby resources can link to sub-resources and annotations can link to resources and to already-existing annotations. This results in a **two-type network**. This design decision brings certain limitations of what can be modelled, but helps to frame the problem and limits the problem space. 
 + Annotations can themselves become resources (changing their type and switching to the other side of the two-type network), but only through editorial decisions that make the annotation into a publicly visible resource. 
 
-Domain model characteristics:
+### 2.2 Domain model characteristics
+
+The two domain constraints described above have a number of consequences for the domain model:
 
 + Resource and their sub-resources form trees. 
 + Resources can be grouped in arbitrary(?) collections, where individual resources can belong to multiple collections. 
@@ -56,7 +58,7 @@ Domain model characteristics:
 + Annotations can be annotated, and multiple annotations can be the target or body of another annotations. The annotation graph is there also a DAG. However, the endpoint of a directed chain of annotations is always a *resource*.
 + The result is not a [bipartite graph](https://en.wikipedia.org/wiki/Bipartite_graph), because 1) among resources links are always between nodes of the same type, namely resource-to-resource, 2) annotations can link to both resources and annotations.  
 
-Desirable data modelling characteristics:
+### 2.3 Desirable data modelling characteristics
 
 + *Simplicity*: number and complexity of data structures needed for exchange. Less complex is preferred.
 + *Interpretation*: the extent to which an annotation is interpretable independently of the annotated resource. More interpretable is preferred.
