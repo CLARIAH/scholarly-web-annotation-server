@@ -169,6 +169,35 @@ There are multiple options for exchanging structural information between annotat
 + *Pro-active, complete, composite*: client sends whole resource structure to server, either upon loading a resource, regardless of whether a user makes an annotation, 
 + *Lazy, complete, composite*: client sends whole resource structure to server together with a new or updated annotation, regardless of which (sub-)resource is the annotation target. 
 
+Below is the same example annotation as in the previous section:
+
+```json
+{
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "created": 1483949925,
+  "body": [
+    {
+      "vocabulary": "DBpedia",
+      "value": "Theo van Gogh (art dealer)",
+      "purpose": "classifying",
+      "id": "http://dbpedia.org/resource/Theo_van_Gogh_(art_dealer)"
+    }
+  ],
+  "motivation": "classifying",
+  "creator": "marijn",
+  "type": "Annotation",
+  "target": [
+    {
+      "id": "urn:vangogh:let001.receiver",
+      "type": "Text"
+    }
+  ],
+  "id": "urn:uuid:8f62be7d-de56-464b-8d9a-5fb0b69fc00b"
+}
+```
+
+The target is the URN of the receiver of the letter. All information regarding the relation between the receiver and the letter and larger correspondence is handled separately in a structure-oriented data model.
+
 #### 1. Structural representation via Annotatable Thing Ontology:
 
 ```json
