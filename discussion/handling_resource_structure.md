@@ -52,7 +52,7 @@ Desirable characteristics:
 + *Redundancy*: the amount of duplication of structural information across representations in the annotation server.
 + *Multiple parents*: a resource can be part of multiple collections (resource re-use). It should be possible to represent multiple parentage in the annotation server, so that annotations can be aggregated for different parents. 
 + *Open standards*: the extent to which open standards are used in the exchange protocol. Open standards are preferred.
-+ *Model fitness*: Existing standards may not always be a perfect fit for the scenario that needs to be modelled. It is preferred use models that fit the domain and scenario and allow communicating the appropriate and necessary semantics.
++ *Model fitness*: Existing standards may not always be a perfect fit for the scenario that needs to be modelled. It is preferred to use models that fit the domain and scenario and allow communicating the appropriate and necessary semantics.
 
 
 <a name="responsibilities"></a>
@@ -60,12 +60,15 @@ Desirable characteristics:
 
 + **Editition server**: 
 	+ serving up RDFa-enriched resources,
-	+ determining the annotatable thing ontology and resource structure
+	+ determining the annotatable thing ontology and resource structure.
+	
 + **Annotation client**:
-	+ incorporation of resource structure and ontology in handling user annotations 
-	+ communicating resource structure to annotation server
+	+ incorporation of resource structure and ontology in handling user annotations,
+	+ dealing with non-annotatable parts of a resource and with resources that can only be targeted as a whole, 
+	+ communicating annotations and resource structure to annotation server.
+
 + **Annotation server**:
-	+ reasoning over resource structure in collecting annotations related to a resource
+	+ reasoning over resource structure in collecting annotations related to a resource.
 
 
 <a name="representing"></a>
@@ -123,7 +126,7 @@ Example:
 	+ *Separation of concerns*: server cannot reason over structure outside of annotations, should check for consistency across annotations with targets that share structural elements. 
 	+ *Conciseness*: annotations contain more structural information than necessary for many contexts
 	+ *Redundancy*: high duplication of structural information, all annotations on resource X contain the same structural information
-	+ *Multiple parents*: annotations on the same resource made in a different contexts show different parentage (is maybe a positive aspect?). The server needs to break down the hierarchy of structural information to allow for traversal from multiple parents. 
+	+ *Multiple parents*: annotations on the same resource made in a different contexts show different parentage (is maybe a positive aspect?). To allow for traversal from the requested resource to a descendant resource, the server needs to break down the hierarchy of structural information in each annotation target and store the relations between hierarchically related (sub-)resources. 
 
 
 
@@ -190,11 +193,12 @@ Example structural relation:
 	+ *Redundancy*: Each relation is stored only once, resulting in low redundancy.
 	+ *Conciseness*: Lazy storing of resource structure, i.e. only the structural relations of annotated (sub-)resources are stored. 
 	+ *Open standards*: Only the W3C Web Annotation standard is used. No home-grown models are used.
+	+ *Multiple parents*: Each hierarchical relationship is send as separate annotation, so the server can traverse from different ancestors to the same descendant resource.
 
 + *Cons*:
-	+ *Conciseness*: each structural relation is sent as a separate representation with unnecessary W3C annotation metadata. 
+	+ *Conciseness*: each structural relation is sent as a separate representation with unnecessary W3C annotation metadata. This generates a load of overhead in transmitted data.
 	+ *Separation of concerns*: The representations do no reflect the different natures of annotations and structural relations.
-	+ *Open standards*: The Web Annotation model is used differently from its intended purpose, namely to describe structural information.
+	+ *Model fitness*: The Web Annotation model is used differently from its intended purpose, namely to describe structural information that should not be displayed to the user.
 
 
 <a name="representing_as_model"></a>
@@ -209,7 +213,8 @@ There are multiple options for exchanging structural information between annotat
 + *Pro-active, complete, composite*: client sends whole resource structure to server, either upon loading a resource, regardless of whether a user makes an annotation, 
 + *Lazy, complete, composite*: client sends whole resource structure to server together with a new or updated annotation, regardless of which (sub-)resource is the annotation target. 
 
-Below is the same example annotation as in the previous section:
+In the various options below, the information about the hierarchical structure of resources that is sent between client and server
+The example annotation below, identifying the paragraph in the translation of a letter that contains the salutation, is used to compare the different models for handling hierarchical structure:
 
 ```json
 {
@@ -218,9 +223,9 @@ Below is the same example annotation as in the previous section:
   "body": [
     {
       "vocabulary": "DBpedia",
-      "value": "Theo van Gogh (art dealer)",
+      "value": "Salutation",
       "purpose": "classifying",
-      "id": "http://dbpedia.org/resource/Theo_van_Gogh_(art_dealer)"
+      "id": "http://dbpedia.org/resource/Salutation"
     }
   ],
   "motivation": "classifying",
@@ -228,7 +233,7 @@ Below is the same example annotation as in the previous section:
   "type": "Annotation",
   "target": [
     {
-      "id": "urn:vangogh:let001.receiver",
+      "id": "urn:vangogh:let001:translation:p.2",
       "type": "Text"
     }
   ],
@@ -236,12 +241,12 @@ Below is the same example annotation as in the previous section:
 }
 ```
 
-The target is the URN of the receiver of the letter. All information regarding the relation between the receiver and the letter and larger correspondence is handled separately in a structure-oriented data model.
+The target is the URN of the second paragraph of the English translation of the letter that is originally written in Dutch. All information regarding the relation between the annotated paragraph and the original letter, its translation and the larger correspondence should be handled separately in a structure-oriented data model.
 
 <a name="representing_as_annotatable_thing"></a>
 #### 4.3.1. Structural representation via Annotatable Thing Ontology:
 
-A straightforward way for the client to communicate structural information about the resource is to send the RDFa information of a resource using the vocabulary that it's based on as context. In that case of the *van Gogh Correspondence*, this is the ontology created by Peter Boot:
+A straightforward way for the client to communicate structural information about the resource is to send the RDFa information of a resource using the vocabulary that it's based on as context. In that case of the *van Gogh Correspondence*, this is the Annotatable Thing ontology created by Peter Boot:
 
 ```json
 {
@@ -327,13 +332,20 @@ A straightforward way for the client to communicate structural information about
 }
 ```
 
+The annotation server can store all structural relations including those between the original letter and its translation, and between the translation and its second paragraph. This allows traversal from any of these three resources to the annotation about the salutation.
+
 + *Pros*:
 	+ *Simplicity*: the structural representation can lean entirely on the ontology used to describe the resource (responsibility of the resource server).
 	+ *Conciseness*: the structural representation only contains structural information. In the above example it is possible to leave out the `@type` information to leave only the relationship information.
-	+ *Standards*: In a way this is the most flexible and open, as it allows use of different ontologies. The main point is that the server should know how to interpret relationships like `hasEnrichment` and `hasNote`, but perhaps it needs nothing more than to use these as edge labels.
+	+ *Open standards*: In a way this is the most flexible and open, as it allows use of different ontologies. The main point is that the server should know how to interpret relationships like `hasEnrichment` and `hasNote`, but perhaps it needs nothing more than to use these as edge labels (it can find out about their inverse, e.g. `isPartOf` from the `@context`.
+	+ *Separation of concerns*: hierarchal resource structure is modelled differently from annotations, there can naturally be handled differently by the server. 
+	+ *Model fitness*: this makes full use of the annotation ontology and allows the server to use the same structure-related semantics as the client. 
 + *Cons*:
 	+ *Open standards*: It introduces the annotatable thing ontology as yet another new ontology. **Note**: it is possible for resource/edition servers to use existing ontologies (e.g. Schema.org). 
-	+ *Conciseness*: as the structure of the letter is based on a template, it feels verbose to send all structural connections for each individual letter. For conciseness, it would be better if only a reference to the ontology would suffice. 
+	+ *Redundancy*: The client sends the entire resource structure to the server upon parsing the resource in the browser window, regardless of whether the server already knows about the resource structure. 
+
+**Note**: as the structure of the letter is based on a template, it feels verbose to send all structural connections for each individual letter. For *conciseness*, it would be better if only a reference to the ontology would suffice. 
+
 
 <a name="representing_as_abstract_class"></a>
 #### 2. Using the ontology as an abstract class
@@ -342,12 +354,18 @@ An question to consider is whether it is possible and preferable to send only (a
 
 The gain would be that potentially less information is sent by the client. However, if the ontology is very elaborate or complex while individual resources based on it are typically much simpler, it might require a smaller payload to send only the few resource IRIs and their structural relations. 
 
-To work with ontologies as abstract classes, the annotations themselves should also rely on ontology information, that is, use the URN of the letter as target and use the path to the annotated sub-resource(s) as selectors within that target. Problems that needs to be solved are:
+To work with ontologies as abstract classes, the annotations themselves should also rely on ontology information, that is, use the URN of the letter as target and use the path to the annotated sub-resource(s) as selectors within that target. There are several problems that need to be solved are.
 
-+ *Referring to an item that's part of a sequence*: how to refer to a specific sub-resource that is part of a list of sub-resources of the same type, at the same structural level. For instance, the example letter has 7 paragraphs. How should the annotation target identify the *n-th* paragraph in that list?
-+ *Multiple parents and selective displays*: if the translation of a letter is a sub-resource of that letter as well as of a collection of translations, then how should it be represented as an annotation target? The translation is a resource in its own right (it's a creative work) and can use the same ontology as template. If only the translation is displayed so that the annotation client only sees the translation as top-level resource, how should the client communicate that a paragraph in that translation is part of the original letter? 
++ *Pros*:
+	+ *Conciseness*: In principle, the client only has to send the URL for the `@context` to the server, both when retrieving existing annotations and submitting new annotations. 
+	+ *Redundancy*: The server can check if it knows about the `@context` already so only has to retrieve and parse that `@context` once (perhaps with a temporal update threshold to check if the `@context` has changed since the last check).
+	+ 	*Separation of concerns*: Hierarchical resource structure is modelled differently from annotations, so can naturally be handled separately.
++ *Cons*:
+	+ *Disambiguation*: how to refer to a specific sub-resource that is part of a list of sub-resources of the same type, at the same structural level. For instance, the example letter has 7 paragraphs. How should the annotation target identify the *n-th* paragraph in that list? More problematically, what information should the client send when the target is the *n-th* paragraph of the translation of the letter? 
+	+ *Multiple parents*: if the translation of a letter is a sub-resource of that letter as well as of a collection of translations, then how should it be represented as an annotation target? The translation is a resource in its own right (it's a creative work) and can use the same ontology as template (e.g. it is a letter with paragraphs and notes as sub-resources). If only the translation is displayed so that the annotation client only sees the translation as top-level resource, how should the client communicate that a paragraph in that translation is part of the original letter? 
+	+ *Simplicity*: For multilevel hierarchies, the annotation should contain all the structural information between the lowest level base target and the deepest level sub-resource at which the annotation is made.
 
-In way, using the ontology as an abstract class requires a similar solution as the **All-in-one** approach: the entire path from the *top* resource (i.e. the letter) to the annotated sub-resource (e.g. a paragraph in the translation of the letter) has to be represented in the annotation target.
+In way, using the ontology as an abstract class requires a similar solution as the **All-in-one** approach: the entire path from the *top* resource (i.e. the letter) to the annotated sub-resource (e.g. a paragraph in the translation of the letter) has to be represented in the annotation target. An unsolved problem remains with identifying the relation between a translation of a letter and its original when only the translation is displayed: does it have its own URN? If so, how is its relation with the original letter stored via the abstract class?
 
 <a name="representing_as_iiif"></a>
 #### 3. Structural representation via IIIF
@@ -356,10 +374,13 @@ An example has been worked out in the IIIF analysis document, in the section [II
 
 + *Pros*:
 	+ *Open standards*: makes use of existing standard for representing structure. 
+	+ *Multiple parents*: Multiple collections can contain the same (sub-)resource, so travel from different ancestors to the same descendant is not problematic.
+	+ *Separation of concerns*: Hierarchical resource structure is modelled differently from annotations, so can naturally be handled separately.
 + *Cons*:
-	+ *Open standards*: uses standard for other than intended purpose (IIIF Presentation API is intended for image viewers to understand structure of images representing an object).
+	+ *Model fitness*: uses standard for other than intended purpose (IIIF Presentation API is intended for image viewers to understand structure of images representing an object).
 	+ *Simplicity*: It introduces two types of structural elements, i.e. collections and manifests.
 	+ *Conciseness*: The IIIF model generates a lot of overhead to represent simple relationships, mainly because it is intended to provide display information in manifests.
+	+ *Redundancy*: A huge of amount of unnecessary information about a resource is sent every time the client retrieves or submits annotations.
 
 
 <a name="representing_as_schema"></a>
@@ -455,8 +476,15 @@ This schema also has properties `sender` , `recipient` and `dateCreated`, but it
 
 + *pros*: 
 	+ *Open standards*: it uses an open standard for communicating structure as well as for annotation.
+	+ *Conciseness*: the structural representation only contains structural information. 
+	+ *Separation of concerns*: Hierarchical resource structure is modelled differently from annotations, so can naturally be handled separately.
+	+ *Multiple parents*: Multiple collections can contain the same (sub-)resource, so travel from different ancestors to the same descendant is not problematic.
+
 + *Cons*:
-	+ *Open standards*: it uses default schema inappropriately and doesn't allow for any specific ontology properties used in editions.
+	+ *Model fitness*: it uses default schema inappropriately and doesn't allow for any specific ontology properties used in editions.
+	+ *Redundancy*: The client sends the entire resource structure to the server upon parsing the resource in the browser window, regardless of whether the server already knows about the resource structure. 
+	+ *Simplicity*: It's not obvious what schema to use if the resource server doesn't specify this. E.g. in the Correspondence case the most appropriate schema might be message, but in the case of newspaper articles, it is probably a different schema. An alternative is to always use the `Thing` because it contains the `hasPart` relationship, but it doesn't allow any subtle semantics of the domain.
+
 
 <a name="reading"></a>
 ## 5. Further reading
