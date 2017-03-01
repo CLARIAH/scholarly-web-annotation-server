@@ -200,6 +200,8 @@ The target is the URN of the receiver of the letter. All information regarding t
 
 #### 1. Structural representation via Annotatable Thing Ontology:
 
+A straightforward way for the client to communicate structural information about the resource is to send the RDFa information of a resource using the vocabulary that it's based on as context. In that case of the *van Gogh Correspondence*, this is the ontology created by Peter Boot:
+
 ```json
 {
   "@context": "http://boot.huygens.knaw.nl/annotate/vangoghontology.ttl#", 
@@ -290,6 +292,11 @@ The target is the URN of the receiver of the letter. All information regarding t
 	+ *Standards*: In a way this is the most flexible and open, as it allows use of different ontologies. The main point is that the server should know how to interpret relationships like `hasEnrichment` and `hasNote`, but perhaps it needs nothing more than to use these as edge labels.
 + *Cons*:
 	+ *Open standards*: It introduces a new ontology. **Note**: it is possible for resource/edition servers to use existing ontologies (e.g. Schema.org). 
+	+ *Conciseness*: as the structure of the letter is based on a template, it feels verbose to send all structural connections for each individual letter. For conciseness, it would be better if only a reference to the ontology would suffice. 
+
+
+
+
 
 #### 2. Structural representation via IIIF
 
