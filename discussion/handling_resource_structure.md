@@ -295,7 +295,12 @@ A straightforward way for the client to communicate structural information about
 	+ *Conciseness*: as the structure of the letter is based on a template, it feels verbose to send all structural connections for each individual letter. For conciseness, it would be better if only a reference to the ontology would suffice. 
 
 
+An question to consider is whether it is possible and preferable to send only (a reference to) the template as structural information, such that the server knows that a `letter` has a `sender` and a `receiver` without having to explicitly receive and store all the relations between the URNs of the sub-resources. 
 
+To work with templates, the annotations themselves should also rely on template information, that is, use the URN of the letter as target and use the annotated sub-resource as selector within that target. Problems that needs to be solved are:
+
++ *Referring to an item that's part of a sequence*: how to refer to a specific sub-resource that is part of a list of sub-resources of the same type, at the same structural level. For instance, the example letter has 7 paragraphs. How should the annotation target identify the *n-th* paragraph in that list?
++ *Multiple parents and selective displays*: if the translation of a letter is a sub-resource of that letter as well as of a collection of translations, then how should it be represented as an annotation target? The translation is a resource in its own right (it's a creative work) and can use the same ontology as template. If only the translation is displayed so that the annotation client only sees the translation as top-level resource, how should the client communicate that a paragraph in that translation is part of the original letter? 
 
 
 #### 2. Structural representation via IIIF
