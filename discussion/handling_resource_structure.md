@@ -7,6 +7,13 @@
 
 ## Requirements
 
+The annotation client is loaded in a browser window together with one or more resources, marked up with structural information embedded RDFa, that can be annotated. Each top-level resource in the browser window can have individually annotatable sub-resources.
+
+The annotation client should be able to:
+
++ retrieve existing annotations on a top-level resource in the browser window as well as annotations on any of its annotatable sub-resources, and annotations on top of those annotations (stacked annotations). 
++ retrieve and process information from the ontology that is used to describe the structure of the resource, and be able to 1) identify annotatable and non-annotatable elements, as well as make identify which (sub-)resources can only be annotated as a whole.
+
 Desirable characteristics:
 
 + *Simplicity*: number and complexity of data structures needed for exchange. Less complex is preferred.
