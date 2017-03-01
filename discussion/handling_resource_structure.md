@@ -348,7 +348,7 @@ The annotation server can store all structural relations including those between
 
 
 <a name="representing_as_abstract_class"></a>
-#### 2. Using the ontology as an abstract class
+#### 2. Using the Annotatable Ontology as an abstract class
 
 An question to consider is whether it is possible and preferable to send only (a reference to) the ontology as an abstract class that explains the structural relations, such that the server knows that a `letter` has a `sender` and a `receiver` without having to explicitly receive and store all the relations between the URNs of the sub-resources. 
 
