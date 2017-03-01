@@ -294,6 +294,7 @@ A straightforward way for the client to communicate structural information about
 	+ *Open standards*: It introduces a new ontology. **Note**: it is possible for resource/edition servers to use existing ontologies (e.g. Schema.org). 
 	+ *Conciseness*: as the structure of the letter is based on a template, it feels verbose to send all structural connections for each individual letter. For conciseness, it would be better if only a reference to the ontology would suffice. 
 
+#### 2. Using the ontology as an abstract class
 
 An question to consider is whether it is possible and preferable to send only (a reference to) the ontology as an abstract class that explains the structural relations, such that the server knows that a `letter` has a `sender` and a `receiver` without having to explicitly receive and store all the relations between the URNs of the sub-resources. 
 
@@ -306,7 +307,7 @@ To work with ontologies as abstract classes, the annotations themselves should a
 
 In way, using the ontology as an abstract class requires a similar solution as the **All-in-one** approach: the entire path from the *top* resource (i.e. the letter) to the annotated sub-resource (e.g. a paragraph in the translation of the letter) has to be represented in the annotation target.
 
-#### 2. Structural representation via IIIF
+#### 3. Structural representation via IIIF
 
 An example has been worked out in the IIIF analysis document, in the section [IIIF Collections and Manifests](https://github.com/marijnkoolen/rdfa-annotation-client/blob/master/discussion/comparing-iiif-and-web-annotation-models.md#iiif_model).
 
@@ -318,7 +319,7 @@ An example has been worked out in the IIIF analysis document, in the section [II
 	+ *Conciseness*: The IIIF model generates a lot of overhead to represent simple relationships, mainly because it is intended to provide display information in manifests.
 
 
-#### 3. Structural representation via [Schema.org]()
+#### 4. Structural representation via Schema.org
 
 An alternative to using our own annotatable thing ontology is to rely on [Schema.org](http://schema.org/). For instance, the van Gogh correspondence can be modelled using a combination of a number of pre-defined schemas:
 
