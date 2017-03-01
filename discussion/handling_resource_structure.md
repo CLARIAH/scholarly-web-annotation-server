@@ -291,7 +291,7 @@ A straightforward way for the client to communicate structural information about
 	+ *Conciseness*: the structural representation only contains structural information. In the above example it is possible to leave out the `@type` information to leave only the relationship information.
 	+ *Standards*: In a way this is the most flexible and open, as it allows use of different ontologies. The main point is that the server should know how to interpret relationships like `hasEnrichment` and `hasNote`, but perhaps it needs nothing more than to use these as edge labels.
 + *Cons*:
-	+ *Open standards*: It introduces a new ontology. **Note**: it is possible for resource/edition servers to use existing ontologies (e.g. Schema.org). 
+	+ *Open standards*: It introduces the annotatable thing ontology as yet another new ontology. **Note**: it is possible for resource/edition servers to use existing ontologies (e.g. Schema.org). 
 	+ *Conciseness*: as the structure of the letter is based on a template, it feels verbose to send all structural connections for each individual letter. For conciseness, it would be better if only a reference to the ontology would suffice. 
 
 #### 2. Using the ontology as an abstract class
