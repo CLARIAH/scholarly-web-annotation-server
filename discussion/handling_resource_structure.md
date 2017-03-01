@@ -4,6 +4,9 @@
 
 1. [Use Cases](#use_cases)
 2. [Requirements](#requirements)
+	+ 2.1 [Domain constraints](#domain_constraints)
+	+ 2.2 [Domain model characteristics](#domain_characteristics)
+	+ 2.3 [Desirable data model characteristics](#desirable_characteristics)
 3. [Architecture and Responsibilities](#responsibilities)
 4. [Representing Annotations and Resource Structure](#representing)
 	+ 4.1 [Structure Embedded in Annotation](#representing_embedded)
@@ -43,11 +46,13 @@ The annotation client should be able to:
 + retrieve existing annotations on a top-level resource in the browser window as well as annotations on any of its annotatable sub-resources, and annotations on top of those annotations (stacked annotations). 
 + retrieve and process information from the ontology that is used to describe the structure of the resource, and be able to 1) identify annotatable and non-annotatable elements, as well as make identify which (sub-)resources can only be annotated as a whole.
 
+<a name="domain_constraints"></a>
 ### 2.1 Domain constraints
 
 + Resources and annotations are considered different types, whereby resources can link to sub-resources and annotations can link to resources and to already-existing annotations. This results in a **two-type network**. This design decision brings certain limitations of what can be modelled, but helps to frame the problem and limits the problem space. 
 + Annotations can themselves become resources (changing their type and switching to the other side of the two-type network), but only through editorial decisions that make the annotation into a publicly visible resource. 
 
+<a name="domain_characteristics"></a>
 ### 2.2 Domain model characteristics
 
 The two domain constraints described above have a number of consequences for the domain model:
@@ -58,7 +63,8 @@ The two domain constraints described above have a number of consequences for the
 + Annotations can be annotated, and multiple annotations can be the target or body of another annotations. The annotation graph is there also a DAG. However, the endpoint of a directed chain of annotations is always a *resource*.
 + The result is not a [bipartite graph](https://en.wikipedia.org/wiki/Bipartite_graph), because 1) among resources links are always between nodes of the same type, namely resource-to-resource, 2) annotations can link to both resources and annotations.  
 
-### 2.3 Desirable data modelling characteristics
+<a name="desired_characteristics"></a>
+### 2.3 Desirable data model characteristics
 
 + *Simplicity*: number and complexity of data structures needed for exchange. Less complex is preferred.
 + *Interpretation*: the extent to which an annotation is interpretable independently of the annotated resource. More interpretable is preferred.
