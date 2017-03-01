@@ -46,7 +46,15 @@ The annotation client should be able to:
 Domain constraints:
 
 + Resources and annotations are considered different types, whereby resources can link to sub-resources and annotations can link to resources and to already-existing annotations. This results in a **two-type network**. This design decision brings certain limitations of what can be modelled, but helps to frame the problem and limits the problem space. 
-+ Annotations can themselves become resources (switching to the other side of the two-type network), but only through editorial decisions that make the annotation into a publicly visible resource. 
++ Annotations can themselves become resources (changing their type and switching to the other side of the two-type network), but only through editorial decisions that make the annotation into a publicly visible resource. 
+
+Domain model characteristics:
+
++ Resource and their sub-resources form trees. 
++ Resources can be grouped in arbitrary(?) collections, where individual resources can belong to multiple collections. 
++ A consequence of allowing arbitrary collections is that resources trees can be grouped in such as way that resources can have multiple parents. This turns a forest of trees into a [Direct Acyclic Graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG). 
++ Annotations can be annotated, and multiple annotations can be the target or body of another annotations. The annotation graph is there also a DAG. However, the endpoint of a directed chain of annotations is always a *resource*.
++ The result is not a [bipartite graph](https://en.wikipedia.org/wiki/Bipartite_graph), because 1) among resources links are always between nodes of the same type, namely resource-to-resource, 2) annotations can link to both resources and annotations.  
 
 Desirable characteristics:
 
