@@ -23,7 +23,12 @@
 <a name="use_cases"></a>
 ## 1. Use cases
 
-+ A textual scholar wants to annotate various parts of a digital edition such that the annotations can be used and interpreted independent from the way the edition is displayed. The scholar wants to analyse aggregates of the annotations at different levels, e.g. all annotations on the entire resource, as well as only the annotations on specific parts, e.g. annotations on a specific translation, or on the metadata. 
+The initial use case for this project was presented at [IAnnotate 2016 by Peter Boot](https://www.youtube.com/watch?v=PHTdfiZoNto):
+
++ A textual scholar wants to annotate various parts of a digital scholarly edition such that the annotations can be used and interpreted independent from the way the edition is displayed. The scholar wants to analyse aggregates of the annotations at different levels, e.g. all annotations on the entire resource, as well as only the annotations on specific parts, e.g. annotations on a specific translation, or on the metadata. 
+
+Additional use cases can be derived from [Melgar et al. (2017)](http://humanities.uva.nl/~mkoolen1/publications/2017/melg:proc17.pdf), including:
+
 + A media scholar wants to annotate the representation of ethnic minorities on Dutch current affairs programs in the 1990s. For analysis the scholar wants to aggregate annotations both on individual recordings of a program as well as at the whole program level (e.g. all annotated recordings of that program).
 
 <a name="requirements"></a>
