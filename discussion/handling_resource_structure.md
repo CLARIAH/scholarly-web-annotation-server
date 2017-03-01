@@ -25,11 +25,13 @@
 
 The initial use case for this project was presented at [IAnnotate 2016 by Peter Boot](https://www.youtube.com/watch?v=PHTdfiZoNto):
 
-+ A textual scholar wants to annotate various parts of a digital scholarly edition such that the annotations can be used and interpreted independent from the way the edition is displayed. The scholar wants to analyse aggregates of the annotations at different levels, e.g. all annotations on the entire resource, as well as only the annotations on specific parts, e.g. annotations on a specific translation, or on the metadata. 
++ A textual scholar wants to annotate various parts of a digital scholarly edition of the [Correspondence of Vincent van Gogh](http://vangoghletters.org/vg/), such that the annotations can be used and interpreted independent from the way the edition is displayed. The scholar wants to analyse aggregates of the annotations at different levels, e.g. all annotations on an entire resource such as a letter, as well as only the annotations on specific parts, e.g. annotations on a specific translation of that letter, or on its metadata. 
 
-Additional use cases can be derived from [Melgar et al. (2017)](http://humanities.uva.nl/~mkoolen1/publications/2017/melg:proc17.pdf), including:
+Additional use cases: 
 
-+ A media scholar wants to annotate the representation of ethnic minorities on Dutch current affairs programs in the 1990s. For analysis the scholar wants to aggregate annotations both on individual recordings of a program as well as at the whole program level (e.g. all annotated recordings of that program).
++ A media scholar wants to annotate the representation of ethnic minorities on Dutch current affairs programs in the 1990s. For analysis the scholar wants to aggregate annotations both on individual recordings of a program as well as at the whole program level (e.g. all annotated recordings of that program). This use case is derived from [Melgar et al. (2017)](http://humanities.uva.nl/~mkoolen1/publications/2017/melg:proc17.pdf)
+
++ A historian wants to investigate uses of medical drug components in the domains of science, commerce and public debate in the period 1500-1800 and wants to annotate relevant passages in newspaper articles, books and pamphlets. On top of the annotated passages, the researchers wants to annotate mentions of medical drug components, and other entities related to the events they are involved, including people, organisations, locations, actions and objects. During the research process, the historian wants to query the annotation server for various subsets of the annotations for analysis, aggregating the annotations on e.g. the newspaper they appeared in or the type of entities or events annotated. 
 
 <a name="requirements"></a>
 ## 2. Requirements
