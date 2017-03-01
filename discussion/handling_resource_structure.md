@@ -56,7 +56,7 @@ Domain model characteristics:
 + Annotations can be annotated, and multiple annotations can be the target or body of another annotations. The annotation graph is there also a DAG. However, the endpoint of a directed chain of annotations is always a *resource*.
 + The result is not a [bipartite graph](https://en.wikipedia.org/wiki/Bipartite_graph), because 1) among resources links are always between nodes of the same type, namely resource-to-resource, 2) annotations can link to both resources and annotations.  
 
-Desirable characteristics:
+Desirable data modelling characteristics:
 
 + *Simplicity*: number and complexity of data structures needed for exchange. Less complex is preferred.
 + *Interpretation*: the extent to which an annotation is interpretable independently of the annotated resource. More interpretable is preferred.
