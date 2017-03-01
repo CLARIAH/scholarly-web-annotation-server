@@ -1,11 +1,33 @@
+# Dealing with Resource Structure for Annotations
+
+### Table of Contents
+
+1. [Use Cases](#use_cases)
+2. [Requirements](#requirements)
+3. [Architecture and Responsibilities](#responsibilities)
+4. [Representing Annotations and Resource Structure](#representing)
+	+ 4.1 [Structure Embedded in Annotation](#representing_embedded)
+	+ 4.2 [Structure as Separate Annotation](#representing_as_annotation)
+	+ 4.3 [Structure as Separate Model](#representing_as_model)
+		+ 4.3.1 [Annotatable Thing Ontology](#representing_as_annotatable_thing)
+		+ 4.3.2 [Annotatable Thing Ontology as Abstract Class](#representing_as_abstract_class)
+		+ 4.3.3 [IIIF](#representing_as_iiif)
+		+ 4.3.4 [Schema.org](#representing_as_schema)
+5. [Further reading](#reading)
+	+ 5.1 [FRBR and FRBRoo](#reading_frbr)
+	+ 5.2 [Europeana Data Model](#reading_edm)
+	+ 5.3 [Schema.org](#reading_schema)
+	+ 5.4 [IIIF](#reading_iiif)
 
 
-## Use case
+<a name="use_cases"></a>
+## 1. Use cases
 
 + A textual scholar wants to annotate various parts of a digital edition such that the annotations can be used and interpreted independent from the way the edition is displayed. The scholar wants to analyse aggregates of the annotations at different levels, e.g. all annotations on the entire resource, as well as only the annotations on specific parts, e.g. annotations on a specific translation, or on the metadata. 
 + A media scholar wants to annotate the representation of ethnic minorities on Dutch current affairs programs in the 1990s. For analysis the scholar wants to aggregate annotations both on individual recordings of a program as well as at the whole program level (e.g. all annotated recordings of that program).
 
-## Requirements
+<a name="requirements"></a>
+## 2. Requirements
 
 The annotation client is loaded in a browser window together with one or more resources, marked up with structural information embedded RDFa, that can be annotated. Each top-level resource in the browser window can have individually annotatable sub-resources.
 
@@ -26,7 +48,8 @@ Desirable characteristics:
 + *Model fitness*: Existing standards may not always be a perfect fit for the scenario that needs to be modelled. It is preferred use models that fit the domain and scenario and allow communicating the appropriate and necessary semantics.
 
 
-## Architecture and Responsibilities
+<a name="responsibilities"></a>
+## 3. Architecture and Responsibilities
 
 + **Editition server**: 
 	+ serving up RDFa-enriched resources,
@@ -38,16 +61,18 @@ Desirable characteristics:
 	+ reasoning over resource structure in collecting annotations related to a resource
 
 
-## Representing Structure and Annotations
+<a name="representing"></a>
+## 4. Representing Structure and Annotations
 
 There are two general approaches to representing the resource structure in the context of annotation:
 
-1. **Embedded**: embedding structural relation information in annotation targets.
-2. **Structure as annotation**: representing structural relation information as separate annotation.
-3. **Structure as separate model**: representing structural relation information in a separate data model.
+1. **Structure Embedded in Annotation**: embedding structural relation information in annotation targets.
+2. **Structure as Separate Annotation**: representing structural relation information as separate annotation.
+3. **Structure as Separate Model**: representing structural relation information in a separate data model.
 
 
-### 1. Embedded
+<a name="representing_embedded"></a>
+### 4.1. Structure Embedded in Annotation
 
 Each annotation contains the structure information about the resource in the annotation target, using selectors and refinements.
 
@@ -96,7 +121,8 @@ Example:
 
 
 
-### 2. Structure as annotation
+<a name="representing_as_annotation"></a>
+### 4.2. Structure as Separate Annotation
 
 A structural relation between a resource and a sub-resource is represented as an annotation.
 
@@ -164,8 +190,8 @@ Example structural relation:
 	+ *Open standards*: The Web Annotation model is used differently from its intended purpose, namely to describe structural information.
 
 
-
-### 3. Structure as Separate Model
+<a name="representing_as_model"></a>
+### 4.3. Structure as Separate Model
 
 Structural information is represented in a different data structure, based on e.g. the Annotatable Thing ontology, or using an existing data model such as the [IIIF Presentation model](http://iiif.io/api/presentation/2.1/) or [Schema.org](http://schema.org).
 
@@ -205,7 +231,8 @@ Below is the same example annotation as in the previous section:
 
 The target is the URN of the receiver of the letter. All information regarding the relation between the receiver and the letter and larger correspondence is handled separately in a structure-oriented data model.
 
-#### 1. Structural representation via Annotatable Thing Ontology:
+<a name="representing_as_annotatable_thing"></a>
+#### 4.3.1. Structural representation via Annotatable Thing Ontology:
 
 A straightforward way for the client to communicate structural information about the resource is to send the RDFa information of a resource using the vocabulary that it's based on as context. In that case of the *van Gogh Correspondence*, this is the ontology created by Peter Boot:
 
@@ -301,6 +328,7 @@ A straightforward way for the client to communicate structural information about
 	+ *Open standards*: It introduces the annotatable thing ontology as yet another new ontology. **Note**: it is possible for resource/edition servers to use existing ontologies (e.g. Schema.org). 
 	+ *Conciseness*: as the structure of the letter is based on a template, it feels verbose to send all structural connections for each individual letter. For conciseness, it would be better if only a reference to the ontology would suffice. 
 
+<a name="representing_as_abstract_class"></a>
 #### 2. Using the ontology as an abstract class
 
 An question to consider is whether it is possible and preferable to send only (a reference to) the ontology as an abstract class that explains the structural relations, such that the server knows that a `letter` has a `sender` and a `receiver` without having to explicitly receive and store all the relations between the URNs of the sub-resources. 
@@ -314,6 +342,7 @@ To work with ontologies as abstract classes, the annotations themselves should a
 
 In way, using the ontology as an abstract class requires a similar solution as the **All-in-one** approach: the entire path from the *top* resource (i.e. the letter) to the annotated sub-resource (e.g. a paragraph in the translation of the letter) has to be represented in the annotation target.
 
+<a name="representing_as_iiif"></a>
 #### 3. Structural representation via IIIF
 
 An example has been worked out in the IIIF analysis document, in the section [IIIF Collections and Manifests](https://github.com/marijnkoolen/rdfa-annotation-client/blob/master/discussion/comparing-iiif-and-web-annotation-models.md#iiif_model).
@@ -326,6 +355,7 @@ An example has been worked out in the IIIF analysis document, in the section [II
 	+ *Conciseness*: The IIIF model generates a lot of overhead to represent simple relationships, mainly because it is intended to provide display information in manifests.
 
 
+<a name="representing_as_schema"></a>
 #### 4. Structural representation via Schema.org
 
 An alternative to using our own annotatable thing ontology is to rely on [Schema.org](http://schema.org/). For instance, the van Gogh correspondence can be modelled using a combination of a number of pre-defined schemas:
@@ -421,9 +451,11 @@ This schema also has properties `sender` , `recipient` and `dateCreated`, but it
 + *Cons*:
 	+ *Open standards*: it uses default schema inappropriately and doesn't allow for any specific ontology properties used in editions.
 
-## Further reading
+<a name="reading"></a>
+## 5. Further reading
 
-#### FRBR
+<a name="reading_frbr"></a>
+### 5.1 FRBR
 
 + [FRBR in JSON-LD markup examples](http://json-ld.org/spec/ED/json-ld-syntax/20100529/#markup-examples)
 + [Expression of Core FRBR Concepts in RDF](http://vocab.org/frbr/)
@@ -432,14 +464,27 @@ This schema also has properties `sender` , `recipient` and `dateCreated`, but it
 + [IFLA overview page for FRBRoo](http://www.ifla.org/node/10171)
 + [Definition of Object-Oriented FRBR](http://www.ifla.org/files/assets/cataloguing/FRBRoo/frbroo_v_2.4.pdf)
 
-#### Europeana Data Model
+<a name="reading_edm"></a>
+### 5.2 Europeana Data Model
 
 + [EDM documentation](http://pro.europeana.eu/share-your-data/data-guidelines/edm-documentation)
 + [record properties](http://labs.europeana.eu/api/record), [JSON-LD version](http://labs.europeana.eu/api/record-jsonld)
 + [hierarchical records](http://labs.europeana.eu/api/hierarchical-records)
 
-#### Schema.org
+<a name="reading_schema"></a>
+### 5.3 Schema.org
 
 + [Overview of schemas](http://schema.org/docs/schemas.html)
 + [Data Model](http://schema.org/docs/datamodel.html)
 + Example: [Scholarly article](http://schema.org/ScholarlyArticle)
+
+
+<a name="reading_iiif"></a>
+### 5.4 IIIF
+
++ [IIIF](http://iiif.io/)
+	+ APIs: [Image](http://iiif.io/api/image/2.1/), [Presentation](http://iiif.io/api/presentation/2.1/), [Search](http://iiif.io/api/search/2.1/)
++ IXIF
+	+ [IXIF Interim Implementation](https://gist.github.com/tomcrane/7f86ac08d3b009c8af7c)
+	+ [Sound and Vision blog post on IXIF](https://www.beeldengeluid.nl/en/blogs/research-amp-development-en/201604/interweaving-online-media-ixif)
++ [Universal Viewer](http://universalviewer.io/)
