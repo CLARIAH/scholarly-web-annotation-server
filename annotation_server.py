@@ -70,12 +70,9 @@ def get_annotation_by_id(annotation_id):
 @app.route('/api/annotation', methods=['POST'])
 def post_annotation():
     new_annotation = request.get_json()
-    try:
-        stored_annotation = store.add(new_annotation)
-        save_annotations()
-        return make_response(stored_annotation)
-    except InvalidAnnotation as error:
-        raise InvalidAnnotation(error)
+    stored_annotation = store.add(new_annotation)
+    save_annotations()
+    return make_response(stored_annotation)
 
 @app.route('/api/annotations', methods=['GET'])
 def get_annotations():
