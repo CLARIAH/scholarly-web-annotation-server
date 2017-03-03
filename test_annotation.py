@@ -78,24 +78,27 @@ class TestAnnotationStore(unittest.TestCase):
         self.store.add(examples["vincent"])
         annotation_id = self.store.ids()[0]
         annotation = self.store.get(annotation_id)
-        self.assertEqual(annotation.id, annotation_id)
+        self.assertEqual(annotation['id'], annotation_id)
 
     def test_store_can_get_annotation_by_target_id(self):
         self.store.add(examples["vincent"])
         annotation_id = self.store.ids()[0]
-        annotation = self.store.get(annotation_id)
+        annotation_data = self.store.get(annotation_id)
+        annotation = Annotation(annotation_data)
         target_ids = annotation.get_target_ids()
-        target_annotations = self.store.get_by_target(target_ids[0])
-        self.assertTrue(annotation in target_annotations)
+        for target_id in target_ids:
+            target_annotations = self.store.get_by_target(target_id)
+            ids = [target_annotation['id'] for target_annotation in target_annotations]
+            self.assertTrue(annotation_data['id'] in ids)
 
     def test_store_can_update_annotation(self):
         self.store.add(examples["vincent"])
         annotation_id = self.store.ids()[0]
-        annotation = copy.copy(self.store.get(annotation_id).data)
+        annotation = self.store.get(annotation_id)
         annotation['motivation'] = "linking"
         updated_annotation = self.store.update(annotation)
-        self.assertEqual(updated_annotation.id, annotation_id)
-        self.assertTrue('modified' in updated_annotation.data)
+        self.assertEqual(updated_annotation['id'], annotation_id)
+        self.assertTrue('modified' in updated_annotation)
 
     def test_store_can_remove_annotation(self):
         self.store.add(examples["vincent"])
@@ -103,7 +106,7 @@ class TestAnnotationStore(unittest.TestCase):
         self.assertEqual(len(self.store.ids()), 1)
         annotation = self.store.remove(annotation_id)
         self.assertEqual(len(self.store.ids()), 0)
-        self.assertEqual(annotation.data, examples["vincent"])
+        self.assertEqual(annotation, examples["vincent"])
         self.assertEqual(len(self.store.target_index.keys()), 0)
 
 if __name__ == "__main__":
