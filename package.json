@@ -4,7 +4,7 @@
   "description": "Annotation library for RDFa-enriched HTML representations of complex text objects.",
   "main": "src/index.jsx",
   "scripts": {
-    "test": "mocha --compilers js:babel-core/register tests/*",
+    "test": "mocha --compilers js:babel-core/register src/test/*",
     "test:lint": "eslint . --ext .js --ext .jsx --ignore-path .eslintignore --cache",
     "dev": "webpack -d --progress --colors --watch"
   },
