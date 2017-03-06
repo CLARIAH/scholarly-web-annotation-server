@@ -4,7 +4,7 @@
   "description": "Annotation library for RDFa-enriched HTML representations of complex text objects.",
   "main": "src/index.jsx",
   "scripts": {
-    "test": "mocha --compilers js:babel-core/register src/test/*",
+    "test": "mocha --compilers js:babel-core/register src/test/* -r jsdom-global/register",
     "test:lint": "eslint . --ext .js --ext .jsx --ignore-path .eslintignore --cache",
     "dev": "webpack -d --progress --colors --watch"
   },
@@ -36,6 +36,8 @@
     "eslint-plugin-react": "^6.8.0",
     "eslint-plugin-standard": "^2.0.1",
     "isomorphic-fetch": "^2.2.1",
+    "jsdom": "^9.11.0",
+    "jsdom-global": "^2.1.1",
     "jsx-loader": "^0.13.2",
     "mocha": "^3.2.0",
     "n3": "^0.9.0",
