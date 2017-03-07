@@ -59,9 +59,13 @@ The two domain constraints described above have a number of consequences for the
 
 + Resource and their sub-resources form trees. 
 + Resources can be grouped in arbitrary(?) collections, where individual resources can belong to multiple collections. 
-+ A consequence of allowing arbitrary collections is that resources trees can be grouped in such as way that resources can have multiple parents. This turns a forest of trees into a [Direct Acyclic Graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG). 
-+ Annotations can be annotated, and multiple annotations can be the target or body of another annotations. The annotation graph is there also a DAG. However, the endpoint of a directed chain of annotations is always a *resource*.
-+ The result is not a [bipartite graph](https://en.wikipedia.org/wiki/Bipartite_graph), because 1) among resources links are always between nodes of the same type, namely resource-to-resource, 2) annotations can link to both resources and annotations.  
++ A consequence of allowing arbitrary collections is that resources trees can be grouped in such as way that resources can have multiple parents. Instead of a *forest*, the resulting structure of trees is a [Direct Acyclic Graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG). 
++ Annotations can target one or more resources and/or one or more annotations. 
++ Annotations can be targeted by multiple other annotations (multiple parentage). 
++ The annotation graph is therefore also a DAG. However, the endpoint of a directed chain of annotations is always a *resource*.
++ Annotations can only target existing annotations, so the graph is also temporally ordered. 
++ A chain of annotations always ends in leaf annotations that target *resources*.
++ This results in a single graph structure. It is not a [bipartite graph](https://en.wikipedia.org/wiki/Bipartite_graph), because 1) among resources links are always between nodes of the same type, namely resource-to-resource, 2) annotations can link to both resources and annotations.  
 
 <a name="desired_characteristics"></a>
 ### 2.3 Desirable data model characteristics
