@@ -49,13 +49,18 @@ The annotation client should be able to:
 <a name="domain_constraints"></a>
 ### 2.1 Domain constraints
 
-+ Resources and annotations are considered different types, whereby resources can link to sub-resources and annotations can link to resources and to already-existing annotations. This results in a **two-type network**. This design decision brings certain limitations of what can be modelled, but helps to frame the problem and limits the problem space. 
-+ Annotations can themselves become resources (changing their type and switching to the other side of the two-type network), but only through editorial decisions that make the annotation into a publicly visible resource. 
+The requirements above provide few constraints on what structures of resources and sub-resources are possible. In principle, resources could be linked in cycles, where for instance one digital edition represents the the translation of a letter is a sub-resource of the original letter, but a different edition may represent the original as sub-resource of the translation. 
+
+To ensure a clearly defined and computationally tractable set of annotations to retrieve for a given resources, it's desirable to avoid cycles in resource relational structure. Therefore, we propose the follow constraints:
+
++ Resources and annotations are considered different types, whereby resources can only link to sub-resources, whereas annotations can link to resources *and* to already-existing annotations. This results in a **two-type network**. 
++ Sub-resources cannot link to higher-level resources, to avoid cycles. This design decision brings certain limitations of what can be modelled, but helps to frame the problem and limits the problem space. 
++ Annotations can themselves become resources (changing their type and switching to the other side of the two-type network), but only through editorial decisions. [not sure about the following constraint]: This makes the annotation into a publicly visible resource. The annotation becomes a sub-resources of the resource it annotations.
 
 <a name="domain_characteristics"></a>
 ### 2.2 Domain model characteristics
 
-The two domain constraints described above have a number of consequences for the domain model:
+The domain constraints described above have a number of consequences for the domain model:
 
 + Resource and their sub-resources form trees. 
 + Resources can be grouped in arbitrary(?) collections, where individual resources can belong to multiple collections. 
