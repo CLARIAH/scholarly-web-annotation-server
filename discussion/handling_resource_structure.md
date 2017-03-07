@@ -84,7 +84,7 @@ In Peter's IAnnotate presentation, he suggested three
 
 + **Editition server**: 
 	+ serve up an edition (or more generally, a resource) to a user in a browser,
-	+ determine what parts of the edition/resource can be annotated, specified in an *Annotatable Thing* ontology, 
+	+ determine what parts of the edition/resource can be annotated, specified in an [Annotatable Thing ontology](http://boot.huygens.knaw.nl/annotate/genericontology.ttl) and any extension for specific domain (e.g [Van Gogh Ontology](boot.huygens.knaw.nl/annotate/vangoghontology.ttl)), 
 	+ embed the structural information of the resource through RDFa properties in the HTML representation.
 	
 + **Annotation client**:
