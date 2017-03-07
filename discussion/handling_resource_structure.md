@@ -30,7 +30,7 @@
 
 The initial use case for this project was presented at [IAnnotate 2016 by Peter Boot](https://www.youtube.com/watch?v=PHTdfiZoNto):
 
-+ A textual scholar wants to annotate various parts of a digital scholarly edition of the [Correspondence of Vincent van Gogh](http://vangoghletters.org/vg/), such that the annotations can be used and interpreted independent from the way the edition is displayed. The scholar wants to analyse aggregates of the annotations at different levels, e.g. all annotations on an entire resource such as a letter, as well as only the annotations on specific parts, e.g. annotations on a specific translation of that letter, or on its metadata. 
++ A textual scholar wants to annotate various parts of a digital scholarly edition of the [Correspondence of Vincent van Gogh](http://vangoghletters.org/vg/), such that the annotations can be used and interpreted independent from the way the edition is displayed. The scholar wants to analyse aggregates of the annotations at different levels, e.g. all annotations on an entire resource such as a letter, as well as only the annotations on specific parts, e.g. annotations on a specific translation of that letter, on a fragment of a single paragraph, or on its metadata. 
 
 Potential other use cases: 
 
