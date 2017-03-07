@@ -58,7 +58,7 @@ The requirements above provide few constraints on what structures of resources a
 
 To ensure a clearly defined and computationally tractable set of annotations to retrieve for a given resources, it's desirable to avoid cycles in resource relational structure. Therefore, we propose the follow constraints:
 
-+ Resources and annotations are considered different types, whereby resources can only link to sub-resources, whereas annotations can link to resources *and* to already-existing annotations. This results in a **two-type network**. 
++ Resources and annotations are considered different types, whereby resources can only link to sub-resources, whereas annotations can link to resources *and* to already-existing annotations. This results in a *two-type network*, e.g. each node belongs to one of two types. 
 + Sub-resources cannot link to higher-level resources, to avoid cycles. This design decision brings certain limitations of what can be modelled, but helps to frame the problem and limits the problem space. 
 + Annotations can themselves become resources (changing their type and switching to the other side of the two-type network), but only through editorial decisions. [not sure about the following constraint]: This makes the annotation into a publicly visible resource. The annotation becomes a sub-resources of the resource it annotations.
 
@@ -75,7 +75,7 @@ The domain constraints described above have a number of consequences for the dom
 + The annotation graph is therefore also a DAG. However, the endpoint of a directed chain of annotations is always a *resource*.
 + Annotations can only target existing annotations, so the graph is also temporally ordered. 
 + A chain of annotations always ends in leaf annotations that target *resources*.
-+ This results in a single graph structure. It is not a [bipartite graph](https://en.wikipedia.org/wiki/Bipartite_graph), because 1) among resources links are always between nodes of the same type, namely resource-to-resource, 2) annotations can link to both resources and annotations.  
++ This results in a single graph structure, with resources on one side and annotations on the other side. However, it is not a [bipartite graph](https://en.wikipedia.org/wiki/Bipartite_graph), because 1) among resources links are always between nodes of the same type, namely resource-to-resource, 2) annotations can link to both resources and annotations.  
 
 <a name="responsibilities"></a>
 ## 3. Architecture and Responsibilities
