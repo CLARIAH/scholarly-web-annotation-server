@@ -4,18 +4,20 @@
 
 1. [Use Cases](#use_cases)
 2. [Requirements](#requirements)
-	+ 2.1 [Domain constraints](#domain_constraints)
-	+ 2.2 [Domain model characteristics](#domain_characteristics)
-	+ 2.3 [Desirable data model characteristics](#desirable_characteristics)
+	+ 2.1 [Annotation Functionalities](#annotation_functionalities)
+	+ 2.2 [Domain constraints](#domain_constraints)
+	+ 2.3 [Domain model characteristics](#domain_characteristics)
 3. [Architecture and Responsibilities](#responsibilities)
 4. [Representing Annotations and Resource Structure](#representing)
-	+ 4.1 [Structure Embedded in Annotation](#representing_embedded)
-	+ 4.2 [Structure as Separate Annotation](#representing_as_annotation)
-	+ 4.3 [Structure as Separate Model](#representing_as_model)
-		+ 4.3.1 [Annotatable Thing Ontology](#representing_as_annotatable_thing)
-		+ 4.3.2 [Annotatable Thing Ontology as Abstract Class](#representing_as_abstract_class)
-		+ 4.3.3 [IIIF](#representing_as_iiif)
-		+ 4.3.4 [Schema.org](#representing_as_schema)
+	+ 4.1 [Desirable data model characteristics](#desirable_characteristics)
+	+ 4.2 [Structure Embedded in Annotation](#representing_embedded)
+	+ 4.3 [Structure as Separate Annotation](#representing_as_annotation)
+	+ 4.4 [Structure as Separate Model](#representing_as_model)
+		+ 4.4.1 [Annotatable Thing Ontology](#representing_as_annotatable_thing)
+		+ 4.4.2 [Annotatable Thing Ontology as Abstract Class](#representing_as_abstract_class)
+		+ 4.4.3 [IIIF](#representing_as_iiif)
+		+ 4.4.4 [Schema.org](#representing_as_schema)
+	+ 4.5 [Ranking Modelling Options](#ranking_options)
 5. [Further reading](#reading)
 	+ 5.1 [FRBR and FRBRoo](#reading_frbr)
 	+ 5.2 [Europeana Data Model](#reading_edm)
@@ -41,13 +43,16 @@ Potential other use cases:
 
 The annotation client is loaded in a browser window together with one or more resources, marked up with structural information embedded RDFa, that can be annotated. Each top-level resource in the browser window can have individually annotatable sub-resources.
 
+<a name="annotation_functionalities"></a>
+### 2.1 Annotation Functionalities
+
 The annotation client should be able to:
 
 + retrieve existing annotations on a top-level resource in the browser window as well as annotations on any of its annotatable sub-resources, and annotations on top of those annotations (stacked annotations). 
 + retrieve and process information from the ontology that is used to describe the structure of the resource, and be able to 1) identify annotatable and non-annotatable elements, as well as make identify which (sub-)resources can only be annotated as a whole.
 
 <a name="domain_constraints"></a>
-### 2.1 Domain constraints
+### 2.2 Domain constraints
 
 The requirements above provide few constraints on what structures of resources and sub-resources are possible. In principle, resources could be linked in cycles, where for instance one digital edition represents the the translation of a letter is a sub-resource of the original letter, but a different edition may represent the original as sub-resource of the translation. 
 
@@ -58,7 +63,7 @@ To ensure a clearly defined and computationally tractable set of annotations to 
 + Annotations can themselves become resources (changing their type and switching to the other side of the two-type network), but only through editorial decisions. [not sure about the following constraint]: This makes the annotation into a publicly visible resource. The annotation becomes a sub-resources of the resource it annotations.
 
 <a name="domain_characteristics"></a>
-### 2.2 Domain model characteristics
+### 2.3 Domain model characteristics
 
 The domain constraints described above have a number of consequences for the domain model:
 
@@ -72,33 +77,25 @@ The domain constraints described above have a number of consequences for the dom
 + A chain of annotations always ends in leaf annotations that target *resources*.
 + This results in a single graph structure. It is not a [bipartite graph](https://en.wikipedia.org/wiki/Bipartite_graph), because 1) among resources links are always between nodes of the same type, namely resource-to-resource, 2) annotations can link to both resources and annotations.  
 
-<a name="desired_characteristics"></a>
-### 2.3 Desirable data model characteristics
-
-+ *Simplicity*: number and complexity of data structures needed for exchange. Less complex is preferred.
-+ *Interpretation*: the extent to which an annotation is interpretable independently of the annotated resource. More interpretable is preferred.
-+ *Separation of concerns*: the structural relations between annotatable resources are needed for aggregating annotations on a requested resource, they are provided by the responsible agent of the edition server. The annotations are created by the users of the annotated resource and bear on the resources themselves, not necessarily on their structural relations. The annotation server should treat structural relations between resources differently from annotations on resources. This separation of concerns should ideally be reflected in the data structures used for representing structure and annotation. Clear separation is preferred.
-+ *Conciseness*: annotation targets should contain no more information than necessary for identification. More concise is preferred. 
-+ *Redundancy*: the amount of duplication of structural information across representations in the annotation server.
-+ *Multiple parents*: a resource can be part of multiple collections (resource re-use). It should be possible to represent multiple parentage in the annotation server, so that annotations can be aggregated for different parents. 
-+ *Open standards*: the extent to which open standards are used in the exchange protocol. Open standards are preferred.
-+ *Model fitness*: Existing standards may not always be a perfect fit for the scenario that needs to be modelled. It is preferred to use models that fit the domain and scenario and allow communicating the appropriate and necessary semantics.
-
-
 <a name="responsibilities"></a>
 ## 3. Architecture and Responsibilities
 
+In Peter's IAnnotate presentation, he suggested three
+
 + **Editition server**: 
-	+ serving up RDFa-enriched resources,
-	+ determining the annotatable thing ontology and resource structure.
+	+ serve up an edition (or more generally, a resource) to a user in a browser,
+	+ determine what parts of the edition/resource can be annotated, specified in an *Annotatable Thing* ontology, 
+	+ embed the structural information of the resource through RDFa properties in the HTML representation.
 	
 + **Annotation client**:
-	+ incorporation of resource structure and ontology in handling user annotations,
-	+ dealing with non-annotatable parts of a resource and with resources that can only be targeted as a whole, 
-	+ communicating annotations and resource structure to annotation server.
+	+ runs in the browser and is embedded in edition/resource.
+	+ incorporates the resource structure and ontology in handling user annotations,
+	+ deals with non-annotatable parts of a resource and with resources that can only be targeted as a whole, 
+	+ exchanges annotations and resource structure with the annotation server.
 
 + **Annotation server**:
-	+ reasoning over resource structure in collecting annotations related to a resource.
+	+ reasons over resource structure in storing and retrieving annotations related to a resource.
+	+ exchanges annotations and resource structure with the annotation client.
 
 
 <a name="representing"></a>
@@ -110,9 +107,24 @@ There are two general approaches to representing the resource structure in the c
 2. **Structure as Separate Annotation**: representing structural relation information as separate annotation.
 3. **Structure as Separate Model**: representing structural relation information in a separate data model.
 
+<a name="desired_characteristics"></a>
+### 4.1 Desirable data model characteristics
+
+The annotation client and server have to use an exchange protocol and data model to exchange information about annotations and resources. Below are a (rather ad hoc) list of characteristics by which to compare different data models and help decide on a model that best fits the problem domain and constraints. 
+
++ *Simplicity*: number and complexity of data structures needed for exchange. Less complex is preferred.
++ *Interpretation*: the extent to which an annotation is interpretable independently of the annotated resource. More interpretable is preferred.
++ *Separation of concerns*: the structural relations between annotatable resources are needed for aggregating annotations on a requested resource, they are provided by the responsible agent of the edition server. The annotations are created by the users of the annotated resource and bear on the resources themselves, not necessarily on their structural relations. The annotation server should treat structural relations between resources differently from annotations on resources. This separation of concerns should ideally be reflected in the data structures used for representing structure and annotation. Clear separation is preferred.
++ *Conciseness*: annotation targets should contain no more information than necessary for identification. More concise is preferred. 
++ *Redundancy*: the amount of duplication of structural information across representations in the annotation server.
++ *Multiple parents*: a resource can be part of multiple collections (resource re-use). It should be possible to represent multiple parentage in the annotation server, so that annotations can be aggregated for different parents. 
++ *Open standards*: the extent to which open standards are used in the exchange protocol. Open standards are preferred.
++ *Model fitness*: Existing standards may not always be a perfect fit for the scenario that needs to be modelled. It is preferred to use models that fit the domain and scenario and allow communicating the appropriate and necessary semantics.
+
+
 
 <a name="representing_embedded"></a>
-### 4.1. Structure Embedded in Annotation
+### 4.2. Structure Embedded in Annotation
 
 Each annotation contains the structure information about the resource in the annotation target, using selectors and refinements.
 
@@ -162,7 +174,7 @@ Example:
 
 
 <a name="representing_as_annotation"></a>
-### 4.2. Structure as Separate Annotation
+### 4.3. Structure as Separate Annotation
 
 A structural relation between a resource and a sub-resource is represented as an annotation.
 
@@ -232,7 +244,7 @@ Example structural relation:
 
 
 <a name="representing_as_model"></a>
-### 4.3. Structure as Separate Model
+### 4.4. Structure as Separate Model
 
 Structural information is represented in a different data structure, based on e.g. the Annotatable Thing ontology, or using an existing data model such as the [IIIF Presentation model](http://iiif.io/api/presentation/2.1/) or [Schema.org](http://schema.org).
 
@@ -274,7 +286,7 @@ The example annotation below, identifying the paragraph in the translation of a 
 The target is the URN of the second paragraph of the English translation of the letter that is originally written in Dutch. All information regarding the relation between the annotated paragraph and the original letter, its translation and the larger correspondence should be handled separately in a structure-oriented data model.
 
 <a name="representing_as_annotatable_thing"></a>
-#### 4.3.1. Structural representation via Annotatable Thing Ontology:
+#### 4.4.1. Structural representation via Annotatable Thing Ontology:
 
 A straightforward way for the client to communicate structural information about the resource is to send the RDFa information of a resource using the vocabulary that it's based on as context. In that case of the *van Gogh Correspondence*, this is the Annotatable Thing ontology created by Peter Boot:
 
@@ -378,7 +390,7 @@ The annotation server can store all structural relations including those between
 
 
 <a name="representing_as_abstract_class"></a>
-#### 2. Using the Annotatable Ontology as an abstract class
+#### 4.4.2. Using the Annotatable Ontology as an abstract class
 
 An question to consider is whether it is possible and preferable to send only (a reference to) the ontology as an abstract class that explains the structural relations, such that the server knows that a `letter` has a `sender` and a `receiver` without having to explicitly receive and store all the relations between the URNs of the sub-resources. 
 
@@ -398,7 +410,7 @@ To work with ontologies as abstract classes, the annotations themselves should a
 In way, using the ontology as an abstract class requires a similar solution as the **All-in-one** approach: the entire path from the *top* resource (i.e. the letter) to the annotated sub-resource (e.g. a paragraph in the translation of the letter) has to be represented in the annotation target. An unsolved problem remains with identifying the relation between a translation of a letter and its original when only the translation is displayed: does it have its own URN? If so, how is its relation with the original letter stored via the abstract class?
 
 <a name="representing_as_iiif"></a>
-#### 3. Structural representation via IIIF
+#### 4.4.3. Structural representation via IIIF
 
 An example has been worked out in the IIIF analysis document, in the section [IIIF Collections and Manifests](https://github.com/marijnkoolen/rdfa-annotation-client/blob/master/discussion/comparing-iiif-and-web-annotation-models.md#iiif_model).
 
@@ -414,7 +426,7 @@ An example has been worked out in the IIIF analysis document, in the section [II
 
 
 <a name="representing_as_schema"></a>
-#### 4. Structural representation via Schema.org
+#### 4.4.4. Structural representation via Schema.org
 
 An alternative to using our own annotatable thing ontology is to rely on [Schema.org](http://schema.org/). For instance, the van Gogh correspondence can be modelled using a combination of a number of pre-defined schemas:
 
@@ -514,6 +526,21 @@ This schema also has properties `sender` , `recipient` and `dateCreated`, but it
 	+ *Model fitness*: it uses default schema inappropriately and doesn't allow for any specific ontology properties used in editions.
 	+ *Redundancy*: The client sends the entire resource structure to the server upon parsing the resource in the browser window, regardless of whether the server already knows about the resource structure. 
 	+ *Simplicity*: It's not obvious what schema to use if the resource server doesn't specify this. E.g. in the Correspondence case the most appropriate schema might be message, but in the case of newspaper articles, it is probably a different schema. An alternative is to always use the `Thing` because it contains the `hasPart` relationship, but it doesn't allow any subtle semantics of the domain.
+
+<a name="ranking_options"></a>
+### 4.5 Ranking Modelling Options
+
+The first two options (**All-in-one** and **Structure as annotation**) lead to severe problems:
+
++ **All-in-one** doesn't easily generalise aggregation at larger levels.
++ **Structure as annotation**
+
+Of the **Structure as separate model** options, the **IIIF** and **Annotation as Abstract Class** models have severe problems:
+
++ The **IIIF** case has enormous overhead and makes inappropriate use of an open standard.
++ The **Annotation as Abstract Class** model has similar issues as the **All-in-one** approach.
+
+From the above, it seems that the most viable options is to use the *Annotatable Thing* ontology as a context to represent resource structure. Perhaps this could be treated as a special case of Schema.org as a specific schema for annotation. Alternatively, it could be seen as a general ontology that can be extended with domain-specific schemas from Schema.org. 
 
 
 <a name="reading"></a>
