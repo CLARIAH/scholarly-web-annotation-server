@@ -532,8 +532,8 @@ This schema also has properties `sender` , `recipient` and `dateCreated`, but it
 
 The first two options (**All-in-one** and **Structure as annotation**) lead to severe problems:
 
-+ **All-in-one** doesn't easily generalise aggregation at larger levels.
-+ **Structure as annotation**
++ **All-in-one** forces the server to parse annotations to reason over structure, has high duplication and doesn't easily generalise aggregation at larger levels (multiple parents).
++ **Structure as annotation** has high overhead in exchanging information, doesn't clearly separate resource structure information from annotations and doesn't fit well with the purposes of the W3C Web Annotation model. 
 
 Of the **Structure as separate model** options, the **IIIF** and **Annotation as Abstract Class** models have severe problems:
 
