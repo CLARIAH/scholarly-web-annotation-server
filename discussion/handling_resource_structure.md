@@ -386,11 +386,11 @@ The annotation server can store all structural relations including those between
 
 
 <a name="representing_as_abstract_class"></a>
-#### 4.4.2. Using the Annotatable Ontology as an abstract class
+#### 4.4.2. Using the Annotatable Thing Ontology as an abstract class
 
-An question to consider is whether it is possible and preferable to send only (a reference to) the ontology as an abstract class that explains the structural relations, such that the server knows that a `letter` has a `sender` and a `receiver` without having to explicitly receive and store all the relations between the URNs of the sub-resources. 
+A question to consider is whether it is possible and preferable to send only (a reference to) the ontology as an abstract class that explains the structural relations for letters in general, such that the server knows that a `Letter` has a `Sender` and a `Receiver` and may have a `Translation` without having to explicitly receive and store all the relations between the URNs of the sub-resources. Thus, for an annotation on the `Translation`, the *target* refers to the `Translation` property of the letter identified by its URN `urn:vangogh:letter001`.
 
-The gain would be that potentially less information is sent by the client. However, if the ontology is very elaborate or complex while individual resources based on it are typically much simpler, it might require a smaller payload to send only the few resource IRIs and their structural relations. 
+The gain would be that potentially less information is sent by the client. The server only needs to retrieve the ontology once to store it as an abstract class so it knows what properties a `Letter` has. However, if the ontology is very elaborate or complex while individual resources based on it are typically much simpler, it might require a smaller payload to send only the few resource IRIs and their structural relations. 
 
 To work with ontologies as abstract classes, the annotations themselves should also rely on ontology information, that is, use the URN of the letter as target and use the path to the annotated sub-resource(s) as selectors within that target. There are several problems that need to be solved are.
 
@@ -408,7 +408,7 @@ In way, using the ontology as an abstract class requires a similar solution as t
 <a name="representing_as_iiif"></a>
 #### 4.4.3. Structural representation via IIIF
 
-An example has been worked out in the IIIF analysis document, in the section [IIIF Collections and Manifests](https://github.com/marijnkoolen/rdfa-annotation-client/blob/master/discussion/comparing-iiif-and-web-annotation-models.md#iiif_model).
+An example has been worked out in an earlier document analysing the IIIF Presentation model, in the section [IIIF Collections and Manifests](https://github.com/marijnkoolen/rdfa-annotation-client/blob/master/discussion/comparing-iiif-and-web-annotation-models.md#iiif_model).
 
 + *Pros*:
 	+ *Open standards*: makes use of existing standard for representing structure. 
@@ -524,12 +524,12 @@ This schema also has properties `sender` , `recipient` and `dateCreated`, but it
 	+ *Simplicity*: It's not obvious what schema to use if the resource server doesn't specify this. E.g. in the Correspondence case the most appropriate schema might be message, but in the case of newspaper articles, it is probably a different schema. An alternative is to always use the `Thing` because it contains the `hasPart` relationship, but it doesn't allow any subtle semantics of the domain.
 
 <a name="ranking_options"></a>
-### 4.5 Ranking Modelling Options
+### 4.5 Choosing between Modelling Options
 
 The first two options (**All-in-one** and **Structure as annotation**) lead to severe problems:
 
 + **All-in-one** forces the server to parse annotations to reason over structure, has high duplication and doesn't easily generalise aggregation at larger levels (multiple parents).
-+ **Structure as annotation** has high overhead in exchanging information, doesn't clearly separate resource structure information from annotations and doesn't fit well with the purposes of the W3C Web Annotation model. 
++ **Structure as annotation** has high overhead in exchanging information, doesn't clearly separate resource structure information from annotations leading to potential ambiguity and doesn't fit well with the purposes of the W3C Web Annotation model. 
 
 Of the **Structure as separate model** options, the **IIIF** and **Annotation as Abstract Class** models have severe problems:
 
