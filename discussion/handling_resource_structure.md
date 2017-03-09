@@ -374,16 +374,15 @@ A straightforward way for the client to communicate structural information about
 The annotation server can store all structural relations including those between the original letter and its translation, and between the translation and its second paragraph. This allows traversal from any of these three resources to the annotation about the salutation.
 
 + *Pros*:
-	+ *Simplicity*: the structural representation can lean entirely on the ontology used to describe the resource (responsibility of the resource server).
-	+ *Conciseness*: the structural representation only contains structural information. In the above example it is possible to leave out the `@type` information to leave only the relationship information.
-	+ *Open standards*: In a way this is the most flexible and open, as it allows use of different ontologies. The main point is that the server should know how to interpret relationships like `hasEnrichment` and `hasNote`, but perhaps it needs nothing more than to use these as edge labels (it can find out about their inverse, e.g. `isPartOf` from the `@context`.
+	+ *Simplicity*: the structural representation can lean entirely on the ontology used to describe the resource (which is the responsibility of the resource server).
+	+ *Conciseness*: the structural representation only contains structural information. In the above example it is possible to leave out the `@type` information to leave only the relationship information. All this information is stored by the server.
 	+ *Separation of concerns*: hierarchal resource structure is modelled differently from annotations, there can naturally be handled differently by the server. 
 	+ *Model fitness*: this makes full use of the annotation ontology and allows the server to use the same structure-related semantics as the client. 
 + *Cons*:
-	+ *Open standards*: It introduces the annotatable thing ontology as yet another new ontology. **Note**: it is possible for resource/edition servers to use existing ontologies (e.g. Schema.org). 
+	+ *Open standards*: It introduces the annotatable thing ontology as yet another new ontology. 
 	+ *Redundancy*: The client sends the entire resource structure to the server upon parsing the resource in the browser window, regardless of whether the server already knows about the resource structure. 
 
-**Note**: as the structure of the letter is based on a template, it feels verbose to send all structural connections for each individual letter. For *conciseness*, it would be better if only a reference to the ontology would suffice. 
+**Note**: as the structure of the letter is based on a template, it feels verbose to send all structural connections for each individual letter. For *conciseness*, it would be better if the annotation only mentions that a `Paragraph` in the `Translation` of the `Letter` is targeted, and includes a reference to the ontology from the server can reason that a `Letter` can have an *enrichment* called a `Translation`, which can have a `hasPart` relation with a `Paragraph`. 
 
 
 <a name="representing_as_abstract_class"></a>
