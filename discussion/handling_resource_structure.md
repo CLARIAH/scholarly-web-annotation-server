@@ -117,7 +117,7 @@ The annotation client and server have to use an exchange protocol and data model
 + *Separation of concerns*: the structural relations between annotatable resources are needed for aggregating annotations on a requested resource, they are provided by the responsible agent of the edition server. The annotations are created by the users of the annotated resource and bear on the resources themselves, not necessarily on their structural relations. The annotation server should treat structural relations between resources differently from annotations on resources. This separation of concerns should ideally be reflected in the data structures used for representing structure and annotation. Clear separation is preferred.
 + *Conciseness*: annotation targets should contain no more information than necessary for identification. More concise is preferred. 
 + *Redundancy*: the amount of duplication of structural information across representations in the annotation server.
-+ *Multiple parents*: a resource can be part of multiple collections (resource re-use). It should be possible to represent multiple parentage in the annotation server, so that annotations can be aggregated for different parents. 
++ *Multiple parents*: a resource can be part of multiple collections (resource re-use). It should be possible to represent multiple parentage in the annotation server, so that annotations can be aggregated for different parents. For instance, the translation of a letter can be part of the original letter but also be part of a collection of translations of letters without reference to the original letter. 
 + *Open standards*: the extent to which open standards are used in the exchange protocol. Open standards are preferred.
 + *Model fitness*: Existing standards may not always be a perfect fit for the scenario that needs to be modelled. It is preferred to use models that fit the domain and scenario and allow communicating the appropriate and necessary semantics.
 
@@ -128,7 +128,7 @@ The annotation client and server have to use an exchange protocol and data model
 
 Each annotation contains the structure information about the resource in the annotation target, using selectors and refinements.
 
-Example:
+The example below is an annotation conforming to the W3C Web Annotation model, where the target is the receiver of a letter from the Van Gogh correspondence. The body of the annotation indicates that the receiver is classified with a term from DBpedia, i.e. the person referred to as receiver:
 
 ```json
 {
@@ -162,13 +162,15 @@ Example:
 
 + *pros*: 
 	+ *Simplicity*: It uses a single data structure for exchange.
-	+ *Interpretation*: annotations require less context for interpretation.
+	+ *Interpretation*: annotations in this form contain a lot of information about the resource that aids interpretation when the annotation is presented outside of the context of the letter. 
 	+ *Open standards*: Only the W3C Web Annotation standard is used. No home-grown models are used.
 + *cons*:
-	+ *Separation of concerns*: server cannot reason over structure outside of annotations, should check for consistency across annotations with targets that share structural elements. 
+	+ *Interpretation*: the server cannot (easily) distinguish between targets that are *resources* and targets that are other *annotations*.
+	+ *Separation of concerns*: the server cannot reason about resource structure outside of annotations. 
 	+ *Conciseness*: annotations contain more structural information than necessary for many contexts
-	+ *Redundancy*: high duplication of structural information, all annotations on resource X contain the same structural information
-	+ *Multiple parents*: annotations on the same resource made in a different contexts show different parentage (is maybe a positive aspect?). To allow for traversal from the requested resource to a descendant resource, the server needs to break down the hierarchy of structural information in each annotation target and store the relations between hierarchically related (sub-)resources. 
+	+ *Redundancy*: high duplication of structural information, all annotations on resource X contain the same structural information. E.g. each annotation on the receiver of the letter duplicates the structural information that the receiver is part of the letter.
+	+ *Multiple parents*: annotations on the same resource made in a different contexts, e.g. a translation as part of the original and as part of a collection of translations, show different parentage. If an annotation is made on the translation of a letter in the context of its original, and is subsequently retrieved in the context of a collection of translations, it is confusing that the annotation shows a different parent.
+	+ *Model fitness*: annotations are used both as annotation and as carriers of structural information that the server has to parse to build a resource structure model. To allow for traversal from the requested resource to a sub-resource, the server needs to break down the hierarchy of structural information in each annotation target and store the relations between hierarchically related (sub-)resources. 
 
 
 
@@ -176,9 +178,9 @@ Example:
 <a name="representing_as_annotation"></a>
 ### 4.3. Structure as Separate Annotation
 
-A structural relation between a resource and a sub-resource is represented as an annotation.
+It is possible to separate resource structure information from annotation information by representing them as separate data structures. One approach is to represent the structural relation between a resource and a sub-resource as a separate *annotation*.
 
-Example annotation:
+With the structural information removed from the actual annotation, the receiver annotation is represented as follows:
 
 ```json
 {
@@ -205,7 +207,7 @@ Example annotation:
 }
 ```
 
-Example structural relation:
+The structural relation is represented in a separate annotation as follows:
 
 ```json
 {
