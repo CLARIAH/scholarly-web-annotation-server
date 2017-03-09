@@ -234,31 +234,26 @@ The structural relation is represented in a separate annotation as follows:
 
 + *pros*:
 	+ *Simplicity*: all representations are W3C annotations.
-	+ *Redundancy*: Each relation is stored only once, resulting in low redundancy.
-	+ *Conciseness*: Lazy storing of resource structure, i.e. only the structural relations of annotated (sub-)resources are stored. 
+	+ *Redundancy*: Each relation is stored only once, resulting in low redundancy compared to the annotation that embeds the resource structure.
+	+ *Conciseness*: Lazy storing of resource structure, i.e. only the structural relations of (sub-)resources are stored for the parts that are actually annotated. 
 	+ *Open standards*: Only the W3C Web Annotation standard is used. No home-grown models are used.
-	+ *Multiple parents*: Each hierarchical relationship is send as separate annotation, so the server can traverse from different ancestors to the same descendant resource.
+	+ *Multiple parents*: Each hierarchical relationship is send as separate annotation, so the server can easily traverse from different ancestors to the same descendant resource.
 
 + *Cons*:
-	+ *Conciseness*: each structural relation is sent as a separate representation with unnecessary W3C annotation metadata. This generates a load of overhead in transmitted data.
-	+ *Separation of concerns*: The representations do no reflect the different natures of annotations and structural relations.
-	+ *Model fitness*: The Web Annotation model is used differently from its intended purpose, namely to describe structural information that should not be displayed to the user.
+	+ *Conciseness*: each structural relation is sent as a separate representation with unnecessary W3C annotation metadata. This generates a lot of overhead in transmitted data.
+	+ *Separation of concerns*: Although the two types of information are sent in separate representations, they do no reflect the different natures of annotations and structural relations. The server has to parse each annotation to determine what to do with it, e.g. store as resource structure or as annotation on resources. Or it stores both as annotation but then, when receiving a request to send annotations on a resource, it has to determine which annotations refer to resource structure and which represent actual annotations.
+	+ *Model fitness*: The Web Annotation model is used differently from its intended purpose, as the server discards most of the annotation and only stores the relation between resource and sub-resource. Also, this may introduce ambiguity, such that it's not clear whether an annotation represents structure information (e.g. a translation belonging to original) or an annotation to indicate that two resources are linked (e.g. linking a letter that mentions a painting to the identifier of that painting). This makes it problematic for the server to figure where to stop its travels over resource structure (it should not traverse to the painting and annotations on that painting).
 
 
 <a name="representing_as_model"></a>
 ### 4.4. Structure as Separate Model
 
-Structural information is represented in a different data structure, based on e.g. the Annotatable Thing ontology, or using an existing data model such as the [IIIF Presentation model](http://iiif.io/api/presentation/2.1/) or [Schema.org](http://schema.org).
+A way to solve the problem of ambiguity is to represent structural information in a different data model, based on e.g. the Annotatable Thing ontology, or using an existing data model such as the [IIIF Presentation model](http://iiif.io/api/presentation/2.1/) or a schema definition from [Schema.org](http://schema.org).
 
-There are multiple options for exchanging structural information between annotation server and client:
+In this case, a choice has to be made on when the client sends structural information to the server and what structure information to send. A *lazy* client sends only structural relations between annotated target and its ancestors when an annotation is made. A *pro-active* client sends the entire resource structure (i.e. the resource and all its sub-resources) when a new resource is loaded in the browser window.
 
-+ *Lazy, partial, atomic*: client sends only structural relations between annotated target and its ancestors, each parent-child relation as separate data structure. The server stores each relation directly.
-+ *Lazy, partial, composite*: client sends only structural relations between annotated target and its ancestors, all parent-child relations in one hierarchical data structure. The server parses the hierarchy and stores individual relations.
-+ *Pro-active, complete, composite*: client sends whole resource structure to server, either upon loading a resource, regardless of whether a user makes an annotation, 
-+ *Lazy, complete, composite*: client sends whole resource structure to server together with a new or updated annotation, regardless of which (sub-)resource is the annotation target. 
-
-In the various options below, the information about the hierarchical structure of resources that is sent between client and server
-The example annotation below, identifying the paragraph in the translation of a letter that contains the salutation, is used to compare the different models for handling hierarchical structure:
+To compare the different models for handling hierarchical structure, a different example annotation is used, that identifies the paragraph in the translation of a letter that contains the salutation.
+:
 
 ```json
 {
@@ -285,7 +280,7 @@ The example annotation below, identifying the paragraph in the translation of a 
 }
 ```
 
-The target is the URN of the second paragraph of the English translation of the letter that is originally written in Dutch. All information regarding the relation between the annotated paragraph and the original letter, its translation and the larger correspondence should be handled separately in a structure-oriented data model.
+The target is the URN of the second paragraph of the English translation of the letter (which contains the salutation to the receiver, "Dear Theo" in the translation) that is originally written in Dutch ("Waarde Theo"). All information regarding the relation between the annotated paragraph and the original letter, its translation and the larger correspondence should be handled separately in a structure-oriented data model.
 
 <a name="representing_as_annotatable_thing"></a>
 #### 4.4.1. Structural representation via Annotatable Thing Ontology:
