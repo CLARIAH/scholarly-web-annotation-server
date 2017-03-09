@@ -400,7 +400,7 @@ To work with ontologies as abstract classes, the annotations themselves should a
 	+ 	*Separation of concerns*: Hierarchical resource structure is modelled differently from annotations, so can naturally be handled separately.
 + *Cons*:
 	+ *Disambiguation*: how to refer to a specific sub-resource that is part of a list of sub-resources of the same type, at the same structural level. For instance, the example letter has 7 paragraphs. How should the annotation target identify the *n-th* paragraph in that list? More problematically, what information should the client send when the target is the *n-th* paragraph of the translation of the letter? 
-	+ *Multiple parents*: if the translation of a letter is a sub-resource of that letter as well as of a collection of translations, then how should it be represented as an annotation target? The translation is a resource in its own right (it's a creative work) and can use the same ontology as template (e.g. it is a letter with paragraphs and notes as sub-resources). If only the translation is displayed so that the annotation client only sees the translation as top-level resource, how should the client communicate that a paragraph in that translation is part of the original letter? 
+	+ *Multiple parents*: if the translation of a letter is a sub-resource of that letter as well as of a collection of translations, then how should it be represented as an annotation *target*? The translation is a resource in its own right (it's a creative work) and can use the same ontology as template (e.g. it is a letter with paragraphs and notes as sub-resources). If only the translation is displayed so that the annotation client only sees the translation as top-level resource, how should the client communicate that a paragraph in that translation is part of the original letter? 
 	+ *Simplicity*: For multilevel hierarchies, the annotation should contain all the structural information between the lowest level base target and the deepest level sub-resource at which the annotation is made.
 
 In way, using the ontology as an abstract class requires a similar solution as the **All-in-one** approach: the entire path from the *top* resource (i.e. the letter) to the annotated sub-resource (e.g. a paragraph in the translation of the letter) has to be represented in the annotation target. An unsolved problem remains with identifying the relation between a translation of a letter and its original when only the translation is displayed: does it have its own URN? If so, how is its relation with the original letter stored via the abstract class?
@@ -415,18 +415,18 @@ An example has been worked out in an earlier document analysing the IIIF Present
 	+ *Multiple parents*: Multiple collections can contain the same (sub-)resource, so travel from different ancestors to the same descendant is not problematic.
 	+ *Separation of concerns*: Hierarchical resource structure is modelled differently from annotations, so can naturally be handled separately.
 + *Cons*:
-	+ *Model fitness*: uses standard for other than intended purpose (IIIF Presentation API is intended for image viewers to understand structure of images representing an object).
-	+ *Simplicity*: It introduces two types of structural elements, i.e. collections and manifests.
+	+ *Model fitness*: uses the IIIF standard for something it wasn't designed to model (IIIF Presentation API is intended for image viewers to understand structure of images representing an object).
+	+ *Simplicity*: It introduces two types of structural elements, i.e. collections and manifests, instead of just one.
 	+ *Conciseness*: The IIIF model generates a lot of overhead to represent simple relationships, mainly because it is intended to provide display information in manifests.
-	+ *Redundancy*: A huge of amount of unnecessary information about a resource is sent every time the client retrieves or submits annotations.
+	+ *Redundancy*: A lot of unnecessary information about a resource is sent every time the client retrieves or submits annotations.
 
 
 <a name="representing_as_schema"></a>
 #### 4.4.4. Structural representation via Schema.org
 
-An alternative to using our own annotatable thing ontology is to rely on [Schema.org](http://schema.org/). For instance, the van Gogh correspondence can be modelled using a combination of a number of pre-defined schemas:
+An alternative to using our own *Annotatable Thing* ontology is to rely on [Schema.org](http://schema.org/). For instance, the van Gogh correspondence can be modelled using a combination of a number of pre-defined schemas:
 
-+ [Message](http://schema.org/Message), [TranslationOfWork](http://bib.schema.org/workTranslation) and [Painting](http://schema.org/Painting) (for paintings mentioned in letters)
++ [Message](http://schema.org/Message) and [TranslationOfWork](http://bib.schema.org/workTranslation).
 
 ```json
 {
@@ -484,25 +484,25 @@ An alternative to using our own annotatable thing ontology is to rely on [Schema
 	  "id": "urn:vangogh:letter001.translation",
 	  "hasPart": [
         {
-          "id": "urn:vangogh:letter001:p.1",
+          "id": "urn:vangogh:letter001:translation.p.1",
 		},
 		{
-		  "id": "urn:vangogh:letter001:p.2",
+		  "id": "urn:vangogh:letter001:translation.p.2",
 		},
 		{
-		  "id": "urn:vangogh:letter001:p.3",
+		  "id": "urn:vangogh:letter001:translation.p.3",
 		},
 		{
-		  "id": "urn:vangogh:letter001:p.4",
+		  "id": "urn:vangogh:letter001:translation.p.4",
 		},
 		{
-		  "id": "urn:vangogh:letter001:p.5",
+		  "id": "urn:vangogh:letter001:translation.p.5",
 		},
 		{
-		  "id": "urn:vangogh:letter001:p.6",
+		  "id": "urn:vangogh:letter001:translation.p.6",
 		},
 		{
-		  "id": "urn:vangogh:letter001:p.7",
+		  "id": "urn:vangogh:letter001:translation.p.7",
         }
       ]
     }
@@ -516,12 +516,12 @@ This schema also has properties `sender` , `recipient` and `dateCreated`, but it
 	+ *Open standards*: it uses an open standard for communicating structure as well as for annotation.
 	+ *Conciseness*: the structural representation only contains structural information. 
 	+ *Separation of concerns*: Hierarchical resource structure is modelled differently from annotations, so can naturally be handled separately.
-	+ *Multiple parents*: Multiple collections can contain the same (sub-)resource, so travel from different ancestors to the same descendant is not problematic.
+	+ *Multiple parents*: Multiple collections can contain the same (sub-)resource, so traversal from different ancestors to the same descendant is not problematic.
 
 + *Cons*:
-	+ *Model fitness*: it uses default schema inappropriately and doesn't allow for any specific ontology properties used in editions.
+	+ *Model fitness*: it uses the default schema inappropriately (most of the message properties are ignored, in fact in only uses properties from the generic [CreativeWork](http://schema.org/CreativeWork) schema) and doesn't allow for any specific ontology *properties* used in editions, such as `hasEnrichment` and `isCarriedOn`.
 	+ *Redundancy*: The client sends the entire resource structure to the server upon parsing the resource in the browser window, regardless of whether the server already knows about the resource structure. 
-	+ *Simplicity*: It's not obvious what schema to use if the resource server doesn't specify this. E.g. in the Correspondence case the most appropriate schema might be message, but in the case of newspaper articles, it is probably a different schema. An alternative is to always use the `Thing` because it contains the `hasPart` relationship, but it doesn't allow any subtle semantics of the domain.
+	+ *Simplicity*: It's not obvious what schema to use for different types of resources. E.g. in the Correspondence case the most appropriate schema might be message, but in the case of newspaper articles, it is probably a different schema. An alternative is to always use the `CreativeWork` because it contains the `hasPart` relationship, but it doesn't allow any specific semantics of the domain. **Although it is possible to let the *resource* server specify what schema should be used (next to the *Annotatable Thing* ontology for indicating what can annotated) but this falls outside its responsibilities. It shouldn't have to specify which schema the annotation client and server use to communicate with each other. **
 
 <a name="ranking_options"></a>
 ### 4.5 Choosing between Modelling Options
