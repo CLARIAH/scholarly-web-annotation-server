@@ -380,9 +380,9 @@ The annotation server can store all structural relations including those between
 	+ *Conciseness*: the structural representation only contains structural information. In the above example it is possible to leave out the `@type` information leaving only the relationship information. All this information is stored by the server.
 	+ *Separation of concerns*: the hierarchical resource structure is modelled differently from the annotations, they can naturally be handled differently by the server. 
 	+ *Model fitness*: this makes full use of the annotation ontology and allows the server to use the same structure-related semantics as the client. 
+	+ *Redundancy*: The client first asks the server if it already knows about the resource. If not, the client sends the entire resource structure to the server upon parsing the resource in the browser window. Otherwise, no structural information needs to be sent. 
 + *Cons*:
-	+ *Open standards*: It introduces the annotatable thing ontology as yet another new ontology. 
-	+ *Redundancy*: The client sends the entire resource structure to the server upon parsing the resource in the browser window, regardless of whether the server already knows about the resource structure. [ the client could ask the server first if it already has this information? ]
+	+ *Open standards*: It introduces the Annotatable Thing ontology as yet another new ontology. However, the ontology is not the responsibility of the client nor of the server. They're using a published ontology and a standard format (JSON-LD) for exchange. 
 
 **Note**: as the structure of the letter is based on a template, it feels verbose to send all structural connections for each individual letter. For *conciseness*, it would be better if the annotation only mentions that a `Paragraph` in the `Translation` of the `Letter` is targeted, and includes a reference to the ontology, so the server can reason that a `Letter` can have an *enrichment* called a `Translation`, which can have a `hasPart` relation with a `Paragraph`. 
 
