@@ -60,7 +60,7 @@ To ensure a clearly defined and computationally tractable set of annotations to 
 
 + Resources and annotations are considered different types, whereby resources can only link to sub-resources, whereas annotations can link to resources *and* to already-existing annotations. This results in a *two-type network*, i.e. each node belongs to one of two types. 
 + Sub-resources cannot link to higher-level resources, to avoid cycles. This design decision brings certain limitations of what can be modelled, but helps to frame the problem and limits the problem space. 
-+ Annotations can themselves become resources (changing their type and switching to the other side of the two-type network), but only through editorial decisions. [not sure about the following constraint]: This makes the annotation into a publicly visible resource. The annotation becomes a sub-resource of the resource it annotates.
++ Annotations can themselves become resources (changing their type and switching to the other side of the two-type network), but only through editorial decisions. [MK: not sure about the following constraint]: This makes the annotation into a publicly visible resource. The annotation becomes a sub-resource of the resource it annotates.
 
 <a name="domain_characteristics"></a>
 ### 2.3 Domain model characteristics
@@ -68,19 +68,19 @@ To ensure a clearly defined and computationally tractable set of annotations to 
 The domain constraints described above have a number of consequences for the domain model:
 
 + Resources and their sub-resources form trees. 
-+ Resources can be grouped in arbitrary(?) collections, where individual resources can belong to multiple collections. 
++ Resources can be grouped in arbitrary collections, where individual resources can belong to multiple collections. 
 + A consequence of allowing arbitrary collections is that resource trees can be grouped in such a way that resources can have multiple parents. Instead of a *forest*, the resulting structure of trees is a [Direct Acyclic Graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG). 
 + Annotations can target one or more resources and/or one or more annotations. 
 + Annotations can be targeted by multiple other annotations (multiple parentage). 
 + The annotation graph is therefore also a DAG. However, the endpoint of a directed chain of annotations is always a *resource*.
 + Annotations can only target existing annotations, so the graph is also temporally ordered. 
-+ A chain of annotations always ends in leaf annotations that target *resources*. [ == "the endpoint of a directed chain of annotations is always a *resource*" ?]
++ A chain of annotations always ends in a leaf annotation that targets one or more *resources*. The endpoint of a directed chain of annotations is always a *resource*".
 + This results in a single graph structure, with resources on one side and annotations on the other side. However, it is not a [bipartite graph](https://en.wikipedia.org/wiki/Bipartite_graph), because 1) among resources, links are always between nodes of the same type, namely resource-to-resource, 2) annotations can link to both resources and annotations.  
 
 <a name="responsibilities"></a>
 ## 3. Architecture and Responsibilities
 
-In Peter's IAnnotate presentation, he suggested three [responsibilities?]
+In Peter's IAnnotate presentation, he suggested an architecture with three components:
 
 + **Editition server**: 
 	+ serve up an edition (or more generally, a resource) to a user in a browser,
