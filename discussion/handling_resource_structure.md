@@ -287,11 +287,9 @@ The target is the URN of the second paragraph of the English translation of the 
 
 A straightforward way for the client to communicate structural information about the resource is to send the RDFa information of a resource using the vocabulary that it's based on as context. In the case of the *van Gogh Correspondence*, this is the Annotatable Thing ontology created by Peter Boot:
 
-[ The @context links to a Turtle file, I think it should refer to a json file that maps properties like "hasMetadataItem" to an IRI ]
-
 ```json
 {
-  "@context": "http://boot.huygens.knaw.nl/annotate/vangoghontology.ttl#", 
+  "@context": "http://boot.huygens.knaw.nl/annotate/vangoghontology.json", 
   "@type": "Letter", 
   "id": "urn:vangogh:letter001", 
   "hasMetadataItem": [
