@@ -430,11 +430,9 @@ An alternative to using our own *Annotatable Thing* ontology is to rely on [Sche
 
 + [Message](http://schema.org/Message) and [TranslationOfWork](http://bib.schema.org/workTranslation).
 
-[ http://schema.org does not refer to a valid context ]
-
 ```json
 {
-  "@context": "http://schema.org/",
+  "@context": "http://schema.org/docs/jsonldcontext.json",
   "@type": "Message",
   "id": "urn:vangogh:letter001",
   "hasPart": [
