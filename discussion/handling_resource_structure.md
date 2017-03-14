@@ -94,8 +94,9 @@ In Peter's IAnnotate presentation, he suggested three [responsibilities?]
 	+ exchanges annotations and resource structure with the annotation server.
 
 + **Annotation server**:
-	+ reasons [about?] resource structure [by?] storing and retrieving annotations related to a resource.
 	+ exchanges annotations and resource structure with the annotation client.
+	+ store and retrieve annotations and resource structure
+	+ reasons about resource structure to identify (sub-)resources that have annotations on them, to gather all annotations related to a resource.
 
 
 <a name="representing"></a>
