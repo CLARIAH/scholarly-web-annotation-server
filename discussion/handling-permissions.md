@@ -28,6 +28,6 @@ Types of operations permitted:
 + edit:
 + delete:
 
-### Capturing permissions in annotations
+### Capturing groups and permissions in annotations
 
-The W3C working group for Web Annotations suggests to use the `audience` property for any *group*-related aspects and that *authorization* and *authentication* are not responsibilities of the annotation data model. 
+The W3C working group for Web Annotations suggests to use the [audience](https://www.w3.org/TR/annotation-model/#intended-audience) property for any *group*-related aspects and that *authorization* and *authentication* are not responsibilities of the annotation data model (as discussed in this issue on GitHub: [How do we model "groups" in the Annotation Model](https://github.com/w3c/web-annotation/issues/119)). 
