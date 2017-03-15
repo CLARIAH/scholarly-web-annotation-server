@@ -14,19 +14,30 @@ Each annotation must have see/edit/delete permissions for at least one user (typ
 
 The most basic permission is being able to read/see/view an annotation. Given that a user can create, retrieve, edit, and remove annotations, it makes sense to have separate permissions for different *operations*, e.g. seeing, changing and removing (**question: should changing and removing be a single operational permission?**). This can also be based on the UNIX model for read/write/execute permissions. The *execute* operation in UNIX has no meaningful correspondence in the annotation domain, so it can be discarded.
 
-### Permission model
+This results in the following list of requirements:
+
++ R1: there should be permission levels for owner, group and public.
++ R2: operation types should have their own permissions.
++ R3: ownership should be transferrable. 
++ R4: owners should be able to change operation permissions per level and per group.
+
+## Permission model
 
 Types of permissions:
 
-+ user
-+ group
-+ public
++ **owner**: the user who is the owner of the annotation. By default, this is the creator of the annotation, but it should be possible to transfer ownership to other users or groups of users. The owner can only be a single entity, e.g. either a single user or a single group.
++ **group**: the group(s) who have access to the annotation. Each user represents their own group. Additional groups can be made that can have multiple members. Users may want to share an annotation with multiple users and/or multi-user groups, so this can be a list of groups (single-user and multi-user groups).
++ **public**: the public represents any user. The server may return *public* annotations for requests without an authenticated user.
+
+The owner of an annotation can have 
 
 Types of operations permitted:
 
-+ read:
-+ edit:
-+ delete:
++ **read**: the permission to see/view/read an annotation. The responsibility lies with the server to return only annotations to a user who has read permissions.
++ **edit**: the permission to make changes to an annotation. Changes are timestamped via the `modified` property. To avoid overly complex permission models, there should only be a single set of properties that are allowed to be changed. The properties relation to the creation of the annotation (e.g. `creator`, `created`) should not be changeable. The server should check with each PUT request whether the user has edit permissions. The client can indicate edit permissions through e.g. an edit button. 
++ **delete**: the permission to completely remove an annotation. 
+
+There are some issues regarding *editing* and *deleting* annotations. If an annotation is the target of a later annotation, it cannot be changed or removed without consequences. One way of dealing with this is to add a notification to annotations that target a changed/deleted annotation. Another way is to not allow changing/removing annotations that are targets of other annotations. 
 
 ### Capturing groups and permissions in annotations
 
