@@ -175,7 +175,8 @@ class AnnotationStore(object):
             anno = self.index[anno_id]
             if self.get_type(anno_id) == "structural":
                 annotations += self.get_by_target(anno.data['body']['source'])
-            annotations += [anno.data]
+            else:
+                annotations += [anno.data]
         return annotations
 
     def exists(self, annotation_id):
