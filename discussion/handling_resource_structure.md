@@ -24,12 +24,6 @@
 	+ 5.3 [Schema.org](#reading_schema)
 	+ 5.4 [IIIF](#reading_iiif)
 
-**Comments from Rik (21-03-2017):**
-
-- edition should be able to register its collection (e.g. which letters are part of the entire correspondence. The individual sub-resource of the letters are only registered upon receiving an annotation on a letter.
-- the text is hard to follow, make more reference to the use cases especially when discussing the more abstract concepts. 
-
-
 <a name="use_cases"></a>
 ## 1. Use cases
 
@@ -388,7 +382,11 @@ The annotation server can store all structural relations including those between
 + *Cons*:
 	+ *Open standards*: It introduces the Annotatable Thing ontology as yet another new ontology. However, the ontology is not the responsibility of the client nor of the server. They're using a published ontology and a standard format (JSON-LD) for exchange. 
 
-**Note**: as the structure of the letter is based on a template, it feels verbose to send all structural connections for each individual letter. For *conciseness*, it would be better if the annotation only mentions that a `Paragraph` in the `Translation` of the `Letter` is targeted, and includes a reference to the ontology, so the server can reason that a `Letter` can have an *enrichment* called a `Translation`, which can have a `hasPart` relation with a `Paragraph`. 
+**Note**: 
+
+- as the structure of the letter is based on a template, it feels verbose to send all structural connections for each individual letter. For *conciseness*, it would be better if the annotation only mentions that a `Paragraph` in the `Translation` of the `Letter` is targeted, and includes a reference to the ontology, so the server can reason that a `Letter` can have an *enrichment* called a `Translation`, which can have a `hasPart` relation with a `Paragraph`. 
+- With the model, it is possible for the edition server to register a collection and its members at the annotation server, so the server is aware of the collection structure and can aggregate at the (sub-)collection level. This is done in the same way and with the same protocol as the annotation client uses to register the structure of a resource. When an individual letter is loaded in a browser together with the annotation client, the client sends information about the structural elements of the letter and doesn't have to worry about registering the membership of the letter to any larger resources. Each collection maintainer that wants to offer annotation functionality for a collection can register relationships between the collection and each member. This way, multiple collections containing the same resource get access to the same annotations on that resource.
+
 
 
 <a name="representing_as_abstract_class"></a>
