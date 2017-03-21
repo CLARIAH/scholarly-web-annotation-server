@@ -24,7 +24,7 @@
 	+ 5.3 [Schema.org](#reading_schema)
 	+ 5.4 [IIIF](#reading_iiif)
 
-**Comments from Rik:**
+**Comments from Rik (21-03-2017):**
 
 - edition should be able to register its collection (e.g. which letters are part of the entire correspondence. The individual sub-resource of the letters are only registered upon receiving an annotation on a letter.
 - the text is hard to follow, make more reference to the use cases especially when discussing the more abstract concepts. 
