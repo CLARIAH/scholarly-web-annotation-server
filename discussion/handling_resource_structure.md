@@ -411,10 +411,12 @@ The annotation server can store all structural relations including those between
 			"id": "urn:vangogh:letter004", 
 			"type": "Letter"
 		},
+		...
 	]
 }
 ```
 
+This collection level registration introduces no new requirements for the annotation client and server and allows for discovery of annotations made on collection items in different contexts.
 
 <a name="representing_as_abstract_class"></a>
 #### 4.4.2. Using the Annotatable Thing Ontology as an abstract class
