@@ -387,8 +387,33 @@ The annotation server can store all structural relations including those between
 **Note**: 
 
 - as the structure of the letter is based on a template, it feels verbose to send all structural connections for each individual letter. For *conciseness*, it would be better if the annotation only mentions that a `Paragraph` in the `Translation` of the `Letter` is targeted, and includes a reference to the ontology, so the server can reason that a `Letter` can have an *enrichment* called a `Translation`, which can have a `hasPart` relation with a `Paragraph`. 
-- With the model, it is possible for the edition server to register a collection and its members at the annotation server, so the server is aware of the collection structure and can aggregate at the (sub-)collection level. This is done in the same way and with the same protocol as the annotation client uses to register the structure of a resource. When an individual letter is loaded in a browser together with the annotation client, the client sends information about the structural elements of the letter and doesn't have to worry about registering the membership of the letter to any larger resources. Each collection maintainer that wants to offer annotation functionality for a collection can register relationships between the collection and each member. This way, multiple collections containing the same resource get access to the same annotations on that resource.
+- With the model, it is possible for the edition server to register a collection and its members at the annotation server, so the server is aware of the collection structure and can aggregate at the (sub-)collection level. This is done in the same way and with the same protocol as the annotation client uses to register the structure of a resource. When an individual letter is loaded in a browser together with the annotation client, the client sends information about the structural elements of the letter and doesn't have to worry about registering the membership of the letter to any larger resources. Each collection maintainer that wants to offer annotation functionality for a collection can register relationships between the collection and each member. This way, multiple collections containing the same resource get access to the same annotations on that resource. For the *van Gogh correspondence* the edition would register the collection to the annotation server with the following structural representation (similar to the letter representation above):
 
+```json
+{
+	"@context": "http://boot.huygens.knaw.nl/annotate/vangoghontology.json", 
+	"@type": "Correspondence", 
+	"id": "urn:vangogh:letter001", 
+	"hasPart": [
+		{
+			"id": "urn:vangogh:letter001", 
+			"type": "Letter"
+		},
+		{
+			"id": "urn:vangogh:letter002", 
+			"type": "Letter"
+		},
+		{
+			"id": "urn:vangogh:letter003", 
+			"type": "Letter"
+		},
+		{
+			"id": "urn:vangogh:letter004", 
+			"type": "Letter"
+		},
+	]
+}
+```
 
 
 <a name="representing_as_abstract_class"></a>
