@@ -24,9 +24,10 @@
 	+ 5.3 [Schema.org](#reading_schema)
 	+ 5.4 [IIIF](#reading_iiif)
 
-
 <a name="use_cases"></a>
 ## 1. Use cases
+
+**To do: elaborate on use cases and integrate them more in the later sections to make those sections easier to understand.**
 
 The initial use case for this project was presented at [IAnnotate 2016 by Peter Boot](https://www.youtube.com/watch?v=PHTdfiZoNto):
 
@@ -383,8 +384,39 @@ The annotation server can store all structural relations including those between
 + *Cons*:
 	+ *Open standards*: It introduces the Annotatable Thing ontology as yet another new ontology. However, the ontology is not the responsibility of the client nor of the server. They're using a published ontology and a standard format (JSON-LD) for exchange. 
 
-**Note**: as the structure of the letter is based on a template, it feels verbose to send all structural connections for each individual letter. For *conciseness*, it would be better if the annotation only mentions that a `Paragraph` in the `Translation` of the `Letter` is targeted, and includes a reference to the ontology, so the server can reason that a `Letter` can have an *enrichment* called a `Translation`, which can have a `hasPart` relation with a `Paragraph`. 
+**Note**: 
 
+- as the structure of the letter is based on a template, it feels verbose to send all structural connections for each individual letter. For *conciseness*, it would be better if the annotation only mentions that a `Paragraph` in the `Translation` of the `Letter` is targeted, and includes a reference to the ontology, so the server can reason that a `Letter` can have an *enrichment* called a `Translation`, which can have a `hasPart` relation with a `Paragraph`. 
+- With the model, it is possible for the edition server to register a collection and its members at the annotation server, so the server is aware of the collection structure and can aggregate at the (sub-)collection level. This is done in the same way and with the same protocol as the annotation client uses to register the structure of a resource. When an individual letter is loaded in a browser together with the annotation client, the client sends information about the structural elements of the letter and doesn't have to worry about registering the membership of the letter to any larger resources. Each collection maintainer that wants to offer annotation functionality for a collection can register relationships between the collection and each member. This way, multiple collections containing the same resource get access to the same annotations on that resource. For the *van Gogh correspondence* the edition would register the collection to the annotation server with the following structural representation (similar to the letter representation above):
+
+```json
+{
+	"@context": "http://boot.huygens.knaw.nl/annotate/vangoghontology.json", 
+	"@type": "Correspondence", 
+	"id": "urn:vangogh:letter001", 
+	"hasPart": [
+		{
+			"id": "urn:vangogh:letter001", 
+			"type": "Letter"
+		},
+		{
+			"id": "urn:vangogh:letter002", 
+			"type": "Letter"
+		},
+		{
+			"id": "urn:vangogh:letter003", 
+			"type": "Letter"
+		},
+		{
+			"id": "urn:vangogh:letter004", 
+			"type": "Letter"
+		},
+		...
+	]
+}
+```
+
+This collection level registration introduces no new requirements for the annotation client and server and allows for discovery of annotations made on collection items in different contexts.
 
 <a name="representing_as_abstract_class"></a>
 #### 4.4.2. Using the Annotatable Thing Ontology as an abstract class
