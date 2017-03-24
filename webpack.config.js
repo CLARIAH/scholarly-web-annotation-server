@@ -4,7 +4,9 @@ module.exports = {
     entry: "./src/main.jsx",
     output: {
         path: path.join(__dirname, "public/js"),
-        filename: "rdfa_annotator.js"
+        filename: "rdfa_annotator.js",
+		libraryTarget: "var",
+		library: "RDFaAnnotator"
     },
 	devtool: 'inline-source-map',
     module: {
