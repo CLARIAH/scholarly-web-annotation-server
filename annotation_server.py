@@ -99,6 +99,11 @@ def get_resource(resource_id, format):
     else:
         return resource_data
 
+@app.route("/api/register/resource/<resource_id>", methods=["POST"])
+def register_resource(resource_id):
+    resource_map = request.get_json()
+    return make_response(resource_map)
+
 def save_annotations():
     with open(app.config['DATAFILE'], 'w') as f:
         f.write(json.dumps(store.list(), indent=4, separators=(',', ': ')))
