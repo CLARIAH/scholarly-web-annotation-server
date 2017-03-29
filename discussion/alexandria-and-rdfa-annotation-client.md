@@ -27,3 +27,18 @@ What additional properties should Alexandria be able to store on a resource?
 - **media-type of the annotation target**: should the annotation server be aware of the media-type of a resource? E.g. for querying by media-type? Probably not, since Web Annotations allow [specifying media-type of an annotation target](https://www.w3.org/TR/annotation-model/#external-web-resources) (and body) via the `format` property. The general type of a resource can be [specified as a class on target](https://www.w3.org/TR/annotation-model/#classes) (and body) via the `type` property (i.e. *Data*, *Image*, *Sound*, *Text*, *Video*).
 
 
+### Querying and Filtering
+
+Upon loading the client, it sends a request to the server for annotations on resources that it observes. Beyond that, users of annotations may wish to filter annotations based on different aspects, such motivation/task type, motivation/task label, date, user, group, ...
+
+- `GET` annotations by:
+	- **annotation ID**
+	- **resource ID** (with or without annotations on sub-resources)
+	- **creator**
+- `filter` annotations by:
+	- **target resource type**: e.g. only annotations on `Transciption` type resources,
+	- **motivation/task type**: e.g. only `correction` annotations
+	- **motivation/task label**: e.g. only `classify` annotations with the classification *colour*
+	- **creation date range**: e.g. only annotations made today or in January 2017
+	- **creator**: only annotations made by me or user X
+	- **permission group**: only annotations accessible by group Y (not sure how this information can/will be registered as part of annotations or in separate user and group DB)
