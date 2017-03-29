@@ -37,8 +37,9 @@ Upon loading the client, it sends a request to the server for annotations on res
 	- **creator**
 - `filter` annotations by:
 	- **target resource type**: e.g. only annotations on `Transciption` type resources,
-	- **motivation/task type**: e.g. only `correction` annotations
-	- **motivation/task label**: e.g. only `classify` annotations with the classification *colour*
-	- **creation date range**: e.g. only annotations made today or in January 2017
-	- **creator**: only annotations made by me or user X
-	- **permission group**: only annotations accessible by group Y (not sure how this information can/will be registered as part of annotations or in separate user and group DB)
+	- **target text**: e.g. only annotations on text selections containing *cortex china*,
+	- **motivation/task type**: e.g. only `correction` annotations,
+	- **motivation/task label**: e.g. only `classify` annotations with the classification *colour*,
+	- **creation date range**: e.g. only annotations made today or in January 2017,
+	- **creator**: only annotations made by me or user X,
+	- **permission group**: only annotations accessible by group Y (not sure how this information can/will be registered as part of annotations or in separate user and group DB).
