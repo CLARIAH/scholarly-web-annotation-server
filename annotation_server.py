@@ -1,12 +1,8 @@
-# This file provided by Facebook is for non-commercial testing and evaluation
-# purposes only. Facebook reserves all rights not expressly granted.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-# FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-# ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# File: annotation_server.py
+# Created by: Marijn Koolen (https://github.com/marijnkoolen)
+# Description:  this is a temporary solution for an annotation server
+#               for the RDFa Annotation Client. For a proper solution,
+#               look at https://huygensing.github.io/alexandria
 
 import json
 import os
@@ -99,9 +95,16 @@ def get_resource(resource_id, format):
     else:
         return resource_data
 
-@app.route("/api/register/resource/<resource_id>", methods=["POST"])
-def register_resource(resource_id):
+@app.route("/api/resources/<resource_id>", methods=["GET", "PUT", "DELETE"])
+def handle_known_resource(resource_id):
+    if request.method == "GET":
+        response = {}
+    return make_response(response)
+
+@app.route("/api/resources", methods=["POST"])
+def register_resource():
     resource_map = request.get_json()
+    print(json.dumps(resource_map, indent=4))
     return make_response(resource_map)
 
 def save_annotations():
