@@ -2,7 +2,7 @@ import unittest
 import os
 import json
 import tempfile
-import annotation_server as server
+import server as server
 from annotation_examples import annotations as examples
 
 def get_json(response):
