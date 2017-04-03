@@ -1,7 +1,6 @@
-from vocabulary_store import VocabularyStore
+from vocabulary import VocabularyStore
 from rfc3987 import parse as parse_IRI
 from collections import defaultdict
-import json
 
 class Resource(object):
 
@@ -44,7 +43,7 @@ class Resource(object):
         if relation_type == None:
             return self.subresources
         if relation_type not in self.subresources.keys():
-            raise NoSuchRelationError(message="this resources doesn't have a relation of type: %s" % (relation_type))
+            return []
         return self.subresources[relation_type]
 
     def get_relations(self):
