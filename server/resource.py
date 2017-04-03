@@ -1,4 +1,4 @@
-from vocabulary import VocabularyStore
+from server.vocabulary import VocabularyStore
 from rfc3987 import parse as parse_IRI
 from collections import defaultdict
 

@@ -1,7 +1,6 @@
 import unittest
-import copy
 from annotation_examples import annotations as examples
-from annotation import Annotation, AnnotationStore, AnnotationValidator, InvalidAnnotation
+from server.annotation import Annotation, AnnotationStore, AnnotationValidator, InvalidAnnotation
 
 class TestAnnotationValidation(unittest.TestCase):
 

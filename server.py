@@ -9,8 +9,8 @@ import os
 #import requests
 import xmltodict
 import re
-from annotation import InvalidAnnotation, AnnotationDoesNotExistError
-from annotation import AnnotationStore
+from server.annotation import InvalidAnnotation, AnnotationDoesNotExistError
+from server.annotation import AnnotationStore
 from flask import Flask, Response, request
 from flask import jsonify
 

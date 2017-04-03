@@ -1,6 +1,5 @@
 import unittest
 import os
-import copy
 import json
 import tempfile
 import annotation_server as server
@@ -40,7 +39,7 @@ class TestAnnotationAPI(unittest.TestCase):
         self.assertEqual(annotation['id'], example['id'])
 
     def test_GET_annotations_returns_list_of_annotations(self):
-        example = add_example(self.app)
+        add_example(self.app)
         response = self.app.get('/api/annotations')
         annotations = get_json(response)
         self.assertTrue(type(annotations) == list)

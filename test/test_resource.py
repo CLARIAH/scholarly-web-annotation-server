@@ -1,6 +1,6 @@
 import unittest
-from resource import Resource, ResourceStore, InvalidResourceError, InvalidResourceMapError
-from vocabulary import InvalidVocabularyError
+from server.resource import Resource, ResourceStore, InvalidResourceError, InvalidResourceMapError
+from server.vocabulary import InvalidVocabularyError
 
 
 class TestResourceModel(unittest.TestCase):

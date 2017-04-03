@@ -4,7 +4,7 @@ npm-debug.log
 *.pyc
 
 # specific ignore
-server.py
+experimental_server.py
 public/delpher.html
 public/index.html
 public/let001-image.html
