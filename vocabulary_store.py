@@ -43,6 +43,9 @@ class VocabularyStore(object):
             subject = None
         return subject
 
+    def is_class(self, subject):
+        return self.vocab_has_triple(subject, RDF.type, OWL.Class)
+
     def is_property(self, subject):
         return self.vocab_has_triple(subject, RDF.type, OWL.ObjectProperty)
 
