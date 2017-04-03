@@ -1,6 +1,6 @@
 import unittest
-from resource_model import Resource, ResourceStore, InvalidResourceError, InvalidResourceMapError
-from vocabulary_store import InvalidVocabularyError
+from resource import Resource, ResourceStore, InvalidResourceError, InvalidResourceMapError
+from vocabulary import InvalidVocabularyError
 
 
 class TestResourceModel(unittest.TestCase):
@@ -8,7 +8,7 @@ class TestResourceModel(unittest.TestCase):
     def test_resource_cannot_be_initialized_without_parameters(self):
         error = None
         try:
-            resource = Resource()
+            Resource()
         except InvalidResourceError as e:
             error = e
         self.assertNotEqual(error, None)
@@ -83,10 +83,10 @@ class TestResourceStore(unittest.TestCase):
     def test_resource_store_alerts_registering_known_resource_as_different_type(self):
         error = None
         store = ResourceStore()
-        response = store.register_by_map(self.letter_map)
+        store.register_by_map(self.letter_map)
         self.letter_map["typeof"] = "Correspondence"
         try:
-            response = store.register_by_map(self.letter_map)
+            store.register_by_map(self.letter_map)
         except InvalidResourceMapError as e:
             error = e
         self.assertNotEqual(error, None)
@@ -129,7 +129,7 @@ class TestResourceStore(unittest.TestCase):
         self.letter_map["typeof"] = "UnknownType"
         store = ResourceStore()
         try:
-            response = store.register_by_map(self.letter_map)
+            store.register_by_map(self.letter_map)
         except InvalidResourceMapError as e:
             error = e
         self.assertNotEqual(error, None)

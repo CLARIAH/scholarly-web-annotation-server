@@ -1,5 +1,5 @@
 import unittest
-from vocabulary_store import VocabularyStore, InvalidVocabularyError
+from vocabulary import VocabularyStore, InvalidVocabularyError
 
 class TestVocabularyStore(unittest.TestCase):
 
