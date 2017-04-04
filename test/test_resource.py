@@ -5,6 +5,18 @@ from server_models.vocabulary import InvalidVocabularyError
 
 class TestResourceModel(unittest.TestCase):
 
+    def setUp(self):
+        self.letter = {
+            "vocab": "http://localhost:3000/vocabularies/vangoghontology.ttl",
+            "resource": "urn:vangogh:testletter",
+            "typeof": "Letter",
+        }
+        self.paragraph = {
+            "vocab": "http://localhost:3000/vocabularies/vangoghontology.ttl",
+            "resource": "urn:vangogh:testletter:p.5",
+            "typeof": "ParagraphInLetter"
+        }
+
     def test_resource_cannot_be_initialized_without_parameters(self):
         error = None
         try:
@@ -13,15 +25,33 @@ class TestResourceModel(unittest.TestCase):
             error = e
         self.assertNotEqual(error, None)
 
+    def test_resource_canont_be_initialized_without_required_properties(self):
+        error = None
+        try:
+            Resource({"resource": "Vincent"})
+        except InvalidResourceError as e:
+            error = e
+        self.assertNotEqual(error, None)
+
     def test_resource_can_be_initialized(self):
         error = None
         try:
-            resource = Resource({"resource": "Vincent", "typeof": "van_Gogh"})
+            resource = Resource(self.letter)
         except InvalidResourceError as e:
             error = e
         self.assertEqual(error, None)
-        self.assertEqual(resource.typeof, "van_Gogh")
-        self.assertEqual(resource.resource, "Vincent")
+        self.assertEqual(resource.typeof, self.letter["typeof"])
+        self.assertEqual(resource.resource, self.letter["resource"])
+
+    def test_resource_accepts_new_subresources(self):
+        resource = Resource(self.letter)
+        subresource = Resource(self.paragraph)
+        error = None
+        try:
+            resource.add_subresources({"hasPart": [ subresource ]})
+        except InvalidResourceError as e:
+            error = e
+        self.assertEqual(error, None)
 
 class TestResourceStore(unittest.TestCase):
 
@@ -37,6 +67,28 @@ class TestResourceStore(unittest.TestCase):
                 {
                     "resource": "urn:vangogh:testletter:p.5",
                     "typeof": "ParagraphInLetter"
+                }
+            ]
+        }
+        self.correspondence_map = {
+            "vocab": "http://localhost:3000/vocabularies/vangoghontology.ttl",
+            "resource": "urn:vangogh:correspondence",
+            "typeof": "Correspondence",
+            "hasPart": [
+                {
+                    "resource": "urn:vangogh:testletter",
+                    "typeof": "Letter"
+                }
+            ]
+        }
+        self.collection_map = {
+            "vocab": "http://localhost:3000/vocabularies/vangoghontology.ttl",
+            "resource": "urn:vangogh:collection",
+            "typeof": "Correspondence",
+            "hasPart": [
+                {
+                    "resource": "urn:vangogh:testletter",
+                    "typeof": "Letter"
                 }
             ]
         }
@@ -93,28 +145,6 @@ class TestResourceStore(unittest.TestCase):
         self.assertEqual(error.message, "Conflicting resource types: resource urn:vangogh:testletter is already registered as type Letter and cannot be additionally registered as type Correspondence" % ())
 
     def test_resource_store_can_link_resource_to_multiple_parents(self):
-        self.correspondence_map = {
-            "vocab": "http://localhost:3000/vocabularies/vangoghontology.ttl",
-            "resource": "urn:vangogh:correspondence",
-            "typeof": "Correspondence",
-            "hasPart": [
-                {
-                    "resource": "urn:vangogh:testletter",
-                    "typeof": "Letter"
-                }
-            ]
-        }
-        self.collection_map = {
-            "vocab": "http://localhost:3000/vocabularies/vangoghontology.ttl",
-            "resource": "urn:vangogh:collection",
-            "typeof": "Correspondence",
-            "hasPart": [
-                {
-                    "resource": "urn:vangogh:testletter",
-                    "typeof": "Letter"
-                }
-            ]
-        }
         store = ResourceStore()
         response = store.register_by_map(self.letter_map)
         response = store.register_by_map(self.correspondence_map)
@@ -134,4 +164,11 @@ class TestResourceStore(unittest.TestCase):
             error = e
         self.assertNotEqual(error, None)
         self.assertEqual(error.message, "Illegal resource type: UnknownType")
+
+    def test_resource_store_returns_indirectly_connected_resources(self):
+        store = ResourceStore()
+        store.register_by_map(self.letter_map)
+        store.register_by_map(self.correspondence_map)
+        resource = store.get_resource(self.correspondence_map["resource"])
+        self.assertTrue("urn:vangogh:testletter:p.5" in resource.list_members())
 
