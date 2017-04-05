@@ -9,11 +9,12 @@ The client sends and accepts annotations that are in the format of the [W3C Web 
 
 How much of the Web Annotation model is needed in Alexandria for the RDFa annotation approach to work?
 
-- *body and target*: [standard properties of bodies and targets](https://www.w3.org/TR/annotation-model/#bodies-and-targets)
-- *target selector*:
-	- selectors: Media Fragments, TextPositionSelector, TextQuoteSelector
-	- refinement: i.e. multiple, hierarchically ordered selectors. **Note**: This should not be needed with the RDFa approach, as the `source` of the selector should be the most specific sub-resource.
-- *motivation*: the Web Annotation standard has [a fixed list of motivations](https://www.w3.org/TR/annotation-model/#motivation-and-purpose). Scholars have indicated a requirement for different types of motivations. One solution would be to allow defining of sub-classes of motivations, e.g. specific forms of commenting, tagging or transcribing, so that they always maps to the fixed list.
+- **body and target**: [standard properties of bodies and targets](https://www.w3.org/TR/annotation-model/#bodies-and-targets)
+- **target selector**:
+	- *selectors*: Media Fragments, TextPositionSelector, TextQuoteSelector
+	- *refinements*: i.e. multiple, hierarchically ordered selectors using the `refinedBy` property. **Note**: This should not be needed with the RDFa approach, as the `source` of the selector should be the most specific sub-resource.
+- **motivation**: the Web Annotation standard has [a fixed list of motivations](https://www.w3.org/TR/annotation-model/#motivation-and-purpose). Scholars have indicated a requirement for different types of motivations. One solution would be to allow defining of sub-classes of motivations, e.g. specific forms of commenting, tagging or transcribing, so that they always maps to the fixed list.
+- **Audience**: we probably need to use [audience](https://www.w3.org/TR/annotation-model/#intended-audience) for user and group permissions. The [Working Group suggests](https://github.com/w3c/web-annotation/issues/119) to use the `type` property and [schema.org's audience schema](http://schema.org/Audience). See also the [permission model discussion](https://github.com/marijnkoolen/rdfa-annotation-client/blob/master/discussion/handling-permissions.md) in this repository.
 
 ### Storing and Retrieving Resource Structure
 
