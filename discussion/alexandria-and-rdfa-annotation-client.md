@@ -21,7 +21,7 @@ How much of the Web Annotation model is needed in Alexandria for the RDFa annota
 - **multiple parentage and collections**: [*subresources* in Alexandria are labelled explicitly as *subresources*, not as *resources*](http://huygensing.github.io/alexandria/alexandria-acceptance-tests/concordion/nl/knaw/huygens/alexandria/resource/Anatomy.html). That is, they have a `sub` field, not a `ref` field. This is a problem for 
 	- registering resources as part of multiple collections and subresources as part of multiple resources. 
 	- retrieving resources at an arbitrary level. Each sub-resource is a resource in its own right.
-- **identifiers and references**: Alexandria uses `uuid` as internal identifier for (sub)resources. What are the requirements for the `ref` field? Should it be an URI or an URL?
+- **identifiers and references**: Alexandria uses `uuid` as internal identifier for (sub)resources. What are the requirements for the `ref` field? Should it be an URI or an URL? Must the value in the `ref` field be unique? That is, can a resource identified by a URI only be registered once?
 
 ### Additional Resource Properties
 
