@@ -34,7 +34,7 @@ What additional properties should Alexandria be able to store on a resource?
 
 ### Querying and Filtering
 
-**Note**: this section is not yet finished. 
+**Note 2017-04-05**: this section is definitely not yet finished. 
 
 Upon loading the client, it sends a request to the server for annotations on resources that it observes. Beyond that, users of annotations may wish to filter annotations based on different aspects, such motivation/task type, motivation/task label, date, user, group, ...
 
