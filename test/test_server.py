@@ -16,10 +16,8 @@ def add_example(app):
 class TestAnnotationAPI(unittest.TestCase):
 
     def setUp(self):
-        #annotations_file = "data/annotations.json"
         _, annotations_file = tempfile.mkstemp()
         server.app.config['DATAFILE'] = annotations_file
-        #server.load_annotations()
         self.app = server.app.test_client()
 
     def tearDown(self):
