@@ -1,3 +1,4 @@
+import pickle
 from server_models.vocabulary import VocabularyStore
 from rfc3987 import parse as parse_IRI
 from collections import defaultdict
@@ -72,10 +73,12 @@ class Resource(object):
 
 class ResourceStore(object):
 
-    def __init__(self):
+    def __init__(self, config):
+        self.resource_file = config['resource_file']
         self.required = ["typeof", "vocab", "resource"]
-        self.vocab_store = VocabularyStore()
+        self.vocab_store = VocabularyStore(config)
         self.resource_index = {}
+        self.load_index()
 
     def has_resource(self, resource_id):
         return resource_id in self.resource_index.keys()
@@ -178,6 +181,19 @@ class ResourceStore(object):
 
     def get_resource_relations(self, resource_map):
         return [key for key in resource_map.keys() if self.is_relation(key, resource_map)]
+
+    def dump_index(self):
+        with open(self.resource_file, 'wb') as fh:
+            pickle.dump(self.resource_index, fh)
+
+    def load_index(self):
+        try:
+            with open(self.resource_file, 'rb') as fh:
+                resource_index = pickle.load(fh)
+            for resource_id in resource_index.keys():
+                self.resource_index[resource_id] = resource_index[resource_id]
+        except (FileNotFoundError, EOFError):
+            pass
 
 class InvalidResourceMapError(Exception):
     status_code = 400
