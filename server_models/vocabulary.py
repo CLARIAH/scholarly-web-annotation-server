@@ -1,3 +1,5 @@
+import json
+from json.decoder import JSONDecodeError
 import rdflib
 from rdflib import Graph, OWL, RDFS, RDF
 from rdflib.term import Literal, URIRef
@@ -5,16 +7,13 @@ from rdflib.plugins.parsers.notation3 import BadSyntax
 
 class VocabularyStore(object):
 
-    def __init__(self):
+    def __init__(self, config):
+        self.url_file = config["url_file"]
+        self.triple_file = config["triple_file"]
         self.urls = []
         self.vocab = Graph()
-
-    def register_vocabulary(self, url):
-        if self.has_vocabulary(url):
-            return {"message": "ontology already regsitered"}
-        self.parse_vocabulary(url)
-        self.urls.append(url)
-        return {"message": "ontology registered"}
+        self.load_urls()
+        self.load_store()
 
     def has_vocabulary(self, url=None):
         return url in self.urls
@@ -22,18 +21,31 @@ class VocabularyStore(object):
     def show_vocabularies(self):
         return self.urls
 
+    def register_vocabulary(self, url):
+        response = {"ignored": [], "registered": []}
+        if self.has_vocabulary(url):
+            return {"ignored": [url], "registered": []}
+        else:
+            self.parse_vocabulary(url)
+            self.urls.append(url)
+            response["registered"] += [url]
+            self.handle_imports(url, response)
+        return response
+
     def parse_vocabulary(self, vocab_file):
         try:
             file_format = rdflib.util.guess_format(vocab_file)
             self.vocab.load(vocab_file, format=file_format)
         except BadSyntax as error:
             raise InvalidVocabularyError(message = error.message)
-        self.handle_imports(vocab_file)
 
-    def handle_imports(self, vocab_file):
+    def handle_imports(self, vocab_file, response):
         for s, p, o in self.vocab.triples((URIRef(vocab_file), OWL.imports, None)):
             if not self.has_vocabulary(o.toPython()): # .toPython() to get plain URI string
-                self.register_vocabulary(o.toPython())
+                sub_response = self.register_vocabulary(o.toPython())
+                response["ignored"] += sub_response["ignored"]
+                response["registered"] += sub_response["registered"]
+        return response
 
     def lookupLabel(self, term):
         subjects = [s for s in self.vocab.subjects(RDFS.label, Literal(term))]
@@ -51,6 +63,24 @@ class VocabularyStore(object):
 
     def vocab_has_triple(self, subj, pred, obj):
         return len([t for t in self.vocab.triples((subj, pred, obj))]) > 0
+
+    def load_urls(self):
+        try:
+            with open(self.url_file, 'rt') as fh:
+                self.urls = json.load(fh)
+        except (OSError, JSONDecodeError):
+            pass
+
+    def save_urls(self):
+        with open(self.url_file, 'wt') as fh:
+            json.dump(self.urls, fh)
+
+    def save_store(self):
+        with open(self.triple_file, 'wb') as fh:
+            fh.write(self.vocab.serialize(format="n3"))
+
+    def load_store(self):
+        self.vocab.load(self.triple_file, format="n3")
 
 class InvalidVocabularyError(Exception):
     status_code = 400
