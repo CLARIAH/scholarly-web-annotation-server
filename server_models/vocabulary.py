@@ -37,7 +37,7 @@ class VocabularyStore(object):
             file_format = rdflib.util.guess_format(vocab_file)
             self.vocab.load(vocab_file, format=file_format)
         except BadSyntax as error:
-            raise InvalidVocabularyError(message = error.message)
+            raise VocabularyError(message = error.message)
 
     def handle_imports(self, vocab_file, response):
         for s, p, o in self.vocab.triples((URIRef(vocab_file), OWL.imports, None)):
@@ -80,9 +80,14 @@ class VocabularyStore(object):
             fh.write(self.vocab.serialize(format="n3"))
 
     def load_store(self):
-        self.vocab.load(self.triple_file, format="n3")
+        try:
+            self.vocab.load(self.triple_file, format="n3")
+            message = "Vcoabulary loaded"
+        except FileNotFoundError:
+            message = "Vocabulary store file doesn't exist yet"
+        return message
 
-class InvalidVocabularyError(Exception):
+class VocabularyError(Exception):
     status_code = 400
 
     def __init__(self, message, status_code=400, payload=None):
