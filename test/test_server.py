@@ -4,6 +4,22 @@ import json
 import tempfile
 import server as server
 from annotation_examples import annotations as examples
+from server_models.resource import ResourceStore
+
+tempfiles = []
+
+def make_tempfile():
+    _, fname = tempfile.mkstemp()
+    tempfiles.append(fname)
+    return fname
+
+def remove_tempfiles():
+    for tempfile in tempfiles:
+        try:
+            os.unlink(tempfile)
+        except FileNotFoundError:
+            pass
+
 
 def get_json(response):
     return json.loads(response.get_data(as_text=True))
@@ -16,12 +32,13 @@ def add_example(app):
 class TestAnnotationAPI(unittest.TestCase):
 
     def setUp(self):
-        _, annotations_file = tempfile.mkstemp()
+        annotations_file = make_tempfile()
         server.app.config['DATAFILE'] = annotations_file
         self.app = server.app.test_client()
 
     def tearDown(self):
-        os.unlink(server.app.config['DATAFILE'])
+        remove_tempfiles()
+        #os.unlink(server.app.config['DATAFILE'])
 
     def test_POST_annotation_returns_annotation_with_id(self):
         annotation = examples["vincent"]
@@ -58,6 +75,89 @@ class TestAnnotationAPI(unittest.TestCase):
         response = self.app.get("/api/annotations/annotation/" + example['id'])
         self.assertEqual(response.status_code, 404)
 
+class TestAnnotationAPIResourceEndpoints(unittest.TestCase):
+
+    def setUp(self):
+        annotations_file = make_tempfile()
+        server.app.config['DATAFILE'] = annotations_file
+        resource_config = {
+            "resource_file": make_tempfile(),
+            "triple_file": make_tempfile(),
+            "url_file": make_tempfile()
+        }
+        server.resource_store = ResourceStore(resource_config)
+        self.app = server.app.test_client()
+        self.letter_map = {
+            "vocab": "http://localhost:3000/vocabularies/vangoghontology.ttl",
+            "id": "urn:vangogh:testletter",
+            "type": "Letter",
+            "hasPart": [
+                {
+                    "id": "urn:vangogh:testletter:p.5",
+                    "type": "ParagraphInLetter"
+                }
+            ]
+        }
+        self.correspondence_map = {
+            "vocab": "http://localhost:3000/vocabularies/vangoghontology.ttl",
+            "id": "urn:vangogh:correspondence",
+            "type": "Correspondence",
+            "hasPart": [
+                {
+                    "id": "urn:vangogh:testletter",
+                    "type": "Letter"
+                }
+            ]
+        }
+        self.collection_map = {
+            "vocab": "http://localhost:3000/vocabularies/vangoghontology.ttl",
+            "id": "urn:vangogh:collection",
+            "type": "Correspondence",
+            "hasPart": [
+                {
+                    "id": "urn:vangogh:testletter",
+                    "type": "Letter"
+                }
+            ]
+        }
+
+    def tearDown(self):
+        remove_tempfiles()
+
+    def test_api_can_accepts_valid_resource(self):
+        response = self.app.post("/api/resources", data=json.dumps(self.letter_map), content_type="application/json")
+        data = get_json(response)
+        self.assertTrue(self.letter_map["id"] in data["registered"])
+
+    def test_api_rejects_invalid_resource(self):
+        self.letter_map["type"] = "Collection"
+        response = self.app.post("/api/resources", data=json.dumps(self.letter_map), content_type="application/json")
+        data = get_json(response)
+        self.assertEqual(data["message"], "Illegal resource type: Collection")
+        self.assertEqual(data["status_code"], 400)
+
+    def test_api_can_return_registered_resource(self):
+        self.app.post("/api/resources", data=json.dumps(self.letter_map), content_type="application/json")
+        response = self.app.get("/api/resources/%s/structure" % (self.letter_map["id"]))
+        data = get_json(response)
+        self.assertEqual(data["id"], self.letter_map["id"])
+        self.assertEqual(data["type"], self.letter_map["type"])
+        self.assertEqual(data.keys(), self.letter_map.keys())
+
+    def test_api_can_return_registered_resource_map(self):
+        pass
+
+    def test_api_can_return_registered_resource_annotations(self):
+        pass
+
+    def test_api_can_register_valid_resource(self):
+        pass
+
+    def test_api_can_register_valid_resource(self):
+        pass
+
+    def test_api_can_register_valid_resource(self):
+        pass
 
 if __name__ == "__main__":
     unittest.main()
