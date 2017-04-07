@@ -1,6 +1,6 @@
 import tempfile
 import unittest
-from server_models.vocabulary import VocabularyStore, InvalidVocabularyError
+from server_models.vocabulary import VocabularyStore, VocabularyError
 
 def make_tempfile():
     _, fname = tempfile.mkstemp()
@@ -36,7 +36,7 @@ class TestVocabularyStore(unittest.TestCase):
         error = None
         try:
             vocabulary_store.register_vocabulary(self.vocab_bad)
-        except InvalidVocabularyError as e:
+        except VocabularyError as e:
             error = e
         self.assertTrue(error != None)
 
