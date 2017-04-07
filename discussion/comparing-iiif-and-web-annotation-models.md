@@ -1,6 +1,6 @@
 # IIIF Annotations
 
-This document describes the IIIF Presentation API as a potential vehicle for RDFa enriched multimedia resource annotation.
+This document describes the IIIF Presentation API as a potential vehicle for RDFa enriched multimedia resource description.
 
 Table of Contents:
 
