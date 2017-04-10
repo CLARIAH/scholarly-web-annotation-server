@@ -21,14 +21,16 @@ How much of the Web Annotation model is needed in Alexandria for the RDFa annota
 - **registering complex resources**: based on earlier discussion, it makes sense for the client to check if the server knows about the structure of a resource that the client is annotating, and if the server doesn't, for the client to send the structural information of the resource and all it's subresources to register all their relationships. Currently, it seems like Alexandria only has an endpoint for registering individual subresources with an `isPartOf` relationship with a resource. When the resources is highly complex, this would require many API calls. An alternative is for the server to traverse all relationships of a complex resource and store each relationship along the traversal. This could be done using the same endpoint, or to have a separate endpoint for registering complex resources.
 - **multiple parentage and collections**: [*subresources* in Alexandria are labelled explicitly as *subresources*, not as *resources*](http://huygensing.github.io/alexandria/alexandria-acceptance-tests/concordion/nl/knaw/huygens/alexandria/resource/Anatomy.html). That is, they have a `sub` field, not a `ref` field. This is a problem for 
 	- registering resources as part of multiple collections and subresources as part of multiple resources. 
+	[BB: Correct, currently the resource-subresource relationship in Alexandria is strictly hierarchical]
 	- retrieving resources at an arbitrary level. Each sub-resource is a resource in its own right.
-- **identifiers and references**: Alexandria uses `uuid` as internal identifier for (sub)resources. What are the requirements for the `ref` field? Should it be an URI or an URL? Must the value in the `ref` field be unique? That is, can a resource identified by a URI only be registered once?
+	[BB: this is not a problemn in Alexandria, the URI for a sub-resource is identical to one for a resource: http://alexandriaserver.aaa/resources/UUID this makes it possible to create a sub-resource based on a sub-resource; Internally, `sub` and `ref` both map to `cargo`]
+- **identifiers and references**: Alexandria uses `uuid` as internal identifier for (sub)resources. What are the requirements for the `ref` field? [BB: No requirements] Should it be an URI or an URL? [BB: This is up to the user] Must the value in the `ref` field be unique? [BB: This is up to the user, uniqueness of this field is not checked] That is, can a resource identified by a URI only be registered once? [BB: No, alexandria would allow multiple registrations]
 
 ### Additional Resource Properties
 
 What additional properties should Alexandria be able to store on a resource? 
 
-- **resource type**: based on Annotatable Thing ontology. There is no property in the specification of the Web Annotation model to identify the target resource type. Should Alexandria use the ontology to verify the types and their relationships? Or should it trust the client to do this well? 
+- **resource type**: based on Annotatable Thing ontology. There is no property in the specification of the Web Annotation model to identify the target resource type. Should Alexandria use the ontology to verify the types and their relationships? Or should it trust the client to do this well? [BB: No Resource types defined currently]
 - **media-type of the annotation target**: should the annotation server be aware of the media-type of a resource? E.g. for querying by media-type? Probably not, since Web Annotations allow [specifying media-type of an annotation target](https://www.w3.org/TR/annotation-model/#external-web-resources) (and body) via the `format` property. The general type of a resource can be [specified as a class on target](https://www.w3.org/TR/annotation-model/#classes) (and body) via the `type` property (i.e. *Data*, *Image*, *Sound*, *Text*, *Video*).
 
 
@@ -50,3 +52,5 @@ Upon loading the client, it sends a request to the server for annotations on res
 	- **creation date range**: e.g. only annotations made today or in January 2017,
 	- **creator**: only annotations made by me or user X,
 	- **permission group**: only annotations accessible by group Y (not sure how this information can/will be registered as part of annotations or in separate user and group DB).
+	
+[BB: the `GET` actions are currently possible in Alexandria, the filtering mentioned is not]
