@@ -30,6 +30,7 @@ class VocabularyStore(object):
             self.urls.append(url)
             response["registered"] += [url]
             self.handle_imports(url, response)
+            self.save()
         return response
 
     def parse_vocabulary(self, vocab_file):
@@ -70,6 +71,10 @@ class VocabularyStore(object):
                 self.urls = json.load(fh)
         except (OSError, JSONDecodeError):
             pass
+
+    def save(self):
+        self.save_urls()
+        self.save_store()
 
     def save_urls(self):
         with open(self.url_file, 'wt') as fh:
