@@ -14,9 +14,9 @@ def make_tempfile():
     return fname
 
 def remove_tempfiles():
-    for tempfile in tempfiles:
+    for tmpfile in tempfiles:
         try:
-            os.unlink(tempfile)
+            os.unlink(tmpfile)
         except FileNotFoundError:
             pass
 
@@ -26,7 +26,7 @@ def get_json(response):
 
 def add_example(app):
     annotation = examples["vincent"]
-    response = app.post("/api/annotation", data=json.dumps(annotation), content_type="application/json")
+    response = app.post("/api/annotations", data=json.dumps(annotation), content_type="application/json")
     return get_json(response)
 
 class TestAnnotationAPI(unittest.TestCase):
@@ -42,7 +42,7 @@ class TestAnnotationAPI(unittest.TestCase):
 
     def test_POST_annotation_returns_annotation_with_id(self):
         annotation = examples["vincent"]
-        response = self.app.post("/api/annotation", data=json.dumps(annotation), content_type="application/json")
+        response = self.app.post("/api/annotations", data=json.dumps(annotation), content_type="application/json")
         stored = get_json(response)
         self.assertTrue('id' in stored)
         self.assertTrue('created' in stored)
@@ -120,6 +120,28 @@ class TestAnnotationAPIResourceEndpoints(unittest.TestCase):
                 }
             ]
         }
+        self.annotation = {
+            "type": "Annotation",
+            "motivation": "classifying",
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "target": [
+                {
+                    "type": "Text",
+                    "selector": None,
+                    "source": "urn:vangogh:testletter:p.5"
+                }
+            ],
+            "body": [
+                {
+                    "value": "Location identifier",
+                    "type": "classification",
+                    "purpose": "classifying",
+                    "id": "http://dbpedia.org/resource/Location_identifier",
+                    "vocabulary": "DBpedia"
+                }
+            ],
+            "creator": "marijn",
+        }
 
     def tearDown(self):
         remove_tempfiles()
@@ -138,26 +160,27 @@ class TestAnnotationAPIResourceEndpoints(unittest.TestCase):
 
     def test_api_can_return_registered_resource(self):
         self.app.post("/api/resources", data=json.dumps(self.letter_map), content_type="application/json")
+        response = self.app.get("/api/resources/%s" % (self.letter_map["id"]))
+        data = get_json(response)
+        self.assertEqual(data["id"], self.letter_map["id"])
+        self.assertEqual(data["type"], self.letter_map["type"])
+        self.assertTrue("registered" in data.keys())
+
+    def test_api_can_return_registered_resource_map(self):
+        self.app.post("/api/resources", data=json.dumps(self.letter_map), content_type="application/json")
         response = self.app.get("/api/resources/%s/structure" % (self.letter_map["id"]))
         data = get_json(response)
         self.assertEqual(data["id"], self.letter_map["id"])
         self.assertEqual(data["type"], self.letter_map["type"])
         self.assertEqual(data.keys(), self.letter_map.keys())
 
-    def test_api_can_return_registered_resource_map(self):
-        pass
-
     def test_api_can_return_registered_resource_annotations(self):
-        pass
-
-    def test_api_can_register_valid_resource(self):
-        pass
-
-    def test_api_can_register_valid_resource(self):
-        pass
-
-    def test_api_can_register_valid_resource(self):
-        pass
+        self.app.post("/api/resources", data=json.dumps(self.letter_map), content_type="application/json")
+        response = self.app.post("/api/annotations", data=json.dumps(self.annotation), content_type="application/json")
+        stored_annotation = get_json(response)
+        response = self.app.get("/api/resources/%s/annotations" % (self.letter_map["id"]))
+        annotations = get_json(response)
+        self.assertEqual(annotations[0]["id"], stored_annotation["id"])
 
 if __name__ == "__main__":
     unittest.main()

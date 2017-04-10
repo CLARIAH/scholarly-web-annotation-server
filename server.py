@@ -70,17 +70,15 @@ def get_annotation_by_id(annotation_id):
     save_annotations()
     return make_response(response_data)
 
-@app.route('/api/annotation', methods=['POST'])
-def post_annotation():
-    new_annotation = request.get_json()
-    stored_annotation = annotation_store.add(new_annotation)
-    save_annotations()
-    return make_response(stored_annotation)
-
-@app.route('/api/annotations', methods=['GET'])
+@app.route("/api/annotations", methods=["GET", "POST"])
 def get_annotations():
-    annotations = annotation_store.list()
-    return make_response(annotations)
+    if request.method == "GET":
+        response = annotation_store.list()
+    elif request.method == "POST":
+        new_annotation = request.get_json()
+        response = annotation_store.add(new_annotation)
+        save_annotations()
+    return make_response(response)
 
 @app.route("/api/login", methods=["POST"])
 def login():
@@ -91,16 +89,14 @@ def login():
 
 @app.route('/api/resources/<resource_id>/annotations', methods=['GET'])
 def get_resource_annotations(resource_id):
-    print("GET annotations by resource id %s" % (resource_id))
     annotations = {}
     if resource_store.has_resource(resource_id):
-        resource_ids = resource_store.list_members(resource_id)
+        resource_ids = resource_store.get_resource(resource_id).list_members()
         annotations = annotation_store.get_by_targets(resource_ids)
     return make_response(annotations)
 
 @app.route('/api/resources/<resource_id>/structure', methods=['GET'])
 def get_resource_structure(resource_id):
-    print("GET resoure structure resource id %s" % (resource_id))
     if resource_store.has_resource(resource_id):
         resource_map = resource_store.generate_resource_map(resource_id)
     return make_response(resource_map)
@@ -123,7 +119,7 @@ def handle_known_resource(resource_id):
     response = {}
     # TO DO: return basic resource info similar to Alexandria response
     if request.method == "GET":
-        response = {}
+        response = resource_store.get_resource(resource_id).json()
     return make_response(response)
 
 @app.route("/api/resources", methods=["POST"])
