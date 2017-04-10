@@ -1,4 +1,7 @@
 import pickle
+import datetime
+import pytz
+import uuid
 from server_models.vocabulary import VocabularyStore
 from rfc3987 import parse as parse_IRI
 from collections import defaultdict
@@ -11,6 +14,8 @@ class Resource(object):
         self.type = resource_map["type"]
         self.vocab = resource_map["vocab"]
         self.subresources = defaultdict(list)
+        self.created = datetime.datetime.now(pytz.utc).isoformat()
+        self.uuid = uuid.uuid4().urn
 
     def __repr__(self):
         rv = "%s(%s, %s)\n" % (self.__class__.__name__, self.type, self.id)
@@ -20,6 +25,21 @@ class Resource(object):
             for subresource in self.get_subresources(relation_type):
                 rv += "    %s(%s, %s)\n" % (subresource.__class__.__name__, subresource.type, subresource.id)
         return rv
+
+    def json(self):
+        return {
+            "id": self.id,
+            "type": self.type,
+            "vocabulary": self.vocab,
+            "registered": [
+                {
+                    "timestamp": self.created,
+                    "agent": "TO-DO",
+                    "source_location": "TO-DO"
+                },
+            ],
+            "uuid": self.uuid
+        }
 
     def validate(self, resource_map):
         required = ["id", "type", "vocab"]
