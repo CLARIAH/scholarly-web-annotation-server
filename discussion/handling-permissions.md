@@ -12,7 +12,7 @@ Each annotation must have see/edit/delete permissions for at least one user (typ
 
 ### Operations permitted
 
-The most basic permission is being able to read/see/view an annotation. Given that a user can create, retrieve, edit, and remove annotations, it makes sense to have separate permissions for different *operations*, e.g. seeing, changing and removing (**question: should changing and removing be a single operational permission?**). This can also be based on the UNIX model for read/write/execute permissions. The *execute* operation in UNIX has no meaningful correspondence in the annotation domain, so it can be discarded.
+The most basic permission is being able to read/see/view an annotation. Given that a user can create, retrieve, edit, and remove annotations, it makes sense to have separate permissions for different *operations*, e.g. seeing, changing and removing (**question: should changing and removing be a single operational permission?** [BB: I vote yes]). This can also be based on the UNIX model for read/write/execute permissions. The *execute* operation in UNIX has no meaningful correspondence in the annotation domain, so it can be discarded.
 
 This results in the following list of requirements:
 
@@ -29,7 +29,7 @@ Types of permissions:
 + **group**: the group(s) who have access to the annotation. Each user represents their own group. Additional groups can be made that can have multiple members. Users may want to share an annotation with multiple users and/or multi-user groups, so this can be a list of groups (single-user and multi-user groups).
 + **public**: the public represents any user. The server may return *public* annotations for requests without an authenticated user.
 
-The owner of an annotation can have 
+The owner of an annotation can have (What?)
 
 Types of operations permitted:
 
@@ -38,6 +38,11 @@ Types of operations permitted:
 + **delete**: the permission to completely remove an annotation. 
 
 There are some issues regarding *editing* and *deleting* annotations. If an annotation is the target of a later annotation, it cannot be changed or removed without consequences. One way of dealing with this is to add a notification to annotations that target a changed/deleted annotation. Another way is to not allow changing/removing annotations that are targets of other annotations. 
+
+[BB: In Alexandria, there is no "editing" of an annotation as such, when you PUT to an existing annotation, this creates a new annotation that replaces the existint annotation, and increases the "version" number. When referring to the annotation by URI, it always refers to the latest version of the annotation, but all versions of the annotation can be retrieved by adding /ver/ + the version number to the annotation URI. Also, sending a DELETE to an annotation sets the state of that annotation to DELETED. DELETED annotations are hidden by default, but can still be retrieved. ( http://huygensing.github.io/alexandria/alexandria-acceptance-tests/concordion/nl/knaw/huygens/alexandria/annotation/Accessing.html )
+This can be an alternative or an additional way of dealing with edit/delete.
+
+There is also currently no provision in Alexandria for user-based access limitations, or grouping of users.]
 
 ### Capturing groups and permissions in annotations
 
