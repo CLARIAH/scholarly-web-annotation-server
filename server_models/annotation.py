@@ -50,7 +50,6 @@ class Annotation(object):
         annotation['created'] = datetime.datetime.now(pytz.utc).isoformat()
         self.validator = AnnotationValidator()
         self.validator.validate(annotation)
-        self.type = self.determine_type(annotation)
         self.data = annotation
         self.id = annotation['id']
 
@@ -94,22 +93,6 @@ class Annotation(object):
             self.data = updated_annotation
         else:
             raise InvalidAnnotation(message="ID of updated annotation does not match ID of existing annotation")
-
-    def determine_type(self, annotation):
-        if 'target' not in annotation or 'body' not in annotation:
-            return "enrichment"
-        if 'conformsTo' not in annotation['body']:
-            return "enrichment"
-        if 'conformsTo' not in annotation['target']:
-            return "enrichment"
-        if annotation['target']['conformsTo'] != annotation['body']['conformsTo']:
-            return "enrichment"
-        if annotation['motivation'] != "linking":
-            return "enrichment"
-        return "structural"
-
-    def get_type(self):
-        return self.type
 
 class AnnotationStore(object):
 
@@ -169,14 +152,25 @@ class AnnotationStore(object):
     def get_type(self, annotation_id):
         return self.index[annotation_id].type
 
+    def get_by_targets(self, target_ids):
+        annotations = []
+        ids = []
+        for target_id in target_ids:
+            for annotation in self.get_by_target(target_id):
+                if annotation["id"] not in ids:
+                    ids += [annotation["id"]]
+                    annotations += [annotation]
+        return annotations
+
     def get_by_target(self, target_id):
         annotations = []
+        ids = []
         for anno_id in self.target_index[target_id]:
-            anno = self.index[anno_id]
-            if self.get_type(anno_id) == "structural":
-                annotations += self.get_by_target(anno.data['body']['source'])
-            else:
-                annotations += [anno.data]
+            if anno_id not in ids:
+                annotations += [self.index[anno_id].data]
+                # add annotations on annotations
+                annotations += self.get_by_target(anno_id)
+                ids += [anno_id]
         return annotations
 
     def exists(self, annotation_id):
