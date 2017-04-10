@@ -33,9 +33,6 @@ class TestAnnotation(unittest.TestCase):
     def test_annotation_has_creation_timestamp(self):
         self.assertTrue('created' in self.annotation.data)
 
-    def test_annotation_has_type(self):
-        self.assertEqual(self.annotation.get_type(), "enrichment")
-
     def test_annotation_can_update(self):
         update_annotation = examples["vincent"]
         new_motivation = "linking"
