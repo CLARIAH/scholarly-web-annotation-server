@@ -64,10 +64,10 @@ class Resource(object):
                 self.add_subresource(subresource, relation_type)
 
     def add_subresource(self, subresource, relation_type):
-        if isinstance(subresource, Resource):
-            self.subresources[relation_type] += [subresource]
-        else:
+        if not isinstance(subresource, Resource):
             raise(ResourceError(message="subresource is not a Resource object"))
+        if subresource.id not in [sub.id for sub in self.subresources[relation_type]]:
+            self.subresources[relation_type] += [subresource]
 
     def get_subresources(self, relation_type=None):
         if relation_type == None:
@@ -95,6 +95,7 @@ class ResourceStore(object):
     def __init__(self, config):
         self.resource_file = config['resource_file']
         self.required = ["type", "vocab", "id"]
+        self.optional = ["source", "property"]
         self.vocab_store = VocabularyStore(config)
         self.resource_index = {}
         self.load_index()
@@ -115,6 +116,8 @@ class ResourceStore(object):
         resource = self.parse_resource_map(resource_map)
         response = {"ignored": [], "registered": []}
         self.register_resource(resource, response)
+        if response["registered"] != []:
+            self.save_index()
         return response
 
     def register_resource(self, resource, response):
@@ -202,7 +205,7 @@ class ResourceStore(object):
         return subresources
 
     def is_relation(self, label, resource_map):
-        if label in self.required:
+        if label in self.required or label in self.optional:
             return False # skip own properties
         subject = self.vocab_store.lookupLabel(label)
         # check if subject belongs to vocabulary specified in resource map
@@ -216,7 +219,7 @@ class ResourceStore(object):
     def get_resource_relations(self, resource_map):
         return [key for key in resource_map.keys() if self.is_relation(key, resource_map)]
 
-    def dump_index(self):
+    def save_index(self):
         with open(self.resource_file, 'wb') as fh:
             pickle.dump(self.resource_index, fh)
 
