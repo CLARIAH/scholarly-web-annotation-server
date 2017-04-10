@@ -202,7 +202,7 @@ class TestResourceStore(unittest.TestCase):
     def test_resource_store_can_persist_data(self):
         store1 = ResourceStore(self.config)
         store1.register_by_map(self.letter_map)
-        store1.dump_index()
+        store1.save_index()
         store2 = ResourceStore(self.config)
         self.assertEqual(store1.resource_index.keys(), store2.resource_index.keys())
 

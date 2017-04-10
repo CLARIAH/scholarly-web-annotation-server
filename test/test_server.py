@@ -166,6 +166,12 @@ class TestAnnotationAPIResourceEndpoints(unittest.TestCase):
         self.assertEqual(data["type"], self.letter_map["type"])
         self.assertTrue("registered" in data.keys())
 
+    def test_api_returns_error_for_unknown_resource(self):
+        response = self.app.get("/api/resources/%s" % (self.letter_map["id"]))
+        self.assertEqual(response.status_code, 400)
+        data = get_json(response)
+        self.assertEqual(data["message"], "unknown resource")
+
     def test_api_can_return_registered_resource_map(self):
         self.app.post("/api/resources", data=json.dumps(self.letter_map), content_type="application/json")
         response = self.app.get("/api/resources/%s/structure" % (self.letter_map["id"]))
@@ -173,6 +179,15 @@ class TestAnnotationAPIResourceEndpoints(unittest.TestCase):
         self.assertEqual(data["id"], self.letter_map["id"])
         self.assertEqual(data["type"], self.letter_map["type"])
         self.assertEqual(data.keys(), self.letter_map.keys())
+
+    def test_api_can_register_map_for_known_resource(self):
+        response = self.app.post("/api/resources", data=json.dumps(self.letter_map), content_type="application/json")
+        data = get_json(response)
+        response = self.app.post("/api/resources/%s/structure" % (self.letter_map["id"]), data=json.dumps(self.letter_map), content_type="application/json")
+        data = get_json(response)
+        self.assertTrue("registered" in data.keys())
+        self.assertEqual(data["registered"], [])
+        self.assertEqual(len(data["ignored"]), 2)
 
     def test_api_can_return_registered_resource_annotations(self):
         self.app.post("/api/resources", data=json.dumps(self.letter_map), content_type="application/json")
