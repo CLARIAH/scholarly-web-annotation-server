@@ -49,7 +49,6 @@ def handle_invalid_annotation(error):
 
 @app.route('/api/annotations/target/<target_id>', methods=['GET'])
 def get_annotations_by_target(target_id):
-    print("GET annotations by target id %s" % (target_id))
     annotations = annotation_store.get_by_target(target_id)
     return make_response(annotations)
 
@@ -95,11 +94,20 @@ def get_resource_annotations(resource_id):
         annotations = annotation_store.get_by_targets(resource_ids)
     return make_response(annotations)
 
-@app.route('/api/resources/<resource_id>/structure', methods=['GET'])
+@app.route('/api/resources/<resource_id>/structure', methods=['GET', 'POST'])
 def get_resource_structure(resource_id):
-    if resource_store.has_resource(resource_id):
-        resource_map = resource_store.generate_resource_map(resource_id)
-    return make_response(resource_map)
+    response = {}
+    if request.method == "POST":
+        resource_map = request.get_json()
+        if resource_map["id"] != resource_id:
+            raise ResourceError(message="resource id in map does not correspond with resource id in request URL")
+        response = resource_store.register_by_map(resource_map)
+    if request.method == "GET":
+        if resource_store.has_resource(resource_id):
+            response = resource_store.generate_resource_map(resource_id)
+        else:
+            raise ResourceError(message="unknown resource")
+    return make_response(response)
 
 @app.route("/api/resource/<resource_id>/data/<format>")
 def get_resource(resource_id, format):
@@ -117,6 +125,8 @@ def get_resource(resource_id, format):
 @app.route("/api/resources/<resource_id>", methods=["GET", "PUT", "DELETE"])
 def handle_known_resource(resource_id):
     response = {}
+    if not resource_store.has_resource(resource_id):
+        raise ResourceError(message="unknown resource")
     # TO DO: return basic resource info similar to Alexandria response
     if request.method == "GET":
         response = resource_store.get_resource(resource_id).json()
@@ -150,5 +160,5 @@ if __name__ == '__main__':
         "url_file": "data/vocabulary_refs.json"
     }
     resource_store = ResourceStore(resource_config)
-    app.run(port=int(os.environ.get("PORT", 3000)), debug=True)
+    app.run(port=int(os.environ.get("PORT", 3000)), debug=True, threaded=True)
 
