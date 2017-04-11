@@ -90,3 +90,9 @@ This results in the following list of selection and filtering options:
 	- **Permission group**: only annotations accessible by group Y (not sure how this information can/will be registered as part of annotations or in separate user and group DB).
 	
 The `GET` actions are currently possible in Alexandria, the filtering mentioned is not.
+
+All or most of these querying and filtering requirements can be covered by the following generic approach:
+
+1. select resources based on metadata query (e.g. resource ID, resource type, field/value facets, free-text matches, etc.)
+2. select annotations on resources in step 1
+3. filter annotations based on annotation query (e.g. creator, date, motivation, annotation type, annotation content)
