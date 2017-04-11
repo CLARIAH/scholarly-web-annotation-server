@@ -18,19 +18,24 @@ How much of the Web Annotation model is needed in Alexandria for the RDFa annota
 
 ### Storing and Retrieving Resource Structure
 
-- **registering complex resources**: based on earlier discussion, it makes sense for the client to check if the server knows about the structure of a resource that the client is annotating, and if the server doesn't, for the client to send the structural information of the resource and all it's subresources to register all their relationships. Currently, it seems like Alexandria only has an endpoint for registering individual subresources with an `isPartOf` relationship with a resource. When the resources is highly complex, this would require many API calls. An alternative is for the server to traverse all relationships of a complex resource and store each relationship along the traversal. This could be done using the same endpoint, or to have a separate endpoint for registering complex resources.
-- **multiple parentage and collections**: [*subresources* in Alexandria are labelled explicitly as *subresources*, not as *resources*](http://huygensing.github.io/alexandria/alexandria-acceptance-tests/concordion/nl/knaw/huygens/alexandria/resource/Anatomy.html). That is, they have a `sub` field, not a `ref` field. This is a problem for 
-	- registering resources as part of multiple collections and subresources as part of multiple resources. 
-	[BB: Correct, currently the resource-subresource relationship in Alexandria is strictly hierarchical]
-	- retrieving resources at an arbitrary level. Each sub-resource is a resource in its own right.
-	[BB: this is not a problemn in Alexandria, the URI for a sub-resource is identical to one for a resource: http://alexandriaserver.aaa/resources/UUID this makes it possible to create a sub-resource based on a sub-resource; Internally, `sub` and `ref` both map to `cargo`]
-- **identifiers and references**: Alexandria uses `uuid` as internal identifier for (sub)resources. What are the requirements for the `ref` field? [BB: No requirements] Should it be an URI or an URL? [BB: This is up to the user] Must the value in the `ref` field be unique? [BB: This is up to the user, uniqueness of this field is not checked] That is, can a resource identified by a URI only be registered once? [BB: No, alexandria would allow multiple registrations]
+**Registering complex resources**: based on earlier discussion, it makes sense for the client to check if the server knows about the structure of a resource that the client is annotating, and if the server doesn't, for the client to send the structural information of the resource and all it's subresources to register all their relationships. Currently, it seems like Alexandria only has an endpoint for registering individual subresources with an `isPartOf` relationship with a resource. When the resources is highly complex, this would require many API calls. An alternative is for the server to traverse all relationships of a complex resource and store each relationship along the traversal. This could be done using the same endpoint, or to have a separate endpoint for registering complex resources similar to the endpoint for registering [IIIF annotation lists](http://huygensing.github.io/alexandria/alexandria-acceptance-tests/concordion/nl/knaw/huygens/alexandria/webannotation/WebAnnotation.html).
+
+**Multiple parentage and collections**: [*subresources* in Alexandria are labelled explicitly as *subresources*, not as *resources*](http://huygensing.github.io/alexandria/alexandria-acceptance-tests/concordion/nl/knaw/huygens/alexandria/resource/Anatomy.html). That is, they have a `sub` field, not a `ref` field. 
+
+For retrieving resources at an arbitrary level this is not a problem. Each sub-resource is a resource in its own right, and the URI-requirement for a sub-resource is identical to one for a resource (http://alexandriaserver.aaa/resources/UUID) which makes it possible to create a sub-resource based on a sub-resource; Internally, `sub` and `ref` both map to `cargo`.
+
+*This is a problem for registering resources as part of multiple collections and sub-resources as part of multiple resources. Currently the resource--sub-resource relationship in Alexandria is strictly hierarchical.*
+
+
+**Identifiers and references**: Alexandria uses `uuid` as internal identifier for (sub)resources. The format of the `ref` and `sub` (i.e. `cargo`) fields is up to the user. For Web Annotations this must be an IRI. Alexandria allows multiple registrations of the same `ref` and doesn't check uniqueness of this field. 
+
+*The RDFa-based annotation approach requires that resource identifiers are unique, but multiple contexts are possible (e.g. multiple editions containing the same resource but as part of different collections and with potentially different subsets of sub-resources.*
 
 ### Additional Resource Properties
 
 What additional properties should Alexandria be able to store on a resource? 
 
-- **resource type**: based on Annotatable Thing ontology. There is no property in the specification of the Web Annotation model to identify the target resource type. Should Alexandria use the ontology to verify the types and their relationships? Or should it trust the client to do this well? [BB: No Resource types defined currently]
+- **resource type**: based on Annotatable Thing ontology. There is no property in the specification of the Web Annotation model to identify the target resource type. Should Alexandria use the ontology to verify the types and their relationships? Or should it trust the client or the edition to do this well? [BB: No Resource types defined currently]
 - **media-type of the annotation target**: should the annotation server be aware of the media-type of a resource? E.g. for querying by media-type? Probably not, since Web Annotations allow [specifying media-type of an annotation target](https://www.w3.org/TR/annotation-model/#external-web-resources) (and body) via the `format` property. The general type of a resource can be [specified as a class on target](https://www.w3.org/TR/annotation-model/#classes) (and body) via the `type` property (i.e. *Data*, *Image*, *Sound*, *Text*, *Video*).
 
 
@@ -39,6 +44,8 @@ What additional properties should Alexandria be able to store on a resource?
 **Note 2017-04-05**: this section is definitely not yet finished. 
 
 Upon loading the client, it sends a request to the server for annotations on resources that it observes. Beyond that, users of annotations may wish to filter annotations based on different aspects, such motivation/task type, motivation/task label, date, user, group, ...
+
+
 
 - `GET` annotations by:
 	- **annotation ID**
