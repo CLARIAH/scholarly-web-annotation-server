@@ -49,25 +49,25 @@ In the context of the Van Gogh and Mondriaan use cases, a researcher may wish to
 
 To get a broader view of future requirements for querying and filtering annotations, the proposals of the [CLARIAH WP5 research pilots](http://www.clariah.nl/projecten/research-pilots) have been analysed and a rough estimate of their annotation tasks and querying requirements are listed below:
 
-- **DReAM**: cross-media analysis of trajectories of drugs and regulations
+- [CrossEWT](http://www.clariah.nl/projecten/research-pilots/crossewt): historical development of eye-witness testimonies of WWII
+  - manually annotate testimonies, use manual annotations to bootstrap automtatic recognition, extraction, annotation
+  - query automatic annotations for manual verification
+
+- [DReAM](http://www.clariah.nl/projecten/research-pilots/dream): cross-media analysis of trajectories of drugs and regulations
   - annotate mentions of drug components in broadcast media
   - query for annotations based on annotation bodies (types, values)
 
-- **M&M**: trace emergence of a genre based on analysis of cues related to genre conventions
+- [Me and Myself](http://www.clariah.nl/projecten/research-pilots/m-m): trace emergence of a genre based on analysis of cues related to genre conventions
   - annotation of oral and visual cues in video (bottom-up coding?)
   - annotate video stream of TV broadcasts in combination with TV program guides
   - querying for free-form tags and batch-updating them with more controlled codes
   - querying codes in combination with resource metadata for analysis
 
-- **CrossEWT**: historical development of eye-witness testimonies of WWII
-  - manually annotate testimonies, use manual annotations to bootstrap automtatic recognition, extraction, annotation
-  - query automatic annotations for manual verification
-
-- **MIMEHIST**: annotate video stream of films in combination with film posters, photos and distribution data
+- [MIMEHIST](http://www.clariah.nl/projecten/research-pilots/mimehist): annotate video stream of films in combination with film posters, photos and distribution data
   - querying annotations via bodies in combination with resource metadata 
   - querying annotations via creator, date and tags
 
-- **NarDis**: analysing narrative constructing during exploratory search
+- [NarDis](http://www.clariah.nl/projecten/research-pilots/nardis): analysing narrative constructing during exploratory search
   - exploring linked data collections, generating paths/trails of entities,  and generating narratives based on the relations between entities along the paths using annotations.
   - building trails of entities related to disruptive media events, annotate relations between entities, compare trails via annotations and entities
   - querying for annotations based on arbitrary sets of resources
