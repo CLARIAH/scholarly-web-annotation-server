@@ -96,3 +96,5 @@ All or most of these querying and filtering requirements can be covered by the f
 1. select resources based on metadata query (e.g. resource ID, resource type, field/value facets, free-text matches, etc.)
 2. select annotations on resources in step 1
 3. filter annotations based on annotation query (e.g. creator, date, motivation, annotation type, annotation content)
+
+A remaining question is whether there are queries for which it make sense to start by retrieving/selecting annotations, than gather and filter associated resources.
