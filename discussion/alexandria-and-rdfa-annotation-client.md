@@ -41,23 +41,52 @@ What additional properties should Alexandria be able to store on a resource?
 
 ### Querying and Filtering
 
-**Note 2017-04-05**: this section is definitely not yet finished. 
+ Annotation client is always in context of one or a few resources (e.g. a list of resources in a search/browse results list). With resource ids as constraints, filtering is relatively straightforward. When the annotation client is loaded in a browser window, it sends a request to the server for annotations on resources that it observes. Users may wish to filter these annotations based on different aspects, such motivation/task type, motivation/task label, date, user, group, ...
 
-Upon loading the client, it sends a request to the server for annotations on resources that it observes. Beyond that, users of annotations may wish to filter annotations based on different aspects, such motivation/task type, motivation/task label, date, user, group, ...
+Outside the annotation client, there may be additional requirements for querying the annotation server. The task of annotating is part of the larger research process. Later tasks that use these annotations include analytical steps whereby the researcher may want to aggregate or compare (selections of) annotations. 
 
+In the context of the Van Gogh and Mondriaan use cases, a researcher may wish to query for annotations based on *creator*, *motivation*, *tag/code/classification label*, *creation date* or the *type of resource* that is targeted by annotation.
 
+To get a broader view of future requirements for querying and filtering annotations, the proposals of the [CLARIAH WP5 research pilots](http://www.clariah.nl/projecten/research-pilots) have been analysed and a rough estimate of their annotation tasks and querying requirements are listed below:
 
-- `GET` annotations by:
-	- **annotation ID**
-	- **resource ID** (with or without annotations on sub-resources)
-	- **creator**
-- `filter` annotations by:
-	- **target resource type**: e.g. only annotations on `Transciption` type resources,
-	- **target text**: e.g. only annotations on text selections containing *cortex china*,
-	- **motivation/task type**: e.g. only `correction` annotations,
-	- **motivation/task label**: e.g. only `classify` annotations with the classification *colour*,
-	- **creation date range**: e.g. only annotations made today or in January 2017,
-	- **creator**: only annotations made by me or user X,
-	- **permission group**: only annotations accessible by group Y (not sure how this information can/will be registered as part of annotations or in separate user and group DB).
+- **DReAM**: cross-media analysis of trajectories of drugs and regulations
+  - annotate mentions of drug components in broadcast media
+  - query for annotations based on annotation bodies (types, values)
+
+- **M&M**: trace emergence of a genre based on analysis of cues related to genre conventions
+  - annotation of oral and visual cues in video (bottom-up coding?)
+  - annotate video stream of TV broadcasts in combination with TV program guides
+  - querying for free-form tags and batch-updating them with more controlled codes
+  - querying codes in combination with resource metadata for analysis
+
+- **CrossEWT**: historical development of eye-witness testimonies of WWII
+  - manually annotate testimonies, use manual annotations to bootstrap automtatic recognition, extraction, annotation
+  - query automatic annotations for manual verification
+
+- **MIMEHIST**: annotate video stream of films in combination with film posters, photos and distribution data
+  - querying annotations via bodies in combination with resource metadata 
+  - querying annotations via creator, date and tags
+
+- **NarDis**: analysing narrative constructing during exploratory search
+  - exploring linked data collections, generating paths/trails of entities,  and generating narratives based on the relations between entities along the paths using annotations.
+  - building trails of entities related to disruptive media events, annotate relations between entities, compare trails via annotations and entities
+  - querying for annotations based on arbitrary sets of resources
+
+This results in the following list of selection and filtering options:
+
+- `GET` annotations by (a combination of):
+	- **Annotation ID**
+	- **Resource ID** (with or without annotations on sub-resources)
+	- **Creator ID**
+
+- Searching annotations by:
+	- **Target resource type**: e.g. only annotations on `Transciption` type resources.
+	- **Target text**: e.g. only annotations on text selections containing *cortex china*.
+	- **Motivation/task type**: e.g. only `correction` annotations,
+	- **Motivation/task label**: e.g. only `classify` annotations with the classification *colour*.
+	- **Creation date range**: e.g. only annotations made today or in January 2017.
+	- **Creator**: only annotations made by me or user X, or user X, Y and Z.
+	- **Resource metadata**: e.g. resource creator, resource type, resource creation date, or any other metadata field and/or value of a resource.
+	- **Permission group**: only annotations accessible by group Y (not sure how this information can/will be registered as part of annotations or in separate user and group DB).
 	
-[BB: the `GET` actions are currently possible in Alexandria, the filtering mentioned is not]
+The `GET` actions are currently possible in Alexandria, the filtering mentioned is not.
