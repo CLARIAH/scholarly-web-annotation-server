@@ -16,6 +16,12 @@ How much of the Web Annotation model is needed in Alexandria for the RDFa annota
 - **motivation**: the Web Annotation standard has [a fixed list of motivations](https://www.w3.org/TR/annotation-model/#motivation-and-purpose). Scholars have indicated a requirement for different types of motivations. One solution would be to allow defining of sub-classes of motivations, e.g. specific forms of commenting, tagging or transcribing, so that they always maps to the fixed list.
 - **Audience**: we probably need to use [audience](https://www.w3.org/TR/annotation-model/#intended-audience) for user and group permissions. The [Working Group suggests](https://github.com/w3c/web-annotation/issues/119) to use the `type` property and [schema.org's audience schema](http://schema.org/Audience). See also the [permission model discussion](https://github.com/marijnkoolen/rdfa-annotation-client/blob/master/discussion/handling-permissions.md) in this repository.
 
+PB: I think in terms of annotation 'sets', collections of annotations made for a specific purpose, either for the purpose of organising one's own work (look at for thesis chapter 1) of for more publishable sets (Companion piece to article xyz, Biographical annotations to the persons mentioned in this edition). We agreed that motivation doesn't seem to fit this concept. We could use another property or an RDF list to implement it (or another annotation, with the annotations belonging to the set as its target?).
+Anyhow, it seems to me that permissions will usually be set at the 'set' level. I don't want to authorize someone to look at each of the annotations, I authorize him to look at all of the annotations in a set. 
+Some sets could be worked on by multiple persons. 
+To some extent this overlaps with the idea of annotation types, say 'comment on transcription', which you could ask, say, a review committee, to use when evaluating a digital edition.   
+
+
 ### Storing and Retrieving Resource Structure
 
 **Registering complex resources**: based on earlier discussion, it makes sense for the client to check if the server knows about the structure of a resource that the client is annotating, and if the server doesn't, for the client to send the structural information of the resource and all it's subresources to register all their relationships. Currently, it seems like Alexandria only has an endpoint for registering individual subresources with an `isPartOf` relationship with a resource. When the resources is highly complex, this would require many API calls. An alternative is for the server to traverse all relationships of a complex resource and store each relationship along the traversal. This could be done using the same endpoint, or to have a separate endpoint for registering complex resources similar to the endpoint for registering [IIIF annotation lists](http://huygensing.github.io/alexandria/alexandria-acceptance-tests/concordion/nl/knaw/huygens/alexandria/webannotation/WebAnnotation.html).
@@ -43,9 +49,17 @@ What additional properties should Alexandria be able to store on a resource?
 
  Annotation client is always in context of one or a few resources (e.g. a list of resources in a search/browse results list). With resource ids as constraints, filtering is relatively straightforward. When the annotation client is loaded in a browser window, it sends a request to the server for annotations on resources that it observes. Users may wish to filter these annotations based on different aspects, such motivation/task type, motivation/task label, date, user, group, ...
 
+PB: user won't get to see what he isn't authorised to see (shouldn't be a question of filtering in the client, should happen at the server).  
+
+PB: edition could designate some annotation sets to be displayed by default?
+
 Outside the annotation client, there may be additional requirements for querying the annotation server. The task of annotating is part of the larger research process. Later tasks that use these annotations include analytical steps whereby the researcher may want to aggregate or compare (selections of) annotations. 
 
+PB: first step would be export as csv or xml of a group of annotations, including annotated resource, content of annotation, date, creator. Also as a measure to create trust in potential annotators: you can be sure that even if our software would dispapper, your annotations are safe. (So it should at least be possible to download all of your own annotations).  
+
 In the context of the Van Gogh and Mondriaan use cases, a researcher may wish to query for annotations based on *creator*, *motivation*, *tag/code/classification label*, *creation date* or the *type of resource* that is targeted by annotation.
+
+PB: Again I think in terms of sets. The first selection that a user will want to make to my mind is which set(s) he wants to see. Then as a next step, he may want to make subselections by e.g. classification label. 
 
 To get a broader view of future requirements for querying and filtering annotations, the proposals of the [CLARIAH WP5 research pilots](http://www.clariah.nl/projecten/research-pilots) have been analysed and a rough estimate of their annotation tasks and querying requirements are listed below:
 
@@ -88,7 +102,8 @@ This results in the following list of selection and filtering options:
 	- **Creator**: only annotations made by me or user X, or user X, Y and Z.
 	- **Resource metadata**: e.g. resource creator, resource type, resource creation date, or any other metadata field and/or value of a resource.
 	- **Permission group**: only annotations accessible by group Y (not sure how this information can/will be registered as part of annotations or in separate user and group DB).
-	
+(PB)	- **Annotation set**
+
 The `GET` actions are currently possible in Alexandria, the filtering mentioned is not.
 
 All or most of these querying and filtering requirements can be covered by the following generic approach:
@@ -98,3 +113,5 @@ All or most of these querying and filtering requirements can be covered by the f
 3. filter annotations based on annotation query (e.g. creator, date, motivation, annotation type, annotation content)
 
 A remaining question is whether there are queries for which it make sense to start by retrieving/selecting annotations, than gather and filter associated resources.
+
+PB: I think it would. Because on a large webpage there may be may objects that potentially carry annotations. But maybe I made only ten annotations. Or I am interested in a single annotation set that can  be retrieved very easily. 
