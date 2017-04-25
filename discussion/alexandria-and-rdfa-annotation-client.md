@@ -15,11 +15,9 @@ How much of the Web Annotation model is needed in Alexandria for the RDFa annota
 	- *refinements*: i.e. multiple, hierarchically ordered selectors using the `refinedBy` property. **Note**: This should not be needed with the RDFa approach, as the `source` of the selector should be the most specific sub-resource.
 - **motivation**: the Web Annotation standard has [a fixed list of motivations](https://www.w3.org/TR/annotation-model/#motivation-and-purpose). Scholars have indicated a requirement for different types of motivations. One solution would be to allow defining of sub-classes of motivations, e.g. specific forms of commenting, tagging or transcribing, so that they always maps to the fixed list.
 - **Audience**: we probably need to use [audience](https://www.w3.org/TR/annotation-model/#intended-audience) for user and group permissions. The [Working Group suggests](https://github.com/w3c/web-annotation/issues/119) to use the `type` property and [schema.org's audience schema](http://schema.org/Audience). See also the [permission model discussion](https://github.com/marijnkoolen/rdfa-annotation-client/blob/master/discussion/handling-permissions.md) in this repository.
-
-PB: I think in terms of annotation 'sets', collections of annotations made for a specific purpose, either for the purpose of organising one's own work (look at for thesis chapter 1) of for more publishable sets (Companion piece to article xyz, Biographical annotations to the persons mentioned in this edition). We agreed that motivation doesn't seem to fit this concept. We could use another property or an RDF list to implement it (or another annotation, with the annotations belonging to the set as its target?).
-Anyhow, it seems to me that permissions will usually be set at the 'set' level. I don't want to authorize someone to look at each of the annotations, I authorize him to look at all of the annotations in a set. 
-Some sets could be worked on by multiple persons. 
-To some extent this overlaps with the idea of annotation types, say 'comment on transcription', which you could ask, say, a review committee, to use when evaluating a digital edition.   
+- **Collection**: scholars often think in terms of annotation 'sets', collections of annotations made for a specific purpose, either for the purpose of organising one's own work (look at for thesis chapter 1) of for more publishable sets (Companion piece to article xyz, Biographical annotations to the persons mentioned in this edition). *Motivation* doesn't seem to fit this concept. A *Collection* can be used to group annotations and labelled a human-readable description of work context or purpose using the *label* property. 
+Scholars will probably want to set permissions at the 'set' or *Collection* level. They don't want to authorize others for each individual annotation, but all of the annotations in a set. Sets could be worked on by multiple persons. 
+To some extent this overlaps with the idea of annotation types, e.g.  when evaluating a digital edition, asking a review committee to 'comment on transcription'.   
 
 
 ### Storing and Retrieving Resource Structure
@@ -41,17 +39,15 @@ For retrieving resources at an arbitrary level this is not a problem. Each sub-r
 
 What additional properties should Alexandria be able to store on a resource? 
 
-- **resource type**: based on Annotatable Thing ontology. There is no property in the specification of the Web Annotation model to identify the target resource type. Should Alexandria use the ontology to verify the types and their relationships? Or should it trust the client or the edition to do this well? [BB: No Resource types defined currently]
+- **resource type**: based on Annotatable Thing ontology. There is no property in the specification of the Web Annotation model to identify the target resource type. For a low threshold to participation, verification and validation of resource types and relationships according to an ontology should be optional in Alexandria. With ontology validation, more semantic querying is possible. 
 - **media-type of the annotation target**: should the annotation server be aware of the media-type of a resource? E.g. for querying by media-type? Probably not, since Web Annotations allow [specifying media-type of an annotation target](https://www.w3.org/TR/annotation-model/#external-web-resources) (and body) via the `format` property. The general type of a resource can be [specified as a class on target](https://www.w3.org/TR/annotation-model/#classes) (and body) via the `type` property (i.e. *Data*, *Image*, *Sound*, *Text*, *Video*).
 
 
 ### Querying and Filtering
 
- Annotation client is always in context of one or a few resources (e.g. a list of resources in a search/browse results list). With resource ids as constraints, filtering is relatively straightforward. When the annotation client is loaded in a browser window, it sends a request to the server for annotations on resources that it observes. Users may wish to filter these annotations based on different aspects, such motivation/task type, motivation/task label, date, user, group, ...
+The annotation client is always used in the context of one or a few resources (e.g. one or two resources in a detail view or a list of resources in a search/browse results list). With resource ids as constraints, filtering is relatively straightforward. When the annotation client is loaded in a browser window, it sends a request to the server for annotations on resources that it observes. The server returns annotations based on request and on authorization. Users may wish to filter these annotations based on different aspects, such motivation/task type, motivation/task label, date, user, group, ...
 
-PB: user won't get to see what he isn't authorised to see (shouldn't be a question of filtering in the client, should happen at the server).  
-
-PB: edition could designate some annotation sets to be displayed by default?
+*An open question is whether the edition can designate some annotation sets to be displayed by default.*
 
 Outside the annotation client, there may be additional requirements for querying the annotation server. The task of annotating is part of the larger research process. Later tasks that use these annotations include analytical steps whereby the researcher may want to aggregate or compare (selections of) annotations. 
 
