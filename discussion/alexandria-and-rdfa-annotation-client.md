@@ -110,4 +110,4 @@ All or most of these querying and filtering requirements can be covered by the f
 
 A remaining question is whether there are queries for which it make sense to start by retrieving/selecting annotations, than gather and filter associated resources.
 
-PB: I think it would. Because on a large webpage there may be many objects that potentially carry annotations. But maybe I made only ten annotations. Or I am interested in a single annotation set that can  be retrieved very easily. 
+PB: I think it would. Because on a large webpage there may be many objects that potentially carry annotations. But maybe I made only ten annotations. Or I am interested in a single annotation set that can  be retrieved very easily. MK: Number of resource IDs on the page can indeed be enormous. If user is authorized, annotation client could ask server how many annotations the user 1) has made, 2) has access to. 
