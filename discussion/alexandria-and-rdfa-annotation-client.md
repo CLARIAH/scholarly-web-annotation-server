@@ -51,11 +51,11 @@ The annotation client is always used in the context of one or a few resources (e
 
 Outside the annotation client, there may be additional requirements for querying the annotation server. The task of annotating is part of the larger research process. Later tasks that use these annotations include analytical steps whereby the researcher may want to aggregate or compare (selections of) annotations. 
 
-PB: first step would be export as csv or xml of a group of annotations, including annotated resource, content of annotation, date, creator. Also as a measure to create trust in potential annotators: you can be sure that even if our software would dispapper, your annotations are safe. (So it should at least be possible to download all of your own annotations).  
+It should be possible to export a group of annotations as e.g. csv or xml, including annotated resource, content of annotation, date, creator. Also as a measure to create trust in potential annotators: you can be sure that even if our software would disappear, your annotations are safe. (So it should at least be possible to download all of your own annotations).  
 
 In the context of the Van Gogh and Mondriaan use cases, a researcher may wish to query for annotations based on *creator*, *motivation*, *tag/code/classification label*, *creation date* or the *type of resource* that is targeted by annotation.
 
-PB: Again I think in terms of sets. The first selection that a user will want to make to my mind is which set(s) he wants to see. Then as a next step, he may want to make subselections by e.g. classification label. 
+The first selection that a user may want to make is the set(s) they want to see or work on. Then as a next step, they may want to make subselections by e.g. classification label. 
 
 To get a broader view of future requirements for querying and filtering annotations, the proposals of the [CLARIAH WP5 research pilots](http://www.clariah.nl/projecten/research-pilots) have been analysed and a rough estimate of their annotation tasks and querying requirements are listed below:
 
@@ -110,4 +110,4 @@ All or most of these querying and filtering requirements can be covered by the f
 
 A remaining question is whether there are queries for which it make sense to start by retrieving/selecting annotations, than gather and filter associated resources.
 
-PB: I think it would. Because on a large webpage there may be may objects that potentially carry annotations. But maybe I made only ten annotations. Or I am interested in a single annotation set that can  be retrieved very easily. 
+PB: I think it would. Because on a large webpage there may be many objects that potentially carry annotations. But maybe I made only ten annotations. Or I am interested in a single annotation set that can  be retrieved very easily. 
