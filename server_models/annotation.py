@@ -147,25 +147,46 @@ class Annotation(object):
 class AnnotationStore(object):
 
     def __init__(self, annotations=[]):
-        self.index = {}
+        self.annotation_index = {}
+        self.collection_index = {}
+        self.page_index = {}
         self.target_index = defaultdict(list)
         for annotation in annotations:
-            self.add(annotation)
+            self.add_annotation(annotation)
+
+    def add_collection(self, label):
+        collection = AnnotationCollection(label)
+        self.collection_index[collection.id] = collection
+        return collection.get_collection()
+
+    def add_annotation_to_collection(self, annotation_id, collection_id):
+        annotation = self.annotation_index[annotation_id]
+        new_pages = self.collection_index[collection_id].add_existing(annotation)
+        if len(new_pages) > 0:
+            for page_id in new_pages:
+                self.page_index[page_id] = self.collection_index[collection_id].pages[page_id]
+        return self.collection_index[collection_id].has_annotation_on_page[annotation.id]
+
+    def get_collection(self, collection_id):
+        return self.collection_index[collection_id].get_collection()
+
+    def get_collection_page(self, page_id):
+        return self.page_index[page_id].get_page()
 
     def add_bulk(self, annotations):
         added = []
         for annotation in annotations:
-            added += [self.add(annotation)]
+            added += [self.add_annotation(annotation)]
         return added
 
-    def add(self, annotation):
+    def add_annotation(self, annotation):
         # make a new annotation object
         anno = Annotation(annotation)
         # do nothing if annotation already exists
         if self.exists(anno.id):
             return None
         # add annotation to index
-        self.index[anno.id] = anno
+        self.annotation_index[anno.id] = anno
         # add annotation targets to target_index
         for target_id in anno.get_target_ids():
             self.target_index[target_id] += [anno.id]
@@ -173,34 +194,34 @@ class AnnotationStore(object):
 
     def get(self, annotation_id):
         try:
-            return self.index[annotation_id].data
+            return self.annotation_index[annotation_id].data
         except KeyError:
             raise AnnotationDoesNotExistError(annotation_id)
 
     def remove(self, annotation_id):
         annotation = self.get(annotation_id) # raises if not exists
         # first remove annotation from target_index
-        for target_id in self.index[annotation_id].get_target_ids():
+        for target_id in self.annotation_index[annotation_id].get_target_ids():
             self.target_index[target_id].remove(annotation_id)
             if self.target_index[target_id] == []:
                 del self.target_index[target_id]
         # then remove from index
-        del self.index[annotation_id]
+        del self.annotation_index[annotation_id]
         return annotation
 
     def update(self, updated_annotation):
         try:
-            annotation = self.index[updated_annotation['id']]
+            annotation = self.annotation_index[updated_annotation['id']]
             annotation.update(updated_annotation)
             return annotation.data
         except KeyError:
             raise AnnotationDoesNotExistError(updated_annotation['id'])
 
     def ids(self):
-        return list(self.index.keys())
+        return list(self.annotation_index.keys())
 
     def get_type(self, annotation_id):
-        return self.index[annotation_id].type
+        return self.annotation_index[annotation_id].type
 
     def get_by_targets(self, target_ids):
         annotations = []
@@ -217,21 +238,21 @@ class AnnotationStore(object):
         ids = []
         for anno_id in self.target_index[target_id]:
             if anno_id not in ids:
-                annotations += [self.index[anno_id].data]
+                annotations += [self.annotation_index[anno_id].data]
                 # add annotations on annotations
                 annotations += self.get_by_target(anno_id)
                 ids += [anno_id]
         return annotations
 
     def exists(self, annotation_id):
-        if annotation_id in self.index:
+        if annotation_id in self.annotation_index:
             return True
         return False
 
     def list(self, ids=None):
         if not ids:
             ids = self.ids()
-        return [annotation.data for id, annotation in self.index.items() if id in ids]
+        return [annotation.data for id, annotation in self.annotation_index.items() if id in ids]
 
     def get_annotations_by_target(self, target):
         return self.target_index[target]
@@ -250,32 +271,24 @@ class AnnotationCollection(object):
         self.first = None
         self.last = None
 
-    def add_new(self, annotation_json):
-        if type(annotation_json) != list:
-            self.validator.validate(annotation_json, "Annotation")
-            annotation = Annotation(annotation_json)
-            self.add_annotation(annotation)
-            return annotation.data
-        annotations = []
-        for annotation_data in annotation_json:
-            self.validator.validate(annotation_data, "Annotation")
-            annotation = Annotation(annotation_data)
-            self.add_annotation(annotation)
-            annotations += annotation.data
-        return annotations
-
     def add_existing(self, annotations):
+        new_pages = []
         if type(annotations) != list:
             annotations = [annotations]
         for annotation in annotations:
-            self.add_annotation(annotation)
+            new_page = self.add_annotation(annotation)
+            if new_page:
+                new_pages += [new_page]
+        return new_pages
 
     def add_annotation(self, annotation):
+        new_page_id = None
         if not self.last or self.pages[self.last].is_full():
-            self.add_page(self.last)
+            new_page_id = self.add_page(self.last)
         self.pages[self.last].add_annotation(annotation)
         self.has_annotation_on_page[annotation.id] = self.pages[self.last].id
         self.total += 1
+        return new_page_id
 
     def add_page(self, prev_id):
         new_page = AnnotationPage(self.id, prev_id=prev_id, start_index=self.total, page_size=self.page_size)
@@ -286,6 +299,7 @@ class AnnotationCollection(object):
         if prev_id in self.pages.keys():
             prev_page = self.pages[prev_id]
             prev_page.set_next(new_page.id)
+        return new_page.id
 
     def get(self, annotation_ids):
         if type(annotation_ids) == str:

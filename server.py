@@ -77,7 +77,7 @@ def get_annotations():
         response = annotation_store.list()
     elif request.method == "POST":
         new_annotation = request.get_json()
-        response = annotation_store.add(new_annotation)
+        response = annotation_store.add_annotation(new_annotation)
         save_annotations()
     return make_response(response)
 
