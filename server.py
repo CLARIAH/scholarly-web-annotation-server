@@ -14,9 +14,11 @@ from server_models.annotation import InvalidAnnotation, AnnotationDoesNotExistEr
 from server_models.resource import ResourceStore, ResourceError
 from flask import Flask, Response, request
 from flask import jsonify
+from flask.ext.cors import CORS
 
 app = Flask(__name__, static_url_path='', static_folder='public')
 app.add_url_rule('/', 'root', lambda: app.send_static_file('testletter.html'))
+cors = CORS(app)
 annotation_store = AnnotationStore()
 resource_store = None
 
