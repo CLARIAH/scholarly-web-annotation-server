@@ -5,11 +5,18 @@ import uuid
 from rfc3987 import parse as parse_IRI
 from collections import defaultdict
 
-class AnnotationValidator(object):
+class WebAnnotationValidator(object):
 
-    def validate(self, annotation):
+    def __init__(self):
+        self.accepted_types = ["Annotation", "AnnotationCollection", "AnnotationPage"]
+
+    def validate(self, annotation, annotation_type=None):
+        self.validate_generic(annotation)
+        self.validate_type(annotation, annotation_type)
+        return True
+
+    def validate_generic(self, annotation):
         if type(annotation) != dict:
-            print(type(annotation))
             raise InvalidAnnotation(message='annotation MUST be valid JSON')
         if "@context" not in annotation:
             raise InvalidAnnotation(message='annotation MUST have a @context')
@@ -17,6 +24,42 @@ class AnnotationValidator(object):
             raise InvalidAnnotation(message='annotation @context MUST include "http://www.w3.org/ns/anno.jsonld"')
         if 'type' not in annotation:
             raise InvalidAnnotation(message='annotation MUST have a type')
+
+    def validate_type(self, annotation, annotation_type):
+        anno_type = self.has_valid_type(annotation)
+        if annotation_type == None:
+            annotation_type = anno_type
+        if annotation_type not in self.as_list(annotation['type']):
+            raise InvalidAnnotation(message="annotation is not of type %s" % (annotation_type))
+        if annotation_type == "Annotation":
+            self.validate_annotation(annotation)
+        if annotation_type == "AnnotationPage":
+            self.validate_annotation_page(annotation)
+        if annotation_type == "AnnotationCollection":
+            self.validate_annotation_collection(annotation)
+
+    def validate_annotation_collection(self, annotation_collection):
+        if "AnnotationCollection" not in self.as_list(annotation_collection['type']):
+            raise InvalidAnnotation(message='annotation "type" property MUST include "AnnotationCollection"')
+        if "label" not in annotation_collection.keys():
+            raise InvalidAnnotation(message='annotation collection MUST have an "label" property with as value a string.')
+        if type(annotation_collection["label"]) != str:
+            raise InvalidAnnotation(message='annotation collection "label" property MUST be a string.')
+        if "total" in annotation_collection.keys():
+            if "first" not in annotation_collection.keys():
+                raise InvalidAnnotation(message='Non-empty collection MUST have "first" property referencing the first AnnotationPage')
+            if "last" not in annotation_collection.keys():
+                raise InvalidAnnotation(message='Non-empty collection MUST have "last" property referencing the first AnnotationPage')
+
+    def validate_annotation_page(self, annotation_page):
+        if "AnnotationPage" not in self.as_list(annotation_page['type']):
+            raise InvalidAnnotation(message='annotation "type" property MUST include "AnnotationPage"')
+        if "items" not in annotation_page.keys():
+            raise InvalidAnnotation(message='annotation page MUST have an "items" property with as value a list with at least one annotation.')
+        if type(annotation_page["items"]) != list or len(annotation_page["items"]) == 0:
+            raise InvalidAnnotation(message='annotation page "items" property MUST be a list with at least one annotation.')
+
+    def validate_annotation(self, annotation):
         if "Annotation" not in self.as_list(annotation['type']):
             raise InvalidAnnotation(message='annotation type MUST include "Annotation"')
 
@@ -36,7 +79,14 @@ class AnnotationValidator(object):
                 parse_IRI(target_id, rule="IRI")
             except ValueError:
                 raise InvalidAnnotation(message='annotation target id MUST be an IRI')
-        return True
+
+    def has_valid_type(self, annotation):
+        types = [anno_type for anno_type in self.as_list(annotation["type"]) if anno_type in self.accepted_types]
+        if len(types) > 1:
+            raise InvalidAnnotation(message="annotation cannot have multiple annotation types")
+        if len(types) == 0:
+            raise InvalidAnnotation(message='annotation type MUST be one of "Annotation", "AnnotationCollection", "AnnotationPage"')
+        return types[0]
 
     def as_list(self, value):
         if type(value) == list:
@@ -48,7 +98,7 @@ class Annotation(object):
     def __init__(self, annotation):
         annotation['id'] = uuid.uuid4().urn
         annotation['created'] = datetime.datetime.now(pytz.utc).isoformat()
-        self.validator = AnnotationValidator()
+        self.validator = WebAnnotationValidator()
         self.validator.validate(annotation)
         self.data = annotation
         self.id = annotation['id']
@@ -186,7 +236,204 @@ class AnnotationStore(object):
     def get_annotations_by_target(self, target):
         return self.target_index[target]
 
+class AnnotationCollection(object):
+
+    def __init__(self, label, page_size=100):
+        self.id = uuid.uuid4().urn
+        self.created = datetime.datetime.now(pytz.utc).isoformat()
+        self.label = label
+        self.total = 0
+        self.has_annotation_on_page = {}
+        self.pages = {}
+        self.validator = WebAnnotationValidator()
+        self.page_size = page_size
+        self.first = None
+        self.last = None
+
+    def add_new(self, annotation_json):
+        if type(annotation_json) != list:
+            self.validator.validate(annotation_json, "Annotation")
+            annotation = Annotation(annotation_json)
+            self.add_annotation(annotation)
+            return annotation.data
+        annotations = []
+        for annotation_data in annotation_json:
+            self.validator.validate(annotation_data, "Annotation")
+            annotation = Annotation(annotation_data)
+            self.add_annotation(annotation)
+            annotations += annotation.data
+        return annotations
+
+    def add_existing(self, annotations):
+        if type(annotations) != list:
+            annotations = [annotations]
+        for annotation in annotations:
+            self.add_annotation(annotation)
+
+    def add_annotation(self, annotation):
+        if not self.last or self.pages[self.last].is_full():
+            self.add_page(self.last)
+        self.pages[self.last].add_annotation(annotation)
+        self.has_annotation_on_page[annotation.id] = self.pages[self.last].id
+        self.total += 1
+
+    def add_page(self, prev_id):
+        new_page = AnnotationPage(self.id, prev_id=prev_id, start_index=self.total, page_size=self.page_size)
+        self.pages[new_page.id] = new_page
+        self.last = new_page.id
+        if not self.first:
+            self.first = new_page.id
+        if prev_id in self.pages.keys():
+            prev_page = self.pages[prev_id]
+            prev_page.set_next(new_page.id)
+
+    def get(self, annotation_ids):
+        if type(annotation_ids) == str:
+            return self.get_annotation(annotation_ids)
+        return [self.get_annotation(annotation_id) for annotation_id in annotation_ids]
+
+    def get_annotation(self, annotation_id):
+        if annotation_id not in self.has_annotation_on_page.keys():
+            raise AnnotationError(message="Annotation Collection does not contain annotation with id %s" % (annotation_id))
+        page_id = self.has_annotation_on_page[annotation_id]
+        return self.pages[page_id].get(annotation_id).data
+
+    def remove(self, annotation_ids):
+        if type(annotation_ids) == str:
+            return self.remove_annotation(annotation_ids)
+
+        return [self.remove_annotation(annotation_id) for annotation_id in annotation_ids]
+
+    def remove_annotation(self, annotation_id):
+        if annotation_id not in self.has_annotation_on_page.keys():
+            raise AnnotationError(message="Annotation Collection does not contain annotation with id %s" % (annotation_id))
+        page_id = self.has_annotation_on_page[annotation_id]
+        del self.has_annotation_on_page[annotation_id]
+        self.total -= 1
+        if page_id != self.last and self.pages[page_id].annotations == []:
+            del self.pages[page_id] # remove empty page if it's not the last page
+        return self.pages[page_id].remove(annotation_id)
+
+    def list_pages(self):
+        return list(self.pages.keys())
+
+    def get_page(self, page_id):
+        return self.pages[page_id].get_page()
+
+    def get_collection(self):
+        collection = {
+            "id": self.id,
+            "label": self.label,
+            "created": self.created,
+            "total": self.total
+        }
+        try:
+            collection["first"] = self.first
+            collection["last"] = self.last
+        except AttributeError:
+            pass
+        return collection
+
+class AnnotationPage(object):
+
+    def __init__(self, collection_id, start_index=0, page_size=10, prev_id=None, annotations=[]):
+        self.validator = WebAnnotationValidator()
+        self.id = uuid.uuid4().urn
+        self.part_of = collection_id
+        self.page_size = page_size
+        self.prev_id = prev_id
+        self.set_start_index(start_index)
+        self.annotations = []
+        self.initialise_annotations(annotations)
+
+    def initialise_annotations(self, annotations):
+        if len(annotations) > self.page_size:
+            raise AnnotationError(message="AnnotationPage cannot be initialised with more annotations than set by page_size (%s)." % (self.page_size))
+        self.add_annotations(annotations)
+
+    def set_start_index(self, start_index):
+        if self.prev_id and start_index == 0:
+            raise AnnotationError(message="When passing a prev_id, start_index has to be defined and higher than zero.")
+        self.start_index = start_index
+
+    def is_full(self):
+        return len(self.annotations) == self.page_size
+
+    def set_next(self, page_id):
+        self.next_id = page_id
+
+    def add(self, annotation):
+        if type(annotation) == list:
+            remaining = self.add_annotations(annotation)
+            return remaining
+        else:
+            self.add_annotation(annotation)
+            return True
+
+    def add_annotations(self, annotations):
+        remaining = []
+        for annotation in annotations:
+            if self.is_full():
+                remaining += [annotation]
+            else:
+                self.add_annotation(annotation)
+        return remaining
+
+    def add_annotation(self, annotation):
+        if self.is_full():
+            raise AnnotationError(message="Annotation page is full, cannot add annotation")
+        self.annotations += [annotation]
+
+    def get(self, annotation_ids):
+        if type(annotation_ids) == str:
+            return self.get_annotation(annotation_ids)
+        return [self.get_annotation(annotation_id) for annotation_id in annotation_ids]
+
+    def get_annotation(self, annotation_id):
+        for annotation in self.annotations:
+            if annotation.id == annotation_id:
+                return annotation
+        raise AnnotationError(message="Annotation Page does not contain annotation with id %s" % (annotation_id))
+
+    def remove(self, annotation_ids):
+        annotations = self.get(annotation_ids)
+        if type(annotations) == list:
+            for annotation in annotations:
+                self.annotations.remove(annotations)
+        else:
+            self.annotations.remove(annotations)
+        return annotations
+
+    def get_page(self):
+        page = {
+            "id": self.id,
+            "prev": self.prev_id,
+            "startIndex": self.start_index,
+            "partOf": self.part_of,
+            "items": [annotation.data for annotation in self.annotations]
+        }
+        try:
+            page["next"] = self.next_id
+        except AttributeError:
+            pass
+        return page
+
 class InvalidAnnotation(Exception):
+    status_code = 400
+
+    def __init__(self, message, status_code=400, payload=None):
+        Exception.__init__(self)
+        self.message = message
+        self.status_code = status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        rv['status_code'] = self.status_code
+        return rv
+
+class AnnotationError(Exception):
     status_code = 400
 
     def __init__(self, message, status_code=400, payload=None):

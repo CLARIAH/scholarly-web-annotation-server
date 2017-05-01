@@ -81,3 +81,22 @@ annotations = {
     },
 }
 
+annotation_pages = [
+    {
+        "@context": "http://www.w3.org/ns/anno.jsonld",
+        "type": "AnnotationPage",
+        "id": ""
+    }
+]
+
+annotation_collections = {
+    "empty_collection": {
+        "@context": "http://www.w3.org/ns/anno.jsonld",
+        "type": "AnnotationCollection",
+        "label": "Some collection",
+        "total": 0,
+        "first": "urn:uuid:1dadd70a-f5ad-44d0-a1fb-882ffc994cfd",
+        "last": "urn:uuid:1dadd70a-f5ad-44d0-a1fb-882ffc994cfd",
+    }
+}
+
