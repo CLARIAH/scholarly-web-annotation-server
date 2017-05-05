@@ -94,6 +94,7 @@ annotation_collections = {
         "@context": "http://www.w3.org/ns/anno.jsonld",
         "type": "AnnotationCollection",
         "label": "Some collection",
+        "creator": "Not me",
         "total": 0,
         "first": "urn:uuid:1dadd70a-f5ad-44d0-a1fb-882ffc994cfd",
         "last": "urn:uuid:1dadd70a-f5ad-44d0-a1fb-882ffc994cfd",
