@@ -147,29 +147,30 @@ class TestAnnotationCollection(unittest.TestCase):
         self.label = "Some collection"
 
     def test_annotation_collection_can_be_initialized(self):
-        collection = AnnotationCollection(self.label)
+        collection = AnnotationCollection(self.collection)
         self.assertEqual(collection.total, 0)
         self.assertEqual(collection.label, self.collection["label"])
         self.assertNotEqual(collection.id, None)
 
     def test_annotation_collection_can_add_valid_annotation(self):
-        collection = AnnotationCollection(self.label)
+        collection = AnnotationCollection(self.collection)
         annotation = Annotation(examples["vincent"])
         new_pages = collection.add_existing(annotation)
         self.assertEqual(collection.total, 1)
         self.assertNotEqual(new_pages, None)
 
     def test_annotation_collection_can_retrieve_annotation(self):
-        collection = AnnotationCollection(self.label)
+        collection = AnnotationCollection(self.collection)
         annotation = Annotation(examples["vincent"])
         new_pages = collection.add_existing(annotation)
         retrieved = collection.get(annotation.id)
         self.assertEqual(annotation.id, retrieved["id"])
 
     def test_annotation_collection_can_remove_valid_annotation(self):
-        collection = AnnotationCollection(self.label)
+        collection = AnnotationCollection(self.collection)
         annotation = Annotation(examples["vincent"])
         new_pages = collection.add_existing(annotation)
+        self.assertEqual(collection.total, 1)
         collection.remove(annotation.id)
         self.assertEqual(collection.total, 0)
         error = None
@@ -180,18 +181,18 @@ class TestAnnotationCollection(unittest.TestCase):
         self.assertNotEqual(error, None)
 
     def test_annotation_collection_can_generate_an_annotation_page_json(self):
-        collection = AnnotationCollection(self.label)
+        collection = AnnotationCollection(self.collection)
         annotation = Annotation(examples["vincent"])
         new_pages = collection.add_existing(annotation)
-        page_json = collection.get_page(new_pages[0])
+        page_json = collection.get_page_json(new_pages[0])
         self.assertEqual(page_json["id"], new_pages[0])
         self.assertEqual(page_json["items"][0]["id"], annotation.id)
 
     def test_annotation_collection_can_generate_an_annotation_collection_json(self):
-        collection = AnnotationCollection(self.label)
+        collection = AnnotationCollection(self.collection)
         annotation = Annotation(examples["vincent"])
         collection.add_existing(annotation)
-        collection_json = collection.get_collection()
+        collection_json = collection.to_json()
         self.assertEqual(collection_json["id"], collection.id)
         self.assertEqual(collection_json["total"], 1)
         self.assertEqual(collection_json["first"], collection.first)
@@ -352,20 +353,50 @@ class TestAnnotationStore(unittest.TestCase):
 
     def test_store_can_add_annotation_collection(self):
         collection_data = example_collections["empty_collection"]
-        collection_json = self.store.add_collection(collection_data["label"])
+        collection_json = self.store.create_collection(collection_data)
         self.assertEqual(collection_json["label"], collection_data["label"])
         self.assertNotEqual(collection_json["id"], None)
 
     def test_store_can_add_annotation_to_collection(self):
         annotation = self.store.add_annotation(examples["vincent"])
         collection_data = example_collections["empty_collection"]
-        collection_json = self.store.add_collection(collection_data["label"])
+        collection_json = self.store.create_collection(collection_data)
         self.store.add_annotation_to_collection(annotation["id"], collection_json["id"])
-        collection_json = self.store.get_collection(collection_json["id"])
+        collection_json = self.store.retrieve_collection(collection_json["id"])
         self.assertEqual(collection_json["total"], 1)
-        page_json = self.store.get_collection_page(collection_json["first"])
+        page_json = self.store.retrieve_collection_page(collection_json["first"])
         self.assertEqual(len(page_json["items"]), 1)
         self.assertEqual(page_json["items"][0]["id"], annotation["id"])
+
+    def test_store_can_remove_annotation_from_collection(self):
+        annotation = self.store.add_annotation(examples["vincent"])
+        collection_data = example_collections["empty_collection"]
+        collection_json = self.store.create_collection(collection_data)
+        self.store.add_annotation_to_collection(annotation["id"], collection_json["id"])
+        self.store.remove_annotation_from_collection(annotation["id"], collection_json["id"])
+        collection_json = self.store.retrieve_collection(collection_json["id"])
+        self.assertEqual(collection_json["total"], 0)
+
+    def test_store_can_remove_annotation_collection(self):
+        collection_data = example_collections["empty_collection"]
+        collection_json = self.store.create_collection(collection_data)
+        self.store.delete_collection(collection_json["id"])
+        error = None
+        try:
+            self.store.retrieve_collection(collection_json["id"])
+        except AnnotationError as e:
+            error = e
+        self.assertNotEqual(error, None)
+
+    def test_store_removes_annotation_collection_with_pages(self):
+        annotation = self.store.add_annotation(examples["vincent"])
+        collection_data = example_collections["empty_collection"]
+        collection_json = self.store.create_collection(collection_data)
+        self.store.add_annotation_to_collection(annotation["id"], collection_json["id"])
+        collection_json = self.store.retrieve_collection(collection_json["id"])
+        self.assertEqual(len(self.store.page_index.keys()), 1)
+        self.store.delete_collection(collection_json["id"])
+        self.assertEqual(len(self.store.page_index.keys()), 0)
 
 if __name__ == "__main__":
     unittest.main()

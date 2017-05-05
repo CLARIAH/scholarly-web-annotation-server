@@ -3,7 +3,7 @@ import os
 import json
 import tempfile
 import server as server
-from annotation_examples import annotations as examples
+from annotation_examples import annotations as examples, annotation_collections as example_collections
 from server_models.resource import ResourceStore
 
 tempfiles = []
@@ -196,6 +196,96 @@ class TestAnnotationAPIResourceEndpoints(unittest.TestCase):
         response = self.app.get("/api/resources/%s/annotations" % (self.letter_map["id"]))
         annotations = get_json(response)
         self.assertEqual(annotations[0]["id"], stored_annotation["id"])
+
+class TestAnnotationAPICollectionEndpoints(unittest.TestCase):
+
+    def setUp(self):
+        annotations_file = make_tempfile()
+        server.app.config['DATAFILE'] = annotations_file
+        self.app = server.app.test_client()
+
+    def test_api_can_create_collection(self):
+        collection_raw = example_collections["empty_collection"]
+        response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json")
+        collection_registered = get_json(response)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("id" in collection_registered)
+        self.assertEqual(collection_registered["label"], collection_raw["label"])
+        self.assertEqual(collection_registered["creator"], collection_raw["creator"])
+
+    def test_api_can_retrieve_collection(self):
+        collection_raw = example_collections["empty_collection"]
+        response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json")
+        collection_registered = get_json(response)
+        response = self.app.get("/api/collections/%s" % (collection_registered["id"]))
+        collection_retrieved = get_json(response)
+        self.assertEqual(response.status_code, 200)
+        for key in collection_retrieved.keys():
+            self.assertEqual(collection_retrieved[key], collection_registered[key])
+
+    def test_api_can_update_collection(self):
+        collection_raw = example_collections["empty_collection"]
+        response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json")
+        collection_registered = get_json(response)
+        collection_registered["label"] = "New label"
+        response = self.app.put("/api/collections/%s" % (collection_registered["id"]), data=json.dumps(collection_registered), content_type="application/json")
+        collection_updated = get_json(response)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(collection_updated["label"], collection_registered["label"])
+
+    def test_api_can_delete_collection(self):
+        collection_raw = example_collections["empty_collection"]
+        response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json")
+        collection_registered = get_json(response)
+        response = self.app.delete("/api/collections/%s" % (collection_registered["id"]))
+        collection_deleted = get_json(response)
+        self.assertEqual(collection_registered["id"], collection_deleted["id"])
+        response = self.app.get("/api/collections/%s" % (collection_registered["id"]))
+        collection_retrieved = get_json(response)
+        self.assertEqual(response.status_code, 404)
+
+    def test_api_can_add_annotation_to_collection(self):
+        collection_raw = example_collections["empty_collection"]
+        response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json")
+        collection_registered = get_json(response)
+        self.assertEqual(collection_registered["total"], 0)
+        annotation_raw = examples["vincent"]
+        response = self.app.post("/api/annotations", data=json.dumps(annotation_raw), content_type="application/json")
+        annotation_registered = get_json(response)
+        response = self.app.get("/api/collections/%s/add/%s" % (collection_registered["id"], annotation_registered["id"]))
+        page_registered = get_json(response)
+        response = self.app.get("/api/collections/%s" % (collection_registered["id"]))
+        collection_retrieved = get_json(response)
+        self.assertEqual(collection_retrieved["total"], 1)
+
+    def test_api_can_remove_annotation_to_collection(self):
+        collection_raw = example_collections["empty_collection"]
+        response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json")
+        collection_registered = get_json(response)
+        self.assertEqual(collection_registered["total"], 0)
+        annotation_raw = examples["vincent"]
+        response = self.app.post("/api/annotations", data=json.dumps(annotation_raw), content_type="application/json")
+        annotation_registered = get_json(response)
+        response = self.app.get("/api/collections/%s/add/%s" % (collection_registered["id"], annotation_registered["id"]))
+        response = self.app.get("/api/collections/%s/remove/%s" % (collection_registered["id"], annotation_registered["id"]))
+        response = self.app.get("/api/collections/%s" % (collection_registered["id"]))
+        collection_retrieved = get_json(response)
+        self.assertEqual(collection_retrieved["total"], 0)
+
+    def test_api_can_retrieve_collection_page(self):
+        collection_raw = example_collections["empty_collection"]
+        response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json")
+        collection_registered = get_json(response)
+        self.assertEqual(collection_registered["total"], 0)
+        annotation_raw = examples["vincent"]
+        response = self.app.post("/api/annotations", data=json.dumps(annotation_raw), content_type="application/json")
+        annotation_registered = get_json(response)
+        response = self.app.get("/api/collections/%s/add/%s" % (collection_registered["id"], annotation_registered["id"]))
+        page_id = get_json(response)
+        response = self.app.get("/api/pages/%s" % (page_id))
+        page_retrieved = get_json(response)
+        self.assertEqual(len(page_retrieved["items"]), 1)
+        self.assertEqual(page_retrieved["items"][0]["id"], annotation_registered["id"])
 
 if __name__ == "__main__":
     unittest.main()

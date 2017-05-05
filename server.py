@@ -10,7 +10,7 @@ import os
 #import requests
 import xmltodict
 import re
-from server_models.annotation import InvalidAnnotation, AnnotationDoesNotExistError, AnnotationStore
+from server_models.annotation import InvalidAnnotation, AnnotationDoesNotExistError, AnnotationStore, AnnotationError
 from server_models.resource import ResourceStore, ResourceError
 from flask import Flask, Response, request
 from flask import jsonify
@@ -32,10 +32,29 @@ def make_response(response_data):
         }
     )
 
+class InvalidUsage(Exception):
+    status_code = 400
+
+    def __init__(self, message, status_code=None, payload=None):
+        Exception.__init__(self)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+            self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
+
 def generic_error_handler(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
+
+@app.errorhandler(InvalidUsage)
+def handle_invalid_resource(error):
+    return generic_error_handler(error)
 
 @app.errorhandler(ResourceError)
 def handle_invalid_resource(error):
@@ -47,6 +66,10 @@ def handle_no_such_annotation(error):
 
 @app.errorhandler(InvalidAnnotation)
 def handle_invalid_annotation(error):
+    return generic_error_handler(error)
+
+@app.errorhandler(AnnotationError)
+def handle_annotation_error(error):
     return generic_error_handler(error)
 
 @app.route('/api/annotations/target/<target_id>', methods=['GET'])
@@ -138,6 +161,41 @@ def handle_known_resource(resource_id):
 def register_resource():
     resource_map = request.get_json()
     response = resource_store.register_by_map(resource_map)
+    return make_response(response)
+
+@app.route("/api/pages/<page_id>", methods=["GET"])
+def handle_page(page_id):
+    response = annotation_store.retrieve_collection_page(page_id)
+    return make_response(response)
+
+@app.route("/api/collections/<collection_id>/add/<annotation_id>", methods=["GET"])
+def handle_add_to_collection(collection_id, annotation_id):
+    response = annotation_store.add_annotation_to_collection(annotation_id, collection_id)
+    return make_response(response)
+
+@app.route("/api/collections/<collection_id>/remove/<annotation_id>", methods=["GET"])
+def handle_remove_from_collection(collection_id, annotation_id):
+    response = annotation_store.remove_annotation_from_collection(annotation_id, collection_id)
+    return make_response(response)
+
+@app.route("/api/collections/<collection_id>", methods=["GET", "PUT", "DELETE"])
+def handle_collection(collection_id):
+    if request.method == "GET":
+        response = annotation_store.retrieve_collection(collection_id)
+    elif request.method == "PUT":
+        data = request.get_json()
+        response = annotation_store.update_collection(collection_id, data)
+    elif request.method == "DELETE":
+        response = annotation_store.delete_collection(collection_id)
+    return make_response(response)
+
+@app.route("/api/collections", methods=["GET", "POST"])
+def handle_collections():
+    if request.method == "POST":
+        collection_data = request.get_json()
+        response = annotation_store.create_collection(collection_data)
+    elif request.method == "GET":
+        response = annotation_store.retrieve_collections()
     return make_response(response)
 
 def save_annotations():
