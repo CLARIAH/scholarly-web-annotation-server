@@ -154,10 +154,30 @@ class AnnotationStore(object):
         for annotation in annotations:
             self.add_annotation(annotation)
 
-    def add_collection(self, label):
-        collection = AnnotationCollection(label)
+    def create_collection(self, collection_data):
+        collection = AnnotationCollection(collection_data)
         self.collection_index[collection.id] = collection
-        return collection.get_collection()
+        return collection.to_json()
+
+    def retrieve_collection(self, collection_id):
+        if collection_id not in self.collection_index.keys():
+            raise AnnotationError(message="Annotation Store does not contain collection with id %s" % (collection_id))
+        return self.collection_index[collection_id].to_json()
+
+    def update_collection(self, collection_id, collection_data):
+        if collection_id not in self.collection_index.keys():
+            raise AnnotationError(message="Annotation Store does not contain collection with id %s" % (collection_id))
+        self.collection_index[collection_id].update(collection_data)
+        return self.collection_index[collection_id].to_json()
+
+    def delete_collection(self, collection_id):
+        if collection_id not in self.collection_index.keys():
+            raise AnnotationError(message="Annotation Store does not contain collection with id %s" % (collection_id))
+        current_metadata = self.collection_index[collection_id].to_json()
+        for page_id in self.collection_index[collection_id].list_pages():
+            del self.page_index[page_id]
+        del self.collection_index[collection_id]
+        return current_metadata
 
     def add_annotation_to_collection(self, annotation_id, collection_id):
         annotation = self.annotation_index[annotation_id]
@@ -167,11 +187,13 @@ class AnnotationStore(object):
                 self.page_index[page_id] = self.collection_index[collection_id].pages[page_id]
         return self.collection_index[collection_id].has_annotation_on_page[annotation.id]
 
-    def get_collection(self, collection_id):
-        return self.collection_index[collection_id].get_collection()
+    def remove_annotation_from_collection(self, annotation_id, collection_id):
+        removed_page_id = self.collection_index[collection_id].remove(annotation_id)
+        if removed_page_id:
+            del self.page_index[removed_page_id]
 
-    def get_collection_page(self, page_id):
-        return self.page_index[page_id].get_page()
+    def retrieve_collection_page(self, page_id):
+        return self.page_index[page_id].to_json()
 
     def add_bulk(self, annotations):
         added = []
@@ -259,17 +281,25 @@ class AnnotationStore(object):
 
 class AnnotationCollection(object):
 
-    def __init__(self, label, page_size=100):
+    def __init__(self, data):
         self.id = uuid.uuid4().urn
         self.created = datetime.datetime.now(pytz.utc).isoformat()
-        self.label = label
+        self.creator = data["creator"]
+        self.label = data["label"]
         self.total = 0
         self.has_annotation_on_page = {}
         self.pages = {}
         self.validator = WebAnnotationValidator()
-        self.page_size = page_size
+        self.page_size = data["page_size"] if "page_size" in data else 100
         self.first = None
         self.last = None
+
+    def update(self, data):
+        self.creator = data["creator"]
+        self.label = data["label"]
+        self.page_size = data["page_size"] if "page_size" in data else 100
+        self.modified = datetime.datetime.now(pytz.utc).isoformat()
+
 
     def add_existing(self, annotations):
         new_pages = []
@@ -315,8 +345,12 @@ class AnnotationCollection(object):
     def remove(self, annotation_ids):
         if type(annotation_ids) == str:
             return self.remove_annotation(annotation_ids)
-
-        return [self.remove_annotation(annotation_id) for annotation_id in annotation_ids]
+        removed_page_ids = []
+        for annotation_id in annotation_ids:
+            removed_page_id = self.remove_annotation(annotation_id)
+            if removed_page_id and removed_page_id not in removed_page_ids:
+                removed_page_ids += [removed_page_id]
+        return removed_page_ids
 
     def remove_annotation(self, annotation_id):
         if annotation_id not in self.has_annotation_on_page.keys():
@@ -324,26 +358,57 @@ class AnnotationCollection(object):
         page_id = self.has_annotation_on_page[annotation_id]
         del self.has_annotation_on_page[annotation_id]
         self.total -= 1
+        removed_page = None
         if page_id != self.last and self.pages[page_id].annotations == []:
-            del self.pages[page_id] # remove empty page if it's not the last page
-        return self.pages[page_id].remove(annotation_id)
+            self.removed_page(page_id) # remove empty page if it's not the last page
+            removed_page = page_id
+        return removed_page
+
+    def remove_page(self, page_id):
+        # page is first and last, prev and next become None
+        if page_id == self.first and page_id == self.last:
+            self.first = None
+            self.last = None
+        # page is first, next becomes first
+        elif page_id == self.first:
+            self.first = self.pages[page_id].next
+            self.pages[self.first].prev = None
+        # page is last, prev becomes last
+        elif page_id == self.last:
+            self.last = self.pages[page_id].prev
+            self.pages[self.last].next = None
+        # page is neither, link prev to next page
+        else:
+            prev_page = self.pages[page_id].prev
+            next_page = self.pages[page_id].next
+            self.pages[prev_page].next = next_page
+            self.pages[next_page].prev = prev_page
+        del self.pages[page_id]
 
     def list_pages(self):
         return list(self.pages.keys())
 
-    def get_page(self, page_id):
-        return self.pages[page_id].get_page()
+    def get_page_json(self, page_id):
+        return self.pages[page_id].to_json()
 
-    def get_collection(self):
+    def to_json(self):
         collection = {
             "id": self.id,
             "label": self.label,
+            "creator": self.creator,
             "created": self.created,
             "total": self.total
         }
         try:
             collection["first"] = self.first
+        except AttributeError:
+            pass
+        try:
             collection["last"] = self.last
+        except AttributeError:
+            pass
+        try:
+            collection["modified"] = self.modified
         except AttributeError:
             pass
         return collection
@@ -418,7 +483,7 @@ class AnnotationPage(object):
             self.annotations.remove(annotations)
         return annotations
 
-    def get_page(self):
+    def to_json(self):
         page = {
             "id": self.id,
             "prev": self.prev_id,
@@ -448,9 +513,9 @@ class InvalidAnnotation(Exception):
         return rv
 
 class AnnotationError(Exception):
-    status_code = 400
+    status_code = 404
 
-    def __init__(self, message, status_code=400, payload=None):
+    def __init__(self, message, status_code=404, payload=None):
         Exception.__init__(self)
         self.message = message
         self.status_code = status_code
