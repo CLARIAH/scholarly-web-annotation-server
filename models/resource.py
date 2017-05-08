@@ -2,7 +2,7 @@ import pickle
 import datetime
 import pytz
 import uuid
-from server_models.vocabulary import VocabularyStore
+from models.vocabulary import VocabularyStore
 from rfc3987 import parse as parse_IRI
 from collections import defaultdict
 
