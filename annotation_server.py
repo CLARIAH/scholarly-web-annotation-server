@@ -7,17 +7,13 @@
 
 import json
 import os
-#import requests
-import xmltodict
-import re
-from server_models.annotation import InvalidAnnotation, AnnotationDoesNotExistError, AnnotationStore, AnnotationError
-from server_models.resource import ResourceStore, ResourceError
+from models.annotation import InvalidAnnotation, AnnotationDoesNotExistError, AnnotationStore, AnnotationError
+from models.resource import ResourceStore, ResourceError
 from flask import Flask, Response, request
 from flask import jsonify
 from flask.ext.cors import CORS
 
 app = Flask(__name__, static_url_path='', static_folder='public')
-app.add_url_rule('/', 'root', lambda: app.send_static_file('testletter.html'))
 cors = CORS(app)
 annotation_store = AnnotationStore()
 resource_store = None
@@ -53,7 +49,7 @@ def generic_error_handler(error):
     return response
 
 @app.errorhandler(InvalidUsage)
-def handle_invalid_resource(error):
+def handle_invalid_usage(error):
     return generic_error_handler(error)
 
 @app.errorhandler(ResourceError)
@@ -71,6 +67,10 @@ def handle_invalid_annotation(error):
 @app.errorhandler(AnnotationError)
 def handle_annotation_error(error):
     return generic_error_handler(error)
+
+@app.route('/')
+def handle_root():
+    return make_response({"message": "Welcome"})
 
 @app.route('/api/annotations/target/<target_id>', methods=['GET'])
 def get_annotations_by_target(target_id):
@@ -133,19 +133,6 @@ def get_resource_structure(resource_id):
         else:
             raise ResourceError(message="unknown resource")
     return make_response(response)
-
-@app.route("/api/resource/<resource_id>/data/<format>")
-def get_resource(resource_id, format):
-    fname = "data/%s.xml" % (resource_id)
-    with open (fname, 'rt') as fh:
-        resource_data = fh.read()
-
-    if format == "json":
-        xml_string = re.sub("<\?xml.*?\?>", "", resource_data)
-        json_data = xmltodict.parse(xml_string, process_namespaces=False)
-        return make_response(json_data)
-    else:
-        return resource_data
 
 @app.route("/api/resources/<resource_id>", methods=["GET", "PUT", "DELETE"])
 def handle_known_resource(resource_id):
