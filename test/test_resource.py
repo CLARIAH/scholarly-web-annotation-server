@@ -1,8 +1,8 @@
 import os
 import unittest
 import tempfile
-from server_models.resource import Resource, ResourceStore, ResourceError
-from server_models.vocabulary import VocabularyError
+from models.resource import Resource, ResourceStore, ResourceError
+from models.vocabulary import VocabularyError
 
 tempfiles = []
 

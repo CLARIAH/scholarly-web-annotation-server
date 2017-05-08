@@ -1,6 +1,6 @@
 import tempfile
 import unittest
-from server_models.vocabulary import VocabularyStore, VocabularyError
+from models.vocabulary import VocabularyStore, VocabularyError
 
 def make_tempfile():
     _, fname = tempfile.mkstemp()

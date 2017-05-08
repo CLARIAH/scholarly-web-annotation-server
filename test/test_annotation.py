@@ -1,7 +1,7 @@
 import uuid
 import unittest
 from annotation_examples import annotations as examples, annotation_collections as example_collections
-from server_models.annotation import Annotation, AnnotationStore, AnnotationCollection, AnnotationPage, WebAnnotationValidator, InvalidAnnotation, AnnotationError
+from models.annotation import Annotation, AnnotationStore, AnnotationCollection, AnnotationPage, WebAnnotationValidator, InvalidAnnotation, AnnotationError
 
 class TestAnnotationValidation(unittest.TestCase):
 

@@ -2,9 +2,9 @@ import unittest
 import os
 import json
 import tempfile
-import server as server
+import annotation_server as server
 from annotation_examples import annotations as examples, annotation_collections as example_collections
-from server_models.resource import ResourceStore
+from models.resource import ResourceStore
 
 tempfiles = []
 
