@@ -96,8 +96,10 @@ class WebAnnotationValidator(object):
 class Annotation(object):
 
     def __init__(self, annotation):
-        annotation['id'] = uuid.uuid4().urn
-        annotation['created'] = datetime.datetime.now(pytz.utc).isoformat()
+        if 'id' not in annotation:
+            annotation['id'] = uuid.uuid4().urn
+        if 'created' not in annotation:
+            annotation['created'] = datetime.datetime.now(pytz.utc).isoformat()
         self.validator = WebAnnotationValidator()
         self.validator.validate(annotation)
         self.data = annotation
