@@ -144,10 +144,13 @@ def handle_known_resource(resource_id):
         response = resource_store.get_resource(resource_id).json()
     return make_response(response)
 
-@app.route("/api/resources", methods=["POST"])
+@app.route("/api/resources", methods=["GET", "POST"])
 def register_resource():
-    resource_map = request.get_json()
-    response = resource_store.register_by_map(resource_map)
+    if request.method == "POST":
+        resource_map = request.get_json()
+        response = resource_store.register_by_map(resource_map)
+    if request.method == "GET":
+        response = resource_store.get_resources()
     return make_response(response)
 
 @app.route("/api/pages/<page_id>", methods=["GET"])
