@@ -108,6 +108,9 @@ class ResourceStore(object):
             return self.resource_index[resource_id]
         return None
 
+    def get_resources(self):
+        return [self.generate_resource_map(key) for key, value in self.resource_index.items()]
+
     def get_resource_type(self, resource_id):
         if self.has_resource(resource_id):
             return self.resource_index[resource_id].type
@@ -176,11 +179,14 @@ class ResourceStore(object):
         except ValueError:
             raise ResourceError(message = 'resource identifier is not an IRI: %s' % (resource_id))
 
-    def check_resource_type_is_valid(self, resource_type):
-        resource_class = self.vocab_store.lookupLabel(resource_type)
-        if not resource_class or not self.vocab_store.is_class(resource_class):
-            message="Illegal resource type: %s" % (resource_type)
-            raise ResourceError(message)
+    def check_resource_type_is_valid(self, resource_types):
+        if type(resource_types) == str:
+            resource_types = [resource_types]
+        for resource_type in resource_types:
+            resource_class = self.vocab_store.lookupLabel(resource_type)
+            if not resource_class or not self.vocab_store.is_class(resource_class):
+                message="Illegal resource type: %s" % (resource_type)
+                raise ResourceError(message)
 
     def make_resource(self, resource_map):
         if self.has_resource(resource_map["id"]):
