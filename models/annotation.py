@@ -1,4 +1,6 @@
 import json
+import copy
+import pickle
 import datetime
 import pytz
 import uuid
@@ -104,6 +106,7 @@ class Annotation(object):
         self.validator.validate(annotation)
         self.data = annotation
         self.id = annotation['id']
+        self.in_collection = []
 
     def has_target(self, target_id):
         if not self.get_targets():
@@ -156,6 +159,9 @@ class AnnotationStore(object):
         for annotation in annotations:
             self.add_annotation(annotation)
 
+    def configure(self, configuration):
+        self.config = configuration
+
     def create_collection(self, collection_data):
         collection = AnnotationCollection(collection_data)
         self.collection_index[collection.id] = collection
@@ -181,18 +187,24 @@ class AnnotationStore(object):
         del self.collection_index[collection_id]
         return current_metadata
 
+    def retrieve_collections(self):
+        return [self.collection_index[collection_id].to_json() for collection_id in self.collection_index.keys()]
+
     def add_annotation_to_collection(self, annotation_id, collection_id):
         annotation = self.annotation_index[annotation_id]
         new_pages = self.collection_index[collection_id].add_existing(annotation)
         if len(new_pages) > 0:
             for page_id in new_pages:
                 self.page_index[page_id] = self.collection_index[collection_id].pages[page_id]
+        annotation.in_collection += [collection_id]
         return self.collection_index[collection_id].has_annotation_on_page[annotation.id]
 
     def remove_annotation_from_collection(self, annotation_id, collection_id):
         removed_page_id = self.collection_index[collection_id].remove(annotation_id)
         if removed_page_id:
             del self.page_index[removed_page_id]
+        annotation = self.annotation_index[annotation_id]
+        annotation.in_collection.remove(collection_id)
 
     def retrieve_collection_page(self, page_id):
         return self.page_index[page_id].to_json()
@@ -229,6 +241,9 @@ class AnnotationStore(object):
             self.target_index[target_id].remove(annotation_id)
             if self.target_index[target_id] == []:
                 del self.target_index[target_id]
+        # then remove annotation from collections
+        for collection_id in copy.copy(self.annotation_index[annotation_id].in_collection):
+            self.remove_annotation_from_collection(annotation_id, collection_id)
         # then remove from index
         del self.annotation_index[annotation_id]
         return annotation
@@ -280,6 +295,16 @@ class AnnotationStore(object):
 
     def get_annotations_by_target(self, target):
         return self.target_index[target]
+
+    def load_annotations(self):
+        try:
+            with open(self.config['collections_file'], 'r') as fh:
+                collections = pickle.load(fh)
+        except FileNotFoundError:
+            collections = []
+        return collections
+
+
 
 class AnnotationCollection(object):
 
