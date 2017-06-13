@@ -189,10 +189,12 @@ def handle_collections():
     return make_response(response)
 
 def save_annotations():
+    #annotation_store.save_annotations()
     with open(app.config['DATAFILE'], 'w') as f:
         f.write(json.dumps(annotation_store.list(), indent=4, separators=(',', ': ')))
 
 def load_annotations():
+    #annotation_store.load_annotations()
     try:
         with open(app.config['DATAFILE'], 'r') as f:
             annotations = json.loads(f.read())
@@ -209,6 +211,12 @@ if __name__ == '__main__':
         "triple_file": "data/vocabularies.ttl",
         "url_file": "data/vocabulary_refs.json"
     }
+    annotation_config = {
+        "collections_file": "data/annotation_collections.pickle",
+        "pages_file": "data/annotation_pages.pickle",
+        "annotations_file": "data/annotations.pickle"
+    }
+    annotation_store.configure(annotation_config)
     resource_store = ResourceStore(resource_config)
     app.run(port=int(os.environ.get("PORT", 3000)), debug=True, threaded=True)
 
