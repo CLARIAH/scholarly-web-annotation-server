@@ -1,12 +1,14 @@
 import unittest
+import copy
 import os
 import json
 import tempfile
-import annotation_server as server
+import annotation_rest_server as server
 from annotation_examples import annotations as examples, annotation_collections as example_collections
 from models.resource import ResourceStore
 
 tempfiles = []
+#server.app.register_blueprint(server.blueprint)
 
 def make_tempfile():
     _, fname = tempfile.mkstemp()
@@ -25,7 +27,7 @@ def get_json(response):
     return json.loads(response.get_data(as_text=True))
 
 def add_example(app):
-    annotation = examples["vincent"]
+    annotation = copy.copy(examples["vincent"])
     response = app.post("/api/annotations", data=json.dumps(annotation), content_type="application/json")
     return get_json(response)
 
@@ -41,7 +43,7 @@ class TestAnnotationAPI(unittest.TestCase):
         #os.unlink(server.app.config['DATAFILE'])
 
     def test_POST_annotation_returns_annotation_with_id(self):
-        annotation = examples["vincent"]
+        annotation = copy.copy(examples["vincent"])
         response = self.app.post("/api/annotations", data=json.dumps(annotation), content_type="application/json")
         stored = get_json(response)
         self.assertTrue('id' in stored)
@@ -49,7 +51,7 @@ class TestAnnotationAPI(unittest.TestCase):
 
     def test_GET_annotation_return_stored_annotation(self):
         example = add_example(self.app)
-        response = self.app.get("/api/annotations/annotation/" + example['id'])
+        response = self.app.get("/api/annotations/" + example['id'])
         annotation = get_json(response)
         self.assertEqual(annotation['id'], example['id'])
 
@@ -62,17 +64,17 @@ class TestAnnotationAPI(unittest.TestCase):
     def test_PUT_annotation_returns_modified_annotation(self):
         example = add_example(self.app)
         example["motivation"] = "linking"
-        response = self.app.put("/api/annotations/annotation/" + example['id'], data=json.dumps(example), content_type="application/json")
+        response = self.app.put("/api/annotations/" + example['id'], data=json.dumps(example), content_type="application/json")
         annotation = get_json(response)
         self.assertTrue('modified' in annotation)
         self.assertEqual(annotation['motivation'], example['motivation'])
 
     def test_DELETE_annotation_returns_removed_annotation(self):
         example = add_example(self.app)
-        response = self.app.delete("/api/annotations/annotation/" + example['id'])
+        response = self.app.delete("/api/annotations/" + example['id'])
         annotation = get_json(response)
         self.assertEqual(annotation['id'], example['id'])
-        response = self.app.get("/api/annotations/annotation/" + example['id'])
+        response = self.app.get("/api/annotations/" + example['id'])
         self.assertEqual(response.status_code, 404)
 
 class TestAnnotationAPIResourceEndpoints(unittest.TestCase):
@@ -183,6 +185,7 @@ class TestAnnotationAPIResourceEndpoints(unittest.TestCase):
     def test_api_can_register_map_for_known_resource(self):
         response = self.app.post("/api/resources", data=json.dumps(self.letter_map), content_type="application/json")
         data = get_json(response)
+        url = "/api/resources/%s/structure" % (self.letter_map["id"])
         response = self.app.post("/api/resources/%s/structure" % (self.letter_map["id"]), data=json.dumps(self.letter_map), content_type="application/json")
         data = get_json(response)
         self.assertTrue("registered" in data.keys())
@@ -241,7 +244,7 @@ class TestAnnotationAPICollectionEndpoints(unittest.TestCase):
         collection_deleted = get_json(response)
         self.assertEqual(collection_registered["id"], collection_deleted["id"])
         response = self.app.get("/api/collections/%s" % (collection_registered["id"]))
-        collection_retrieved = get_json(response)
+        #collection_retrieved = get_json(response)
         self.assertEqual(response.status_code, 404)
 
     def test_api_can_add_annotation_to_collection(self):
@@ -249,25 +252,24 @@ class TestAnnotationAPICollectionEndpoints(unittest.TestCase):
         response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json")
         collection_registered = get_json(response)
         self.assertEqual(collection_registered["total"], 0)
-        annotation_raw = examples["vincent"]
+        annotation_raw = copy.copy(examples["vincent"])
         response = self.app.post("/api/annotations", data=json.dumps(annotation_raw), content_type="application/json")
         annotation_registered = get_json(response)
-        response = self.app.get("/api/collections/%s/add/%s" % (collection_registered["id"], annotation_registered["id"]))
-        page_registered = get_json(response)
+        response = self.app.post("/api/collections/%s/annotations/" % (collection_registered["id"]), data=json.dumps(annotation_registered), content_type="application/json")
         response = self.app.get("/api/collections/%s" % (collection_registered["id"]))
         collection_retrieved = get_json(response)
         self.assertEqual(collection_retrieved["total"], 1)
 
-    def test_api_can_remove_annotation_to_collection(self):
+    def test_api_can_remove_annotation_from_collection(self):
         collection_raw = example_collections["empty_collection"]
         response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json")
         collection_registered = get_json(response)
         self.assertEqual(collection_registered["total"], 0)
-        annotation_raw = examples["vincent"]
+        annotation_raw = copy.copy(examples["vincent"])
         response = self.app.post("/api/annotations", data=json.dumps(annotation_raw), content_type="application/json")
         annotation_registered = get_json(response)
-        response = self.app.get("/api/collections/%s/add/%s" % (collection_registered["id"], annotation_registered["id"]))
-        response = self.app.get("/api/collections/%s/remove/%s" % (collection_registered["id"], annotation_registered["id"]))
+        response = self.app.post("/api/collections/%s/annotations/" % (collection_registered["id"]), data=json.dumps(annotation_registered), content_type="application/json")
+        response = self.app.delete("/api/collections/%s/annotations/%s" % (collection_registered["id"], annotation_registered["id"]))
         response = self.app.get("/api/collections/%s" % (collection_registered["id"]))
         collection_retrieved = get_json(response)
         self.assertEqual(collection_retrieved["total"], 0)
@@ -277,10 +279,10 @@ class TestAnnotationAPICollectionEndpoints(unittest.TestCase):
         response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json")
         collection_registered = get_json(response)
         self.assertEqual(collection_registered["total"], 0)
-        annotation_raw = examples["vincent"]
+        annotation_raw = copy.copy(examples["vincent"])
         response = self.app.post("/api/annotations", data=json.dumps(annotation_raw), content_type="application/json")
         annotation_registered = get_json(response)
-        response = self.app.get("/api/collections/%s/add/%s" % (collection_registered["id"], annotation_registered["id"]))
+        response = self.app.post("/api/collections/%s/annotations/" % (collection_registered["id"]), data=json.dumps(annotation_registered), content_type="application/json")
         page_id = get_json(response)
         response = self.app.get("/api/pages/%s" % (page_id))
         page_retrieved = get_json(response)
