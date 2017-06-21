@@ -1,7 +1,8 @@
 import uuid
+import copy
 import unittest
 from annotation_examples import annotations as examples, annotation_collections as example_collections
-from models.annotation import Annotation, AnnotationStore, AnnotationCollection, AnnotationPage, WebAnnotationValidator, InvalidAnnotation, AnnotationError
+from models.annotation import Annotation, AnnotationStore, AnnotationCollection, AnnotationPage, WebAnnotationValidator, AnnotationError
 
 class TestAnnotationValidation(unittest.TestCase):
 
@@ -12,7 +13,7 @@ class TestAnnotationValidation(unittest.TestCase):
         error = None
         try:
             self.validator.validate(examples["no_target"], "Annotation")
-        except InvalidAnnotation as e:
+        except AnnotationError as e:
             error = e
             pass
         # error must be defined
@@ -21,7 +22,7 @@ class TestAnnotationValidation(unittest.TestCase):
         self.assertEqual(error.message, 'annotation MUST have at least one target')
 
     def test_validator_accepts_valid_annotation(self):
-        self.assertEqual(self.validator.validate(examples["vincent"], "Annotation"), True)
+        self.assertEqual(self.validator.validate(copy.copy(examples["vincent"]), "Annotation"), True)
 
     def test_validator_accepts_valid_annotation_page(self):
         page = {
@@ -39,7 +40,7 @@ class TestAnnotationValidation(unittest.TestCase):
         error = None
         try:
             validation_status = self.validator.validate(page, "AnnotationPage")
-        except InvalidAnnotation as e:
+        except AnnotationError as e:
             error = e
         self.assertEqual(error, None)
         self.assertEqual(validation_status, True)
@@ -55,7 +56,7 @@ class TestAnnotationValidation(unittest.TestCase):
         error = None
         try:
             self.validator.validate(page, "AnnotationPage")
-        except InvalidAnnotation as e:
+        except AnnotationError as e:
             error = e
         self.assertNotEqual(error, None)
 
@@ -68,7 +69,7 @@ class TestAnnotationValidation(unittest.TestCase):
         error = None
         try:
             self.validator.validate(page, "AnnotationPage")
-        except InvalidAnnotation as e:
+        except AnnotationError as e:
             error = e
         self.assertNotEqual(error, None)
         self.assertTrue('MUST have an "items" property' in error.message)
@@ -86,7 +87,7 @@ class TestAnnotationValidation(unittest.TestCase):
         error = None
         try:
             self.validator.validate(collection, "AnnotationCollection")
-        except InvalidAnnotation as e:
+        except AnnotationError as e:
             error = e
         self.assertEqual(error, None)
 
@@ -99,7 +100,7 @@ class TestAnnotationValidation(unittest.TestCase):
         error = None
         try:
             self.validator.validate(collection, "AnnotationCollection")
-        except InvalidAnnotation as e:
+        except AnnotationError as e:
             error = e
         self.assertEqual(error, None)
 
@@ -113,7 +114,7 @@ class TestAnnotationValidation(unittest.TestCase):
         error = None
         try:
             self.validator.validate(collection, "AnnotationCollection")
-        except InvalidAnnotation as e:
+        except AnnotationError as e:
             error = e
         self.assertNotEqual(error, None)
         self.assertTrue('Non-empty collection MUST have "first" property referencing the first AnnotationPage')
@@ -121,7 +122,7 @@ class TestAnnotationValidation(unittest.TestCase):
 class TestAnnotation(unittest.TestCase):
 
     def setUp(self):
-        self.annotation = Annotation(examples["vincent"])
+        self.annotation = Annotation(copy.copy(examples["vincent"]))
 
     def test_annotation_has_id(self):
         self.assertTrue('id' in self.annotation.data)
@@ -131,7 +132,7 @@ class TestAnnotation(unittest.TestCase):
         self.assertTrue('created' in self.annotation.data)
 
     def test_annotation_can_update(self):
-        update_annotation = examples["vincent"]
+        update_annotation = self.annotation.data
         new_motivation = "linking"
         update_annotation['motivation'] = new_motivation
         self.annotation.update(update_annotation)
@@ -154,21 +155,21 @@ class TestAnnotationCollection(unittest.TestCase):
 
     def test_annotation_collection_can_add_valid_annotation(self):
         collection = AnnotationCollection(self.collection)
-        annotation = Annotation(examples["vincent"])
+        annotation = Annotation(copy.copy(examples["vincent"]))
         new_pages = collection.add_existing(annotation)
         self.assertEqual(collection.total, 1)
         self.assertNotEqual(new_pages, None)
 
     def test_annotation_collection_can_retrieve_annotation(self):
         collection = AnnotationCollection(self.collection)
-        annotation = Annotation(examples["vincent"])
+        annotation = Annotation(copy.copy(examples["vincent"]))
         new_pages = collection.add_existing(annotation)
         retrieved = collection.get(annotation.id)
         self.assertEqual(annotation.id, retrieved["id"])
 
     def test_annotation_collection_can_remove_valid_annotation(self):
         collection = AnnotationCollection(self.collection)
-        annotation = Annotation(examples["vincent"])
+        annotation = Annotation(copy.copy(examples["vincent"]))
         new_pages = collection.add_existing(annotation)
         self.assertEqual(collection.total, 1)
         collection.remove(annotation.id)
@@ -182,7 +183,7 @@ class TestAnnotationCollection(unittest.TestCase):
 
     def test_annotation_collection_can_generate_an_annotation_page_json(self):
         collection = AnnotationCollection(self.collection)
-        annotation = Annotation(examples["vincent"])
+        annotation = Annotation(copy.copy(examples["vincent"]))
         new_pages = collection.add_existing(annotation)
         page_json = collection.get_page_json(new_pages[0])
         self.assertEqual(page_json["id"], new_pages[0])
@@ -190,7 +191,7 @@ class TestAnnotationCollection(unittest.TestCase):
 
     def test_annotation_collection_can_generate_an_annotation_collection_json(self):
         collection = AnnotationCollection(self.collection)
-        annotation = Annotation(examples["vincent"])
+        annotation = Annotation(copy.copy(examples["vincent"]))
         collection.add_existing(annotation)
         collection_json = collection.to_json()
         self.assertEqual(collection_json["id"], collection.id)
@@ -209,14 +210,14 @@ class TestAnnotationPage(unittest.TestCase):
 
     def test_non_full_annotation_page_can_add_valid_annotation(self):
         collection_id = uuid.uuid4().urn
-        annotations = [examples["vincent"]]
+        annotations = [copy.copy(examples["vincent"])]
         page = AnnotationPage(collection_id, annotations=annotations)
         self.assertEqual(page.start_index, 0)
         self.assertEqual(len(page.annotations), 1)
 
     def test_annotation_page_cannot_be_initialised_with_more_than_page_size(self):
         collection_id = uuid.uuid4().urn
-        annotations = [examples["vincent"], examples["theo"]]
+        annotations = [copy.copy(examples["vincent"]), copy.copy(examples["theo"])]
         error = None
         try:
             page = AnnotationPage(collection_id, page_size=1, annotations=annotations)
@@ -226,7 +227,7 @@ class TestAnnotationPage(unittest.TestCase):
 
     def test_annotation_page_adds_at_most_page_size(self):
         collection_id = uuid.uuid4().urn
-        annotations = [examples["vincent"], examples["theo"]]
+        annotations = [copy.copy(examples["vincent"]), copy.copy(examples["theo"])]
         page = AnnotationPage(collection_id, page_size=1)
         remaining = page.add(annotations)
         self.assertEqual(page.start_index, 0)
@@ -235,7 +236,7 @@ class TestAnnotationPage(unittest.TestCase):
 
     def test_annotation_page_can_set_next_page_id(self):
         collection_id = uuid.uuid4().urn
-        annotations = [examples["vincent"]]
+        annotations = [copy.copy(examples["vincent"])]
         page1 = AnnotationPage(collection_id, page_size=1, annotations=annotations)
         start_index = page1.start_index + len(page1.annotations)
         page2 = AnnotationPage(collection_id, annotations=annotations, prev_id=page1.id, start_index=start_index)
@@ -257,7 +258,7 @@ class TestAnnotationPage(unittest.TestCase):
 
     def test_second_annotation_page_has_correct_start_index(self):
         collection_id = uuid.uuid4().urn
-        annotations = [examples["vincent"], examples["theo"]]
+        annotations = [copy.copy(examples["vincent"]), copy.copy(examples["theo"])]
         page1 = AnnotationPage(collection_id, page_size=1)
         remaining = page1.add(annotations)
         start_index = page1.start_index + len(page1.annotations)
@@ -270,7 +271,8 @@ class TestAnnotationPage(unittest.TestCase):
 
     def test_annotation_page_can_remove_annotation(self):
         collection_id = uuid.uuid4().urn
-        annotation = Annotation(examples["vincent"])
+        annotation = Annotation(copy.copy(examples["vincent"]))
+        annotations = [annotation]
         page = AnnotationPage(collection_id, page_size=1)
         page.add(annotation)
         page.remove(annotation.id)
@@ -278,7 +280,7 @@ class TestAnnotationPage(unittest.TestCase):
 
     def test_annotation_page_warns_annotation_is_not_on_page(self):
         collection_id = uuid.uuid4().urn
-        annotations = [Annotation(examples["vincent"]), Annotation(examples["theo"])]
+        annotations = [Annotation(copy.copy(examples["vincent"])), Annotation(copy.copy(examples["theo"]))]
         page = AnnotationPage(collection_id, page_size=1)
         page.add(annotations[0])
         error = None
@@ -298,7 +300,7 @@ class TestAnnotationStore(unittest.TestCase):
         error = None
         try:
             self.store.add_annotation(examples["no_target"])
-        except InvalidAnnotation as e:
+        except AnnotationError as e:
             error = e
         # error must be defined
         self.assertNotEqual(error, None)
@@ -308,8 +310,8 @@ class TestAnnotationStore(unittest.TestCase):
     def test_store_accepts_valid_annotation(self):
         error = None
         try:
-            self.store.add_annotation(examples["vincent"])
-        except InvalidAnnotation as e:
+            self.store.add_annotation(copy.copy(examples["vincent"]))
+        except AnnotationError as e:
             error = e
         # error must be defined
         self.assertEqual(error, None)
@@ -317,13 +319,13 @@ class TestAnnotationStore(unittest.TestCase):
         self.assertEqual(len(self.store.ids()), 1)
 
     def test_store_can_get_annotation_by_id(self):
-        self.store.add_annotation(examples["vincent"])
+        self.store.add_annotation(copy.copy(examples["vincent"]))
         annotation_id = self.store.ids()[0]
         annotation = self.store.get(annotation_id)
         self.assertEqual(annotation['id'], annotation_id)
 
     def test_store_can_get_annotation_by_target_id(self):
-        self.store.add_annotation(examples["vincent"])
+        self.store.add_annotation(copy.copy(examples["vincent"]))
         annotation_id = self.store.ids()[0]
         annotation_data = self.store.get(annotation_id)
         annotation = Annotation(annotation_data)
@@ -334,7 +336,7 @@ class TestAnnotationStore(unittest.TestCase):
             self.assertTrue(annotation_data['id'] in ids)
 
     def test_store_can_update_annotation(self):
-        self.store.add_annotation(examples["vincent"])
+        self.store.add_annotation(copy.copy(examples["vincent"]))
         annotation_id = self.store.ids()[0]
         annotation = self.store.get(annotation_id)
         annotation['motivation'] = "linking"
@@ -343,12 +345,12 @@ class TestAnnotationStore(unittest.TestCase):
         self.assertTrue('modified' in updated_annotation)
 
     def test_store_can_remove_annotation(self):
-        self.store.add_annotation(examples["vincent"])
+        self.store.add_annotation(copy.copy(examples["vincent"]))
         annotation_id = self.store.ids()[0]
         self.assertEqual(len(self.store.ids()), 1)
         annotation = self.store.remove(annotation_id)
         self.assertEqual(len(self.store.ids()), 0)
-        self.assertEqual(annotation, examples["vincent"])
+        self.assertEqual(annotation["motivation"], examples["vincent"]["motivation"])
         self.assertEqual(len(self.store.target_index.keys()), 0)
 
     def test_store_can_add_annotation_collection(self):
@@ -358,10 +360,10 @@ class TestAnnotationStore(unittest.TestCase):
         self.assertNotEqual(collection_json["id"], None)
 
     def test_store_can_add_annotation_to_collection(self):
-        annotation = self.store.add_annotation(examples["vincent"])
+        annotation = self.store.add_annotation(copy.copy(examples["vincent"]))
         collection_data = example_collections["empty_collection"]
         collection_json = self.store.create_collection(collection_data)
-        self.store.add_annotation_to_collection(annotation["id"], collection_json["id"])
+        self.store.add_annotation_to_collection(annotation, collection_json["id"])
         collection_json = self.store.retrieve_collection(collection_json["id"])
         self.assertEqual(collection_json["total"], 1)
         page_json = self.store.retrieve_collection_page(collection_json["first"])
@@ -369,10 +371,10 @@ class TestAnnotationStore(unittest.TestCase):
         self.assertEqual(page_json["items"][0]["id"], annotation["id"])
 
     def test_store_can_remove_annotation_from_collection(self):
-        annotation = self.store.add_annotation(examples["vincent"])
+        annotation = self.store.add_annotation(copy.copy(examples["vincent"]))
         collection_data = example_collections["empty_collection"]
         collection_json = self.store.create_collection(collection_data)
-        self.store.add_annotation_to_collection(annotation["id"], collection_json["id"])
+        self.store.add_annotation_to_collection(annotation, collection_json["id"])
         self.store.remove_annotation_from_collection(annotation["id"], collection_json["id"])
         collection_json = self.store.retrieve_collection(collection_json["id"])
         self.assertEqual(collection_json["total"], 0)
@@ -389,10 +391,10 @@ class TestAnnotationStore(unittest.TestCase):
         self.assertNotEqual(error, None)
 
     def test_store_removes_annotation_collection_with_pages(self):
-        annotation = self.store.add_annotation(examples["vincent"])
+        annotation = self.store.add_annotation(copy.copy(examples["vincent"]))
         collection_data = example_collections["empty_collection"]
         collection_json = self.store.create_collection(collection_data)
-        self.store.add_annotation_to_collection(annotation["id"], collection_json["id"])
+        self.store.add_annotation_to_collection(annotation, collection_json["id"])
         collection_json = self.store.retrieve_collection(collection_json["id"])
         self.assertEqual(len(self.store.page_index.keys()), 1)
         self.store.delete_collection(collection_json["id"])
