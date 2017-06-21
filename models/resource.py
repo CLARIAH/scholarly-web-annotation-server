@@ -104,9 +104,10 @@ class ResourceStore(object):
         return resource_id in self.resource_index.keys()
 
     def get_resource(self, resource_id):
-        if self.has_resource(resource_id):
+        try:
             return self.resource_index[resource_id]
-        return None
+        except KeyError:
+            raise ResourceError(message="unknown resource")
 
     def get_resources(self):
         return [self.generate_resource_map(key) for key, value in self.resource_index.items()]
