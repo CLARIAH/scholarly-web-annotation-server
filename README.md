@@ -1,38 +1,33 @@
-# rdfa-annotation-client
-Javascript annotation client for RDFa enriched web resources
+# Python server for scholarly web annotations
+
+An experimental Python Flask RESTplus server based on the W3C Web Annotation standard, that implements both the [WA data model](https://www.w3.org/TR/annotation-model/) and the [WA protocol](https://www.w3.org/TR/annotation-protocol/).
 
 ## How to install
 
 Clone the repository:
 ```
-git clone https://github.com/marijnkoolen/rdfa-annotation-client.git
-```
-
-Install the required npm packages:
-```
-npm install
+git clone https://github.com/marijnkoolen/scholarly-web-annotation-server.git
 ```
 
 Install the required python packages:
 ```
-pip install
+pip install -r requirements.txt
 ```
 
-## How to test
+## How to run
 
 Start the server:
 ```
-python test-server.py
+python annotation_server.py
 ```
 
 and point your browser to `localhost:3000`
 
 ## How to modify
 
-Run the webpack watcher:
+Run all tests:
 ```
-npm run dev
+make test_server
 ```
 
-Whenever you modify source files in `src/`, the watcher will rebuild the Javascript bundle `public/js/rdfa-annotation-client.js` that’s used in the test letter `public/testletter.html`.
 
