@@ -1,0 +1,144 @@
+#################################################################
+#
+#    Generic ontology (should be usable for any edition)  
+#
+#################################################################
+@prefix hi: <http://localhost:3000/vocabularies/genericontology.ttl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sch: <http://schema.org/> .
+@base <http://huygens.knaw.nl/annotate/genericontology.ttl#/> .
+<http://localhost:3000/vocabularies/genericontology.ttl> rdf:type owl:Ontology .
+
+#################################################################
+#
+#    Annotatable things and its subclasses 
+#
+#################################################################
+hi:AnnotatableThing rdf:type owl:Class ;
+	rdfs:label "AnnotatableThing" .
+hi:CreativeWork rdf:type owl:Class ;
+	rdfs:label "CreativeWork" ;
+	rdfs:subClassOf hi:AnnotatableThing.
+hi:MediaBearer rdf:type owl:Class ;
+	rdfs:label "MediaBearer" ;
+	rdfs:subClassOf hi:AnnotatableThing .
+hi:TextBearer rdf:type owl:Class ;
+	rdfs:label "TextBearer" ;
+	rdfs:subClassOf hi:MediaBearer .
+hi:VideoBearer rdf:type owl:Class ;
+	rdfs:label "VideoBearer" ;
+	rdfs:subClassOf hi:MediaBearer .
+hi:ImageBearer rdf:type owl:Class ;
+	rdfs:label "ImageBearer" ;
+	rdfs:subClassOf hi:MediaBearer .
+hi:DataBearer rdf:type owl:Class ;
+	rdfs:label "DataBearer" ;
+	rdfs:subClassOf hi:MediaBearer .
+hi:Enrichment rdf:type owl:Class ;
+	rdfs:label "Enrichment" ;
+	rdfs:subClassOf hi:AnnotatableThing .
+hi:IgnorableElement rdf:type owl:Class ;
+	rdfs:label "IgnorableElement" ;
+	rdfs:subClassOf hi:AnnotatableThing ;
+	rdfs:comment "Element should be ignored in annotation".
+hi:IgnorableTag rdf:type owl:Class ;
+	rdfs:label "IgnorableContent" ;
+	rdfs:subClassOf hi:AnnotatableThing ;
+	rdfs:comment "Tags of element should be ignored in annotation (content is relevant)".
+
+#################################################################
+#
+#    Properties that connect Annotatable things
+#
+#################################################################
+hi:isCarriedOn rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:CreativeWork;
+	rdfs:range hi:TextBearer;
+	rdfs:label "isCarriedOn"  ;
+	rdfs:comment "Connects a Creative Work to its physical bearers (usually pages)";
+	rdfs:subPropertyOf hi:includes.
+hi:hasEnrichment rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:CreativeWork;
+	rdfs:range hi:Enrichment;
+	rdfs:label "hasEnrichment" ;
+	rdfs:comment "Adds editorial enrichments (translations, indexing, bibliography, explanatory notes) to a Creative work or part of it";
+	rdfs:subPropertyOf hi:includes.
+hi:hasPart rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:CreativeWork;
+	rdfs:range hi:CreativeWork;
+	rdfs:label "hasPart" ;
+	rdfs:comment "Describes relation between Works and parts of Works";
+	rdfs:subPropertyOf hi:includes.
+hi:isPartOf rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:CreativeWork;
+	rdfs:range hi:CreativeWork;
+	rdfs:label "isPartOf" ;
+	rdfs:comment "Describes relation between parts of Works and Works";
+	owl:inverseOf hi:hasPart.
+hi:includes rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:AnnotatableThing;
+	rdfs:range hi:AnnotatableThing;
+	rdfs:label "includes" ;
+	rdfs:comment "Superproperty for all relations that are considered hierarchical".
+
+#################################################################
+#
+#    Annotation classes
+#
+#################################################################
+hi:Annotations rdf:type owl:Class ;
+	rdfs:comment "Annotations" ;
+	rdfs:label "Annotations".
+hi:AboutContent rdfs:subClassOf hi:Annotations ;
+	rdfs:comment "Comments about the contents of the text" ;
+	rdfs:label "AboutContent".
+hi:AboutEnrichment rdfs:subClassOf hi:Annotations ;
+	rdfs:comment "Comments about editorial enrichment" ;
+	rdfs:label "AboutEnrichment".
+hi:AboutMediaBearer rdfs:subClassOf hi:Annotations ;
+	rdfs:comment "Comments about media bearer" ;
+	rdfs:label "AboutMediaBearer".
+
+#################################################################
+#
+#    Other properties
+#
+#################################################################
+hi:hasType rdf:type owl:DatatypeProperty ;
+	rdfs:domain hi:AnnotatableThing ;
+	rdfs:range xsd:string;
+	rdfs:label "hasType" ;
+	rdfs:comment "Can be used to assign a more specific type to an AnnotatableThing".
+
+hi:selectWholeElement rdf:type owl:DatatypeProperty ;
+	rdfs:domain hi:AnnotatableThing ;
+	rdfs:range xsd:boolean;
+	rdfs:label "hasType" ;
+	rdfs:comment "Selecting part of element is not possible".
+
+hi:hasAnnotation rdf:type owl:ObjectProperty;
+	rdfs:domain hi:AnnotatableThing ;
+	rdfs:range hi:Annotations;
+	rdfs:label "hasSuggestedAnnotationType" .
+
+
+hi:CreativeWork rdfs:subClassOf [
+a owl:Restriction;
+owl:onProperty hi:hasAnnotation; 
+owl:allValuesFrom hi:AboutContent
+].
+hi:Enrichment rdfs:subClassOf [
+a owl:Restriction;
+owl:onProperty hi:hasAnnotation; 
+owl:allValuesFrom hi:AboutEnrichment
+].
+hi:MediaBearer rdfs:subClassOf [
+a owl:Restriction;
+owl:onProperty hi:hasAnnotation; 
+owl:allValuesFrom hi:AboutMediaBearer
+].
+
