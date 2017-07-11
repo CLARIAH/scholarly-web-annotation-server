@@ -1,0 +1,601 @@
+{
+    "collections": [
+        {
+            "id": "urn:uuid:d5551442-83aa-4f59-b53f-9abf3a8cd993",
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "AnnotationCollection",
+            "creator": "marijn",
+            "label": "Test",
+            "modified": "2017-07-11T08:32:44.945564+00:00",
+            "created": "2017-07-11T08:14:21.496754+00:00",
+            "total": 0,
+            "items": []
+        }
+    ],
+    "annotations": [
+        {
+            "id": "urn:uuid:6ec7e1ed-8ad3-465d-a01c-3e5c0ede977b",
+            "motivation": null,
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "creator": "marijn",
+            "created": "2017-05-10T08:50:49.055647+00:00",
+            "body": [
+                {
+                    "format": "text/plain",
+                    "value": "auction broker",
+                    "purpose": "tagging",
+                    "type": "tag"
+                },
+                {
+                    "vocabulary": "DBpedia",
+                    "value": "Broker",
+                    "purpose": "classifying",
+                    "id": "http://dbpedia.org/resource/Broker",
+                    "type": "classification"
+                },
+                {
+                    "vocabulary": "DBpedia",
+                    "value": "person",
+                    "purpose": "classifying",
+                    "id": "http://dbpedia.org/resource/Broker",
+                    "type": "classification"
+                }
+            ],
+            "target": [
+                {
+                    "selector": [
+                        {
+                            "end": 39,
+                            "start": 28,
+                            "type": "TextPositionSelector"
+                        },
+                        {
+                            "suffix": ", J. STEEN HOFF, A. ",
+                            "exact": "G. DE VRIES",
+                            "prefix": "IJ.1J. J. STAEDfcL, ",
+                            "type": "TextQuoteSelector"
+                        }
+                    ],
+                    "type": "Text",
+                    "source": "ddd:010072441:mpeg21:a0030:paragraph.1"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:984ea33d-3d70-44e6-ac1a-f523c179c2ac",
+            "motivation": null,
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "creator": "marijn",
+            "created": "2017-05-10T08:50:49.056103+00:00",
+            "body": [
+                {
+                    "vocabulary": "DBpedia",
+                    "value": "date",
+                    "purpose": "classifying",
+                    "id": null,
+                    "type": "classification"
+                },
+                {
+                    "format": "text/plain",
+                    "value": "auction date",
+                    "purpose": "tagging",
+                    "type": "tag"
+                }
+            ],
+            "target": [
+                {
+                    "selector": [
+                        {
+                            "end": 128,
+                            "start": 107,
+                            "type": "TextPositionSelector"
+                        },
+                        {
+                            "suffix": ", des avonds len hal",
+                            "exact": "Woensdag 2 Maart 1812",
+                            "prefix": "akelaars, zullen op ",
+                            "type": "TextQuoteSelector"
+                        }
+                    ],
+                    "type": "Text",
+                    "source": "ddd:010072441:mpeg21:a0030:paragraph.1"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:6f699a97-f67a-4a90-89bd-4aaea586cd36",
+            "motivation": null,
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "creator": "marijn",
+            "created": "2017-05-10T08:50:49.055566+00:00",
+            "body": [
+                {
+                    "vocabulary": "DBpedia",
+                    "value": "Oisterwijk",
+                    "purpose": "classifying",
+                    "id": "http://dbpedia.org/resource/Oisterwijk",
+                    "type": "classification"
+                }
+            ],
+            "target": [
+                {
+                    "selector": [
+                        {
+                            "end": 86,
+                            "start": 76,
+                            "type": "TextPositionSelector"
+                        },
+                        {
+                            "suffix": ". Gisteren is het ha",
+                            "exact": "Oisterwijk",
+                            "prefix": "je wandelingen naar ",
+                            "type": "TextQuoteSelector"
+                        }
+                    ],
+                    "type": "Text",
+                    "source": "urn:vangogh:testletter:p.5"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:38f9ab17-71b0-46de-a1bc-f029a757e771",
+            "motivation": null,
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "creator": "marijn",
+            "created": 1499763125969,
+            "body": [
+                {
+                    "vocabulary": "DBpedia",
+                    "value": "Horse racing",
+                    "purpose": "classifying",
+                    "id": "http://dbpedia.org/resource/Horse_racing",
+                    "type": "classification"
+                }
+            ],
+            "target": [
+                {
+                    "selector": [
+                        {
+                            "end": 117,
+                            "start": 105,
+                            "type": "TextPositionSelector"
+                        },
+                        {
+                            "suffix": " geweest ter gelegen",
+                            "exact": "harddraverij",
+                            "prefix": "k.1 Gisteren is het ",
+                            "type": "TextQuoteSelector"
+                        }
+                    ],
+                    "type": "Text",
+                    "source": "urn:vangogh:testletter:p.5"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:685b6d95-f4ce-4ba7-9204-63fea8bbae6b",
+            "motivation": null,
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "creator": "marijn",
+            "created": "2017-05-10T08:50:49.056329+00:00",
+            "body": [
+                {
+                    "vocabulary": "DBpedia",
+                    "value": "Nieuwendijk",
+                    "purpose": "classifying",
+                    "id": "http://dbpedia.org/resource/Nieuwendijk",
+                    "type": "classification"
+                },
+                {
+                    "format": "text/plain",
+                    "value": "auction location",
+                    "purpose": "tagging",
+                    "type": "tag"
+                }
+            ],
+            "target": [
+                {
+                    "selector": [
+                        {
+                            "end": 198,
+                            "start": 162,
+                            "type": "TextPositionSelector"
+                        },
+                        {
+                            "suffix": ", verkoopen : 159 Ce",
+                            "exact": "de Witte Zwaan , op den Nieuw-endijk",
+                            "prefix": "en half zes ure, in ",
+                            "type": "TextQuoteSelector"
+                        }
+                    ],
+                    "type": "Text",
+                    "source": "ddd:010072441:mpeg21:a0030:paragraph.1"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:3712b26f-6366-48f5-be76-a91afcfa6485",
+            "motivation": null,
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "creator": "marijn",
+            "created": "2017-05-10T17:20:51.292673+00:00",
+            "body": [
+                {
+                    "vocabulary": "DBpedia",
+                    "value": "Salutation",
+                    "purpose": "classifying",
+                    "id": "http://dbpedia.org/resource/Salutation",
+                    "type": "classification"
+                }
+            ],
+            "target": [
+                {
+                    "selector": [
+                        {
+                            "end": 6,
+                            "start": 0,
+                            "type": "TextPositionSelector"
+                        },
+                        {
+                            "suffix": " Theo,",
+                            "exact": "Waarde",
+                            "prefix": "",
+                            "type": "TextQuoteSelector"
+                        }
+                    ],
+                    "type": "Text",
+                    "source": "urn:vangogh:let001:p.2"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:6273d09b-0ec2-4d90-955b-90aeece1aecd",
+            "motivation": null,
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "creator": "marijn",
+            "created": "2017-05-10T08:50:49.055950+00:00",
+            "body": [
+                {
+                    "vocabulary": "DBpedia",
+                    "value": "Theo van Gogh (art dealer)",
+                    "purpose": "classifying",
+                    "id": "http://dbpedia.org/resource/Theo_van_Gogh_(art_dealer)",
+                    "type": "classification"
+                }
+            ],
+            "target": [
+                {
+                    "selector": null,
+                    "type": "Text",
+                    "source": "urn:vangogh:testletter.receiver"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:f439f600-5b0b-4877-93ff-d32968ab2a33",
+            "motivation": null,
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "creator": "marijn",
+            "created": "2017-05-11T09:38:26.087151+00:00",
+            "body": [
+                {
+                    "vocabulary": "DBpedia",
+                    "value": "Location (geography)",
+                    "purpose": "classifying",
+                    "id": "http://dbpedia.org/resource/Location_(geography)",
+                    "type": "classification"
+                }
+            ],
+            "target": [
+                {
+                    "selector": [
+                        {
+                            "end": 86,
+                            "start": 76,
+                            "type": "TextPositionSelector"
+                        },
+                        {
+                            "suffix": ". Gisteren is het ha",
+                            "exact": "Oisterwijk",
+                            "prefix": "je wandelingen naar ",
+                            "type": "TextQuoteSelector"
+                        }
+                    ],
+                    "type": "Text",
+                    "source": "urn:vangogh:let001:p.5"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:bba274ca-0030-496b-bb20-07a52652dbcb",
+            "motivation": null,
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "creator": "marijn",
+            "created": "2017-05-10T08:50:49.056177+00:00",
+            "body": [
+                {
+                    "format": "text/plain",
+                    "value": "auction peruvian bark",
+                    "purpose": "tagging",
+                    "type": "tag"
+                }
+            ],
+            "target": [
+                {
+                    "selector": null,
+                    "type": null,
+                    "source": "urn:uuid:e70abf9d-0d28-40a9-97db-51894657dda8"
+                },
+                {
+                    "selector": null,
+                    "type": null,
+                    "source": "urn:uuid:f2f7b552-252d-4d94-828d-62c760293a5e"
+                },
+                {
+                    "selector": null,
+                    "type": null,
+                    "source": "urn:uuid:dc7ebd57-eaf5-46d0-8c02-61ffe665f8ab"
+                },
+                {
+                    "selector": null,
+                    "type": null,
+                    "source": "urn:uuid:a25561bb-a1a2-4d8d-bc51-5908d8dfca66"
+                },
+                {
+                    "selector": null,
+                    "type": null,
+                    "source": "urn:uuid:ceb8757f-10d4-4dae-b452-65b11c814f02"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:aca8eb83-1b30-4856-8dce-49956459df4c",
+            "motivation": null,
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "creator": "marijn",
+            "created": "2017-05-10T14:22:36.113151+00:00",
+            "body": [
+                {
+                    "format": "text/plain",
+                    "value": "Peruvian bark auction",
+                    "purpose": "tagging",
+                    "type": "tag"
+                }
+            ],
+            "target": [
+                {
+                    "selector": null,
+                    "type": null,
+                    "source": "urn:uuid:6f6e4740-80c4-4f34-bf6c-61175cc338f9"
+                },
+                {
+                    "selector": null,
+                    "type": null,
+                    "source": "urn:uuid:6ec7e1ed-8ad3-465d-a01c-3e5c0ede977b"
+                },
+                {
+                    "selector": null,
+                    "type": null,
+                    "source": "urn:uuid:685b6d95-f4ce-4ba7-9204-63fea8bbae6b"
+                },
+                {
+                    "selector": null,
+                    "type": null,
+                    "source": "urn:uuid:984ea33d-3d70-44e6-ac1a-f523c179c2ac"
+                },
+                {
+                    "selector": null,
+                    "type": null,
+                    "source": "urn:uuid:9952f628-1ea6-4b8d-9566-5219eb7f5e4e"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:b8d14cb0-5a6b-43bc-83a7-52dd6c3fbe03",
+            "motivation": null,
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "creator": "marijn",
+            "created": "2017-05-10T08:50:49.056401+00:00",
+            "body": [
+                {
+                    "format": "text/plain",
+                    "value": "Test to see if IgnorableElement text is ignored",
+                    "purpose": "commenting",
+                    "type": "comment"
+                }
+            ],
+            "target": [
+                {
+                    "selector": [
+                        {
+                            "end": 92,
+                            "start": 82,
+                            "type": "TextPositionSelector"
+                        },
+                        {
+                            "suffix": "eren is het harddrav",
+                            "exact": "wijk. Gist",
+                            "prefix": "delingen naar Oister",
+                            "type": "TextQuoteSelector"
+                        }
+                    ],
+                    "type": "Text",
+                    "source": "urn:vangogh:testletter:p.5"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:6f6e4740-80c4-4f34-bf6c-61175cc338f9",
+            "motivation": null,
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "creator": "marijn",
+            "created": "2017-05-10T08:50:48.987732+00:00",
+            "body": [
+                {
+                    "vocabulary": "DBpedia",
+                    "value": "person",
+                    "purpose": "classifying",
+                    "id": null,
+                    "type": "classification"
+                },
+                {
+                    "vocabulary": "DBpedia",
+                    "value": "Broker",
+                    "purpose": "classifying",
+                    "id": "http://dbpedia.org/resource/Broker",
+                    "type": "classification"
+                },
+                {
+                    "format": "text/plain",
+                    "value": "auction broker",
+                    "purpose": "tagging",
+                    "type": "tag"
+                }
+            ],
+            "target": [
+                {
+                    "selector": [
+                        {
+                            "end": 54,
+                            "start": 41,
+                            "type": "TextPositionSelector"
+                        },
+                        {
+                            "suffix": ", A. F STALMAN en F.",
+                            "exact": "J. STEEN HOFF",
+                            "prefix": "EDfcL, G. DE VRIES, ",
+                            "type": "TextQuoteSelector"
+                        }
+                    ],
+                    "type": "Text",
+                    "source": "ddd:010072441:mpeg21:a0030:paragraph.1"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:0d41de2e-c3fb-436c-9e36-cb9658599b17",
+            "motivation": null,
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "creator": "marijn",
+            "created": 1495489660558,
+            "body": [
+                {
+                    "vocabulary": "DBpedia",
+                    "value": "Art exhibition",
+                    "purpose": "classifying",
+                    "id": "http://dbpedia.org/resource/Art_exhibition",
+                    "type": "classification"
+                }
+            ],
+            "target": [
+                {
+                    "selector": [
+                        {
+                            "end": 163,
+                            "start": 148,
+                            "type": "TextPositionSelector"
+                        },
+                        {
+                            "suffix": ", maar de illuminati",
+                            "exact": "tentoonstelling",
+                            "prefix": " gelegenheid van de ",
+                            "type": "TextQuoteSelector"
+                        }
+                    ],
+                    "type": "Text",
+                    "source": "urn:vangogh:let001:p.5"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:9952f628-1ea6-4b8d-9566-5219eb7f5e4e",
+            "motivation": null,
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "creator": "marijn",
+            "created": "2017-05-10T08:50:49.055877+00:00",
+            "body": [
+                {
+                    "vocabulary": "DBpedia",
+                    "value": "Jesuit's bark",
+                    "purpose": "classifying",
+                    "id": "http://dbpedia.org/resource/Jesuit's_bark",
+                    "type": "classification"
+                },
+                {
+                    "format": "text/plain",
+                    "value": "auction goods",
+                    "purpose": "tagging",
+                    "type": "tag"
+                }
+            ],
+            "target": [
+                {
+                    "selector": [
+                        {
+                            "end": 242,
+                            "start": 212,
+                            "type": "TextPositionSelector"
+                        },
+                        {
+                            "suffix": ". Liggende en te zie",
+                            "exact": "159 Ceroenen CORT. CHINA CHINA",
+                            "prefix": "endijk, verkoopen : ",
+                            "type": "TextQuoteSelector"
+                        }
+                    ],
+                    "type": "Text",
+                    "source": "ddd:010072441:mpeg21:a0030:paragraph.1"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:c81e0a4c-6be9-45f7-9f42-dd26e576edd3",
+            "motivation": null,
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "creator": "marijn",
+            "created": 1497369006382,
+            "body": [
+                {
+                    "format": "text/plain",
+                    "value": "walk",
+                    "purpose": "commenting",
+                    "type": "comment"
+                }
+            ],
+            "target": [
+                {
+                    "selector": [
+                        {
+                            "end": 97,
+                            "start": 88,
+                            "type": "TextPositionSelector"
+                        },
+                        {
+                            "suffix": " & het een en ander ",
+                            "exact": "gewandeld",
+                            "prefix": "or toch nog al eens ",
+                            "type": "TextQuoteSelector"
+                        }
+                    ],
+                    "type": "Text",
+                    "source": "urn:vangogh:let001:p.4"
+                }
+            ]
+        }
+    ]
+}

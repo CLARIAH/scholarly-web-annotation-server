@@ -1,14 +1,15 @@
 import os
-import json
 from flask import Flask, Blueprint, request
 from flask_restplus import Api, Resource, fields
+from flask.ext.cors import CORS
 
 from models.annotation_store import AnnotationStore
 from models.annotation import AnnotationError
+from models.annotation_container import AnnotationContainer
 from models.resource import ResourceStore, ResourceError
 
 app = Flask(__name__, static_url_path='', static_folder='public')
-#cors = CORS(app)
+cors = CORS(app)
 #api = Api(app)
 blueprint = Blueprint('api', __name__)
 api = Api(blueprint)
@@ -105,18 +106,37 @@ annotation_list_response = api.clone('AnnotationListResponse', response_model, {
     'annotations': fields.List(fields.Nested(annotation_model), description="List of annotations")
 })
 
+def parse_prefer_header(data):
+    parsed = {}
+    for part in data.strip().split(';'):
+        key, value = part.split('=')
+        parsed[key] = value.strip('"')
+    return parsed
+
+def interpret_header(data):
+    prefer = {
+        "view": "PreferMinimalContainer"
+    }
+    if data and 'Prefer' in data:
+        parsed = parse_prefer_header(data)
+        if 'return' in parsed and parsed['return'] == 'representation':
+            prefer['view'] = parsed['include'].split('#')[1]
+    return prefer
 
 
 """--------------- Annotation endpoints ------------------"""
 
 
 @api.route("/api/annotations", endpoint='annotation_list')
-class HandleAnnotations(Resource):
+class AnnotationsAPI(Resource):
 
     @api.response(200, 'Success', annotation_list_response)
     @api.response(404, 'Annotation Error')
     def get(self):
-        return annotation_store.list_annotations()
+        prefer = interpret_header(request.headers.get('Prefer'))
+        annotations = annotation_store.list_annotations()
+        container = AnnotationContainer(request.url, annotations, view=prefer["view"])
+        return container.view()
 
     @api.response(200, 'Success')
     @api.response(404, 'Invalid Annotation Error')
@@ -129,7 +149,7 @@ class HandleAnnotations(Resource):
 
 @api.doc(params={'annotation_id': 'The annotation ID'}, required=False)
 @api.route('/api/annotations/<annotation_id>', endpoint='annotation')
-class HandleAnnotation(Resource):
+class AnnotationAPI(Resource):
 
     @api.response(200, 'Success', annotation_response)
     @api.response(404, 'Annotation does not exist')
@@ -154,7 +174,7 @@ class HandleAnnotation(Resource):
 
 
 @api.route("/api/resources")
-class HandleResources(Resource):
+class ResourcesAPI(Resource):
 
     def post(self):
         resource_map = request.get_json()
@@ -164,13 +184,13 @@ class HandleResources(Resource):
         return resource_store.get_resources()
 
 @api.route("/api/resources/<resource_id>")
-class HandleResource(Resource):
+class ResourceAPI(Resource):
 
     def get(self, resource_id):
         return resource_store.get_resource(resource_id).json()
 
 @api.route('/api/resources/<resource_id>/annotations')
-class HandleResourceAnnotations(Resource):
+class ResourceAnnotationsAPI(Resource):
 
     def get(self, resource_id):
         annotations = {}
@@ -180,7 +200,7 @@ class HandleResourceAnnotations(Resource):
         return annotations
 
 @api.route('/api/resources/<resource_id>/structure')
-class HandleResourceStructure(Resource):
+class ResourceStructureAPI(Resource):
 
     def get(self, resource_id):
         if resource_store.has_resource(resource_id):
@@ -199,7 +219,7 @@ class HandleResourceStructure(Resource):
 
 
 @api.route("/api/collections")
-class HandleCollections(Resource):
+class CollectionsAPI(Resource):
 
     def post(self):
         collection_data = request.get_json()
@@ -208,16 +228,22 @@ class HandleCollections(Resource):
         return response
 
     def get(self):
-        return annotation_store.retrieve_collections()
+        prefer = interpret_header(request.headers.get('Prefer'))
+        print(prefer)
+        response_data = []
+        for collection in  annotation_store.retrieve_collections():
+            container = AnnotationContainer(request.url, collection, view=prefer["view"])
+            response_data.append(container.view())
+        return response_data
 
 @api.route("/api/collections/<collection_id>")
-class HandleCollection(Resource):
+class CollectionAPI(Resource):
 
     def get(self, collection_id):
+        prefer = interpret_header(request.headers.get('Prefer'))
         collection = annotation_store.retrieve_collection(collection_id)
-        #response = annotation_store.generate_container(collection)
-        response = collection
-        return response
+        container = AnnotationContainer(request.url, collection, view=prefer["view"])
+        return container.view()
 
     def put(self, collection_id):
         data = request.get_json()
@@ -231,18 +257,30 @@ class HandleCollection(Resource):
         return response
 
 @api.route("/api/collections/<collection_id>/annotations/")
-class HandleCollectionAnnotations(Resource):
+class CollectionAnnotationsAPI(Resource):
 
+    @api.response(200, 'Success')
+    @api.response(404, 'Invalid Annotation Error')
+    @api.expect(annotation_model)
     def post(self, collection_id):
+        prefer = interpret_header(request.headers.get('Prefer'))
         annotation_data = request.get_json()
         if 'id' not in annotation_data.keys():
-            annotation_data = annotation_store.add_annotation(annotation_data)
-        return annotation_store.add_annotation_to_collection(annotation_data['id'], collection_id)
+            annotation = annotation_store.add_annotation(annotation_data)
+            annotation_data = annotation.data
+        collection = annotation_store.add_annotation_to_collection(annotation_data['id'], collection_id)
+        container = AnnotationContainer(request.url, collection, view=prefer["view"])
+        return container.view()
+
     def get(self, collection_id):
-        return annotation_store.retrieve_collections()
+        prefer = interpret_header(request.headers.get('Prefer'))
+        collection = annotation_store.retrieve_collection(collection_id)
+        print(collection.items)
+        container = AnnotationContainer(request.url, collection.items, view=prefer["view"])
+        return container.view()
 
 @api.route("/api/collections/<collection_id>/annotations/<annotation_id>")
-class HandleCollectionAnnotation(Resource):
+class CollectionAnnotationAPI(Resource):
 
     def get(self, collection_id, annotation_id):
         return annotation_store.get_annotation_from_collection(annotation_id, collection_id)
@@ -257,13 +295,13 @@ class HandleCollectionAnnotation(Resource):
         return annotation_store.remove_annotation_from_collection(annotation_id, collection_id)
 
 @api.route("/api/pages/<page_id>")
-class HandlePage(Resource):
+class PageAPI(Resource):
 
     def get(self, page_id):
         return annotation_store.retrieve_collection_page(page_id)
 
 @api.route("/api/login")
-class Login(Resource):
+class LoginAPI(Resource):
 
     def post(self):
         # dummy route for now, returns request data as is

@@ -7,6 +7,7 @@ from models.annotation_collection import AnnotationCollection
 class AnnotationStore(object):
 
     def __init__(self, annotations=[]):
+        print("Initializing annotation store")
         self.annotation_index = {}
         self.collection_index = {}
         self.target_index = defaultdict(list)
@@ -24,7 +25,7 @@ class AnnotationStore(object):
     def retrieve_collection(self, collection_id):
         if collection_id not in self.collection_index.keys():
             raise AnnotationError(message="Annotation Store does not contain collection with id %s" % (collection_id))
-        return self.collection_index[collection_id].to_json()
+        return self.collection_index[collection_id]
 
     def update_collection(self, collection_id, collection_data):
         if collection_id not in self.collection_index.keys():
@@ -40,20 +41,23 @@ class AnnotationStore(object):
         return current_metadata
 
     def list_collections(self):
+        return [self.collection_index[col_id] for col_id in self.collection_index.keys()]
+
+    def list_collections_as_json(self):
         return [self.collection_index[col_id].to_json() for col_id in self.collection_index.keys()]
 
     def retrieve_collections(self):
-        return [self.collection_index[collection_id].to_json() for collection_id in self.collection_index.keys()]
+        return [self.collection_index[collection_id] for collection_id in self.collection_index.keys()]
 
     def add_annotation_to_collection(self, annotation_id, collection_id):
         self.collection_index[collection_id].add_annotation(annotation_id)
         self.annotation_index[annotation_id].add_collection(collection_id)
-        return self.collection_index[collection_id].to_json()
+        return self.collection_index[collection_id]
 
     def remove_annotation_from_collection(self, annotation_id, collection_id):
         self.collection_index[collection_id].remove_annotation(annotation_id)
         self.annotation_index[annotation_id].remove_collection(collection_id)
-        return self.collection_index[collection_id].to_json()
+        return self.collection_index[collection_id]
 
     def add_annotation(self, annotation):
         # make a new annotation object
@@ -137,6 +141,11 @@ class AnnotationStore(object):
     def list_annotations(self, ids=None):
         if not ids:
             ids = self.list_annotation_ids()
+        return [annotation for id, annotation in self.annotation_index.items() if id in ids]
+
+    def list_annotations_as_json(self, ids=None):
+        if not ids:
+            ids = self.list_annotation_ids()
         return [annotation.data for id, annotation in self.annotation_index.items() if id in ids]
 
     def load_annotations(self, annotations_file):
@@ -153,8 +162,8 @@ class AnnotationStore(object):
     def save_annotations(self, annotations_file):
         try:
             data = {
-                "annotations": self.list_annotations(),
-                "collections": self.list_collections()
+                "annotations": self.list_annotations_as_json(),
+                "collections": self.list_collections_as_json()
             }
             with open(annotations_file, 'w') as fh:
                 fh.write(json.dumps(data, indent=4, separators=(',', ': ')))

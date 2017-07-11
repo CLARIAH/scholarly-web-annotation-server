@@ -1,0 +1,233 @@
+@prefix hi: <http://localhost:3001/vocabularies/genericontology.ttl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sch: <http://schema.org/> .
+@prefix vg: <http://localhost:3001/vocabularies/vangoghontology.ttl#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+hi:DataBearer a owl:Class ;
+    rdfs:label "DataBearer" ;
+    rdfs:subClassOf hi:MediaBearer .
+
+hi:IgnorableElement a owl:Class ;
+    rdfs:label "IgnorableElement" ;
+    rdfs:comment "Element should be ignored in annotation" ;
+    rdfs:subClassOf hi:AnnotatableThing .
+
+hi:IgnorableTag a owl:Class ;
+    rdfs:label "IgnorableContent" ;
+    rdfs:comment "Tags of element should be ignored in annotation (content is relevant)" ;
+    rdfs:subClassOf hi:AnnotatableThing .
+
+hi:ImageBearer a owl:Class ;
+    rdfs:label "ImageBearer" ;
+    rdfs:subClassOf hi:MediaBearer .
+
+hi:VideoBearer a owl:Class ;
+    rdfs:label "VideoBearer" ;
+    rdfs:subClassOf hi:MediaBearer .
+
+hi:hasType a owl:DatatypeProperty ;
+    rdfs:label "hasType" ;
+    rdfs:comment "Can be used to assign a more specific type to an AnnotatableThing" ;
+    rdfs:domain hi:AnnotatableThing ;
+    rdfs:range xsd:string .
+
+hi:isCarriedOn a owl:ObjectProperty ;
+    rdfs:label "isCarriedOn" ;
+    rdfs:comment "Connects a Creative Work to its physical bearers (usually pages)" ;
+    rdfs:domain hi:CreativeWork ;
+    rdfs:range hi:TextBearer ;
+    rdfs:subPropertyOf hi:includes .
+
+hi:isPartOf a owl:ObjectProperty ;
+    rdfs:label "isPartOf" ;
+    rdfs:comment "Describes relation between parts of Works and Works" ;
+    rdfs:domain hi:CreativeWork ;
+    rdfs:range hi:CreativeWork ;
+    owl:inverseOf hi:hasPart .
+
+hi:selectWholeElement a owl:DatatypeProperty ;
+    rdfs:label "hasType" ;
+    rdfs:comment "Selecting part of element is not possible" ;
+    rdfs:domain hi:AnnotatableThing ;
+    rdfs:range xsd:boolean .
+
+<http://localhost:3001/vocabularies/vangoghontology.ttl> owl:imports <http://localhost:3001/vocabularies/genericontology.ttl> .
+
+vg:Correspondence a owl:Class ;
+    rdfs:label "Correspondence" ;
+    rdfs:subClassOf hi:CreativeWork .
+
+vg:Date a owl:Class ;
+    rdfs:label "Date" ;
+    rdfs:subClassOf vg:MetadataItem .
+
+vg:DateNote a owl:Class ;
+    rdfs:label "DateNote" ;
+    rdfs:subClassOf vg:Note .
+
+vg:DiscussedArtwork a owl:Class ;
+    rdfs:label "DiscussedArtwork" ;
+    rdfs:subClassOf vg:Note .
+
+vg:Letter a owl:Class ;
+    rdfs:label "Letter" ;
+    rdfs:subClassOf hi:CreativeWork .
+
+vg:LocationNote a owl:Class ;
+    rdfs:label "LocationNote" ;
+    rdfs:subClassOf vg:Note .
+
+vg:Number a owl:Class ;
+    rdfs:label "Number" ;
+    rdfs:subClassOf vg:MetadataItem .
+
+vg:ParagraphInLetter a owl:Class ;
+    rdfs:label "ParagraphInLetter" ;
+    rdfs:subClassOf hi:CreativeWork .
+
+vg:Receiver a owl:Class ;
+    rdfs:label "Receiver" ;
+    rdfs:subClassOf vg:MetadataItem .
+
+vg:Sender a owl:Class ;
+    rdfs:label "Sender" ;
+    rdfs:subClassOf vg:MetadataItem .
+
+vg:Sketch a owl:Class ;
+    rdfs:label "Sketch" ;
+    rdfs:subClassOf hi:CreativeWork .
+
+vg:SourceNote a owl:Class ;
+    rdfs:label "SourceNote" ;
+    rdfs:subClassOf vg:Note .
+
+vg:hasEssay a owl:ObjectProperty ;
+    rdfs:label "hasEssay" ;
+    rdfs:comment "Adds explanatory essay to creative object" ;
+    rdfs:domain hi:CreativeWork ;
+    rdfs:range vg:Essay ;
+    rdfs:subPropertyOf hi:hasEnrichment .
+
+vg:hasMetadataItem a owl:ObjectProperty ;
+    rdfs:label "hasMetadataItem" ;
+    rdfs:comment "Adds any type of MetadataItem to creative object" ;
+    rdfs:domain hi:CreativeWork ;
+    rdfs:range vg:MetadataItem ;
+    rdfs:subPropertyOf hi:hasEnrichment .
+
+vg:hasNote a owl:ObjectProperty ;
+    rdfs:label "hasNote" ;
+    rdfs:comment "Adds any type of note to creative object" ;
+    rdfs:domain hi:CreativeWork ;
+    rdfs:range vg:Note ;
+    rdfs:subPropertyOf hi:hasEnrichment .
+
+vg:hasTranslation a owl:ObjectProperty ;
+    rdfs:label "hasTranslation" ;
+    rdfs:comment "Adds translation to creative object" ;
+    rdfs:domain hi:CreativeWork ;
+    rdfs:range vg:Translation ;
+    rdfs:subPropertyOf hi:hasEnrichment .
+
+<http://localhost:3001/vocabularies/vg> a owl:Ontology .
+
+<http://localhost:3001/vocabularies/genericontology.ttl> a owl:Ontology .
+
+hi:TextBearer a owl:Class ;
+    rdfs:label "TextBearer" ;
+    rdfs:subClassOf hi:MediaBearer .
+
+hi:hasPart a owl:ObjectProperty ;
+    rdfs:label "hasPart" ;
+    rdfs:comment "Describes relation between Works and parts of Works" ;
+    rdfs:domain hi:CreativeWork ;
+    rdfs:range hi:CreativeWork ;
+    rdfs:subPropertyOf hi:includes .
+
+vg:Essay a owl:Class ;
+    rdfs:label "Essay" ;
+    rdfs:subClassOf hi:Enrichment .
+
+vg:Translation a owl:Class ;
+    rdfs:label "Translation" ;
+    rdfs:subClassOf hi:Enrichment .
+
+hi:AboutContent rdfs:label "AboutContent" ;
+    rdfs:comment "Comments about the contents of the text" ;
+    rdfs:subClassOf hi:Annotations .
+
+hi:AboutEnrichment rdfs:label "AboutEnrichment" ;
+    rdfs:comment "Comments about editorial enrichment" ;
+    rdfs:subClassOf hi:Annotations .
+
+hi:AboutMediaBearer rdfs:label "AboutMediaBearer" ;
+    rdfs:comment "Comments about media bearer" ;
+    rdfs:subClassOf hi:Annotations .
+
+hi:includes a owl:ObjectProperty ;
+    rdfs:label "includes" ;
+    rdfs:comment "Superproperty for all relations that are considered hierarchical" ;
+    rdfs:domain hi:AnnotatableThing ;
+    rdfs:range hi:AnnotatableThing .
+
+hi:Annotations a owl:Class ;
+    rdfs:label "Annotations" ;
+    rdfs:comment "Annotations" .
+
+hi:MediaBearer a owl:Class ;
+    rdfs:label "MediaBearer" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom hi:AboutMediaBearer ;
+            owl:onProperty hi:hasAnnotation ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom hi:AboutMediaBearer ;
+            owl:onProperty hi:hasAnnotation ],
+        hi:AnnotatableThing .
+
+hi:hasEnrichment a owl:ObjectProperty ;
+    rdfs:label "hasEnrichment" ;
+    rdfs:comment "Adds editorial enrichments (translations, indexing, bibliography, explanatory notes) to a Creative work or part of it" ;
+    rdfs:domain hi:CreativeWork ;
+    rdfs:range hi:Enrichment ;
+    rdfs:subPropertyOf hi:includes .
+
+hi:Enrichment a owl:Class ;
+    rdfs:label "Enrichment" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom hi:AboutEnrichment ;
+            owl:onProperty hi:hasAnnotation ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom hi:AboutEnrichment ;
+            owl:onProperty hi:hasAnnotation ],
+        hi:AnnotatableThing .
+
+vg:MetadataItem a owl:Class ;
+    rdfs:label "MetadataItem" ;
+    rdfs:subClassOf hi:Enrichment .
+
+vg:Note a owl:Class ;
+    rdfs:label "Note" ;
+    rdfs:subClassOf hi:Enrichment .
+
+hi:hasAnnotation a owl:ObjectProperty ;
+    rdfs:label "hasSuggestedAnnotationType" ;
+    rdfs:domain hi:AnnotatableThing ;
+    rdfs:range hi:Annotations .
+
+hi:AnnotatableThing a owl:Class ;
+    rdfs:label "AnnotatableThing" .
+
+hi:CreativeWork a owl:Class ;
+    rdfs:label "CreativeWork" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom hi:AboutContent ;
+            owl:onProperty hi:hasAnnotation ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom hi:AboutContent ;
+            owl:onProperty hi:hasAnnotation ],
+        hi:AnnotatableThing .
+
