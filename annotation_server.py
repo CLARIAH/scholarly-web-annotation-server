@@ -113,12 +113,12 @@ def parse_prefer_header(data):
         parsed[key] = value.strip('"')
     return parsed
 
-def interpret_header(data):
+def interpret_header(headers):
     prefer = {
         "view": "PreferMinimalContainer"
     }
-    if data and 'Prefer' in data:
-        parsed = parse_prefer_header(data)
+    if headers.get('Prefer'):
+        parsed = parse_prefer_header(headers.get('Prefer'))
         if 'return' in parsed and parsed['return'] == 'representation':
             prefer['view'] = parsed['include'].split('#')[1]
     return prefer
@@ -133,7 +133,7 @@ class AnnotationsAPI(Resource):
     @api.response(200, 'Success', annotation_list_response)
     @api.response(404, 'Annotation Error')
     def get(self):
-        prefer = interpret_header(request.headers.get('Prefer'))
+        prefer = interpret_header(request.headers)
         annotations = annotation_store.list_annotations()
         container = AnnotationContainer(request.url, annotations, view=prefer["view"])
         return container.view()
@@ -193,7 +193,7 @@ class ResourceAPI(Resource):
 class ResourceAnnotationsAPI(Resource):
 
     def get(self, resource_id):
-        annotations = {}
+        annotations = []
         if resource_store.has_resource(resource_id):
             resource_ids = resource_store.get_resource(resource_id).list_members()
             annotations = annotation_store.get_annotations_by_targets(resource_ids)
@@ -222,14 +222,15 @@ class ResourceStructureAPI(Resource):
 class CollectionsAPI(Resource):
 
     def post(self):
+        prefer = interpret_header(request.headers)
         collection_data = request.get_json()
-        response = annotation_store.create_collection(collection_data)
+        collection = annotation_store.create_collection(collection_data)
         save_annotations()
-        return response
+        container = AnnotationContainer(request.url, collection, view=prefer["view"])
+        return container.view()
 
     def get(self):
-        prefer = interpret_header(request.headers.get('Prefer'))
-        print(prefer)
+        prefer = interpret_header(request.headers)
         response_data = []
         for collection in  annotation_store.retrieve_collections():
             container = AnnotationContainer(request.url, collection, view=prefer["view"])
@@ -240,21 +241,25 @@ class CollectionsAPI(Resource):
 class CollectionAPI(Resource):
 
     def get(self, collection_id):
-        prefer = interpret_header(request.headers.get('Prefer'))
+        prefer = interpret_header(request.headers)
         collection = annotation_store.retrieve_collection(collection_id)
         container = AnnotationContainer(request.url, collection, view=prefer["view"])
         return container.view()
 
     def put(self, collection_id):
+        prefer = interpret_header(request.headers)
         data = request.get_json()
-        response = annotation_store.update_collection(collection_id, data)
+        collection = annotation_store.update_collection(collection_id, data)
         save_annotations()
-        return response
+        container = AnnotationContainer(request.url, collection, view=prefer["view"])
+        return container.view()
 
     def delete(self, collection_id):
-        response = annotation_store.delete_collection(collection_id)
+        prefer = interpret_header(request.headers)
+        collection = annotation_store.delete_collection(collection_id)
         save_annotations()
-        return response
+        container = AnnotationContainer(request.url, collection, view=prefer["view"])
+        return container.view()
 
 @api.route("/api/collections/<collection_id>/annotations/")
 class CollectionAnnotationsAPI(Resource):
@@ -263,7 +268,7 @@ class CollectionAnnotationsAPI(Resource):
     @api.response(404, 'Invalid Annotation Error')
     @api.expect(annotation_model)
     def post(self, collection_id):
-        prefer = interpret_header(request.headers.get('Prefer'))
+        prefer = interpret_header(request.headers)
         annotation_data = request.get_json()
         if 'id' not in annotation_data.keys():
             annotation = annotation_store.add_annotation(annotation_data)
@@ -273,9 +278,8 @@ class CollectionAnnotationsAPI(Resource):
         return container.view()
 
     def get(self, collection_id):
-        prefer = interpret_header(request.headers.get('Prefer'))
+        prefer = interpret_header(request.headers)
         collection = annotation_store.retrieve_collection(collection_id)
-        print(collection.items)
         container = AnnotationContainer(request.url, collection.items, view=prefer["view"])
         return container.view()
 

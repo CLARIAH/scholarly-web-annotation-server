@@ -10,11 +10,8 @@ class AnnotationContainer(object):
         self.base_url = base_url
         self.context = ["http://www.w3.org/ns/ldp.jsonld", "http://www.w3.org/ns/anno.jsonld"]
         self.set_view(view)
-        print("view set")
         self.set_page_size(page_size)
-        print("page size set")
         self.set_container_content(data)
-        print("content set")
         if self.metadata["total"] > 0:
             self.first = self.update_url(self.base_url, {"page": 0})
             self.last = self.update_url(self.base_url, {"page": self.num_pages - 1})

@@ -7,7 +7,6 @@ from models.annotation_collection import AnnotationCollection
 class AnnotationStore(object):
 
     def __init__(self, annotations=[]):
-        print("Initializing annotation store")
         self.annotation_index = {}
         self.collection_index = {}
         self.target_index = defaultdict(list)
@@ -20,7 +19,7 @@ class AnnotationStore(object):
     def create_collection(self, collection_data):
         collection = AnnotationCollection(collection_data)
         self.collection_index[collection.id] = collection
-        return collection.to_json()
+        return collection
 
     def retrieve_collection(self, collection_id):
         if collection_id not in self.collection_index.keys():
@@ -31,14 +30,14 @@ class AnnotationStore(object):
         if collection_id not in self.collection_index.keys():
             raise AnnotationError(message="Annotation Store does not contain collection with id %s" % (collection_id))
         self.collection_index[collection_id].update(collection_data)
-        return self.collection_index[collection_id].to_json()
+        return self.collection_index[collection_id]
 
     def delete_collection(self, collection_id):
         if collection_id not in self.collection_index.keys():
             raise AnnotationError(message="Annotation Store does not contain collection with id %s" % (collection_id))
-        current_metadata = self.collection_index[collection_id].to_json()
+        collection = self.collection_index[collection_id]
         del self.collection_index[collection_id]
-        return current_metadata
+        return collection
 
     def list_collections(self):
         return [self.collection_index[col_id] for col_id in self.collection_index.keys()]
