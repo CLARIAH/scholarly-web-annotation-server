@@ -1,6 +1,6 @@
 # Python server for scholarly web annotations
 
-An experimental Python Flask RESTplus server based on the W3C Web Annotation standard, that implements both the [WA data model](https://www.w3.org/TR/annotation-model/) and the [WA protocol](https://www.w3.org/TR/annotation-protocol/).
+An experimental Python Flask RESTplus server based on the W3C Web Annotation standard, that implements both the [WA data model](https://www.w3.org/TR/annotation-model/) and the [WA protocol](https://www.w3.org/TR/annotation-protocol/). It is developed in tandem with the [Scholarly Web Annotation Client](https://github.com/CLARIAH/scholarly-web-annotation-client) and will eventually be replaced by a proper annotation server.
 
 ## How to install
 
