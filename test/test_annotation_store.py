@@ -68,35 +68,35 @@ class TestAnnotationStore(unittest.TestCase):
 
     def test_store_can_add_annotation_collection(self):
         collection_data = example_collections["empty_collection"]
-        collection_json = self.store.create_collection(collection_data)
-        self.assertEqual(collection_json["label"], collection_data["label"])
-        self.assertNotEqual(collection_json["id"], None)
+        collection = self.store.create_collection(collection_data)
+        self.assertEqual(collection.label, collection_data["label"])
+        self.assertNotEqual(collection.id, None)
 
     def test_store_can_add_annotation_to_collection(self):
         annotation = self.store.add_annotation(copy.copy(examples["vincent"]))
         collection_data = example_collections["empty_collection"]
-        collection_json = self.store.create_collection(collection_data)
-        self.store.add_annotation_to_collection(annotation['id'], collection_json["id"])
-        collection_json = self.store.retrieve_collection(collection_json["id"])
-        self.assertEqual(collection_json["total"], 1)
-        self.assertEqual(collection_json["items"][0], annotation["id"])
+        collection = self.store.create_collection(collection_data)
+        self.store.add_annotation_to_collection(annotation['id'], collection.id)
+        collection = self.store.retrieve_collection(collection.id)
+        self.assertEqual(collection.size(), 1)
+        self.assertEqual(collection.items[0], annotation["id"])
 
     def test_store_can_remove_annotation_from_collection(self):
         annotation = self.store.add_annotation(copy.copy(examples["vincent"]))
         collection_data = example_collections["empty_collection"]
-        collection_json = self.store.create_collection(collection_data)
-        self.store.add_annotation_to_collection(annotation['id'], collection_json["id"])
-        self.store.remove_annotation_from_collection(annotation["id"], collection_json["id"])
-        collection_json = self.store.retrieve_collection(collection_json["id"])
-        self.assertEqual(collection_json["total"], 0)
+        collection = self.store.create_collection(collection_data)
+        self.store.add_annotation_to_collection(annotation['id'], collection.id)
+        self.store.remove_annotation_from_collection(annotation["id"], collection.id)
+        collection = self.store.retrieve_collection(collection.id)
+        self.assertEqual(collection.size(), 0)
 
     def test_store_can_remove_annotation_collection(self):
         collection_data = example_collections["empty_collection"]
-        collection_json = self.store.create_collection(collection_data)
-        self.store.delete_collection(collection_json["id"])
+        collection = self.store.create_collection(collection_data)
+        self.store.delete_collection(collection.id)
         error = None
         try:
-            self.store.retrieve_collection(collection_json["id"])
+            self.store.retrieve_collection(collection.id)
         except AnnotationError as e:
             error = e
         self.assertNotEqual(error, None)

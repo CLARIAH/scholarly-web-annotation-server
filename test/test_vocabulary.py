@@ -9,9 +9,8 @@ def make_tempfile():
 class TestVocabularyStore(unittest.TestCase):
 
     def setUp(self):
-        self.vocab_good = "vocabularies/vangoghontology.ttl"
         self.vocab_bad = "vocabularies/test_ontology_invalid.ttl"
-        self.vocab_none = "vocabularies/vangoghontology.tt"
+        self.vocab_none = "vocabularies/nonexistingontology.ttl"
         self.vocab_url = "http://localhost:3000/vocabularies/vangoghontology.ttl"
         self.config = {
             "triple_file": make_tempfile(),

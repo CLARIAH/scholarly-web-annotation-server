@@ -5,6 +5,7 @@ import json
 import tempfile
 import annotation_server as server
 from annotation_examples import annotations as examples, annotation_collections as example_collections
+from models.annotation_store import AnnotationStore
 from models.resource import ResourceStore
 
 tempfiles = []
@@ -15,11 +16,14 @@ def make_tempfile():
     return fname
 
 def remove_tempfiles():
+    global tempfiles
     for tmpfile in tempfiles:
         try:
             os.unlink(tmpfile)
         except FileNotFoundError:
+            print("cannot remove temp files")
             pass
+    tempfiles = []
 
 
 def get_json(response):
@@ -35,11 +39,11 @@ class TestAnnotationAPI(unittest.TestCase):
     def setUp(self):
         annotations_file = make_tempfile()
         server.app.config['DATAFILE'] = annotations_file
+        server.annotation_store = AnnotationStore() # always start with empty store
         self.app = server.app.test_client()
 
     def tearDown(self):
         remove_tempfiles()
-        #os.unlink(server.app.config['DATAFILE'])
 
     def test_POST_annotation_returns_annotation_with_id(self):
         annotation = copy.copy(examples["vincent"])
@@ -48,17 +52,29 @@ class TestAnnotationAPI(unittest.TestCase):
         self.assertTrue('id' in stored)
         self.assertTrue('created' in stored)
 
-    def test_GET_annotation_return_stored_annotation(self):
+    def test_GET_annotation_returns_stored_annotation(self):
         example = add_example(self.app)
         response = self.app.get("/api/annotations/" + example['id'])
         annotation = get_json(response)
         self.assertEqual(annotation['id'], example['id'])
 
-    def test_GET_annotations_returns_list_of_annotations(self):
+    def test_GET_annotations_returns_annotation_container(self):
+        headers = {"Prefer": 'return=representation;include="http://www.w3.org/ns/oa#PreferContainedDescriptions"'}
+        response = self.app.get('/api/annotations', headers=headers)
+        container = get_json(response)
         add_example(self.app)
         response = self.app.get('/api/annotations')
-        annotations = get_json(response)
-        self.assertTrue(type(annotations) == list)
+        container = get_json(response)
+        self.assertTrue("AnnotationContainer" in container["type"])
+        self.assertEqual(container["total"], 1)
+
+    def test_GET_annotations_with_descriptions_returns_container_with_descriptions(self):
+        add_example(self.app)
+        response = self.app.get('/api/annotations', headers={"Prefer": 'return=representation;include="http://www.w3.org/ns/ldp#PreferContainedDescriptions"'})
+        container = get_json(response)
+        self.assertTrue("AnnotationContainer" in container["type"])
+        self.assertEqual(len(container["first"]["items"]), 1)
+        self.assertEqual(container["total"], 1)
 
     def test_PUT_annotation_returns_modified_annotation(self):
         example = add_example(self.app)
@@ -257,7 +273,6 @@ class TestAnnotationAPICollectionEndpoints(unittest.TestCase):
         response = self.app.get("/api/collections/%s" % (collection_registered["id"]))
         collection_retrieved = get_json(response)
         self.assertEqual(collection_retrieved["total"], 1)
-        self.assertEqual(collection_retrieved["items"][0], annotation_registered['id'])
 
     def test_api_can_remove_annotation_from_collection(self):
         collection_raw = example_collections["empty_collection"]
@@ -273,22 +288,6 @@ class TestAnnotationAPICollectionEndpoints(unittest.TestCase):
         collection_retrieved = get_json(response)
         self.assertEqual(collection_retrieved["total"], 0)
 
-"""
-    def test_api_can_retrieve_collection_page(self):
-        collection_raw = example_collections["empty_collection"]
-        response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json")
-        collection_registered = get_json(response)
-        self.assertEqual(collection_registered["total"], 0)
-        annotation_raw = copy.copy(examples["vincent"])
-        response = self.app.post("/api/annotations", data=json.dumps(annotation_raw), content_type="application/json")
-        annotation_registered = get_json(response)
-        response = self.app.post("/api/collections/%s/annotations/" % (collection_registered["id"]), data=json.dumps(annotation_registered), content_type="application/json")
-        page_id = get_json(response)
-        response = self.app.get("/api/pages/%s" % (page_id))
-        page_retrieved = get_json(response)
-        self.assertEqual(len(page_retrieved["items"]), 1)
-        self.assertEqual(page_retrieved["items"][0]["id"], annotation_registered["id"])
-"""
 
 if __name__ == "__main__":
     pass
