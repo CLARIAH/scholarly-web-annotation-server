@@ -11,7 +11,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sch: <http://schema.org/> .
-@base <http://localhost:3000/vocabularies/vangoghontology.ttl#> .
+@base <http://localhost:3000/vocabularies/vangoghontology.ttl> .
 <http://localhost:3000/vocabularies/vg> rdf:type owl:Ontology .
 
 <http://localhost:3000/vocabularies/vangoghontology.ttl>  owl:imports  <http://localhost:3000/vocabularies/genericontology.ttl>.
@@ -33,21 +33,18 @@ vg:ParagraphInLetter rdf:type owl:Class ;
 vg:Sketch rdf:type owl:Class ;
 	rdfs:label "Sketch" ;
 	rdfs:subClassOf hi:CreativeWork.
-vg:MetadataItem rdf:type owl:Class ;
-	rdfs:label "MetadataItem" ;
-	rdfs:subClassOf hi:Enrichment.
 vg:Sender rdf:type owl:Class ;
 	rdfs:label "Sender" ;
-	rdfs:subClassOf vg:MetadataItem.
+	rdfs:subClassOf hi:MetadataItem.
 vg:Receiver rdf:type owl:Class ;
 	rdfs:label "Receiver" ;
-	rdfs:subClassOf vg:MetadataItem.
+	rdfs:subClassOf hi:MetadataItem.
 vg:Date rdf:type owl:Class ;
 	rdfs:label "Date" ;
-	rdfs:subClassOf vg:MetadataItem.
+	rdfs:subClassOf hi:MetadataItem.
 vg:Number rdf:type owl:Class ;
 	rdfs:label "Number" ;
-	rdfs:subClassOf vg:MetadataItem.
+	rdfs:subClassOf hi:MetadataItem.
 vg:Note rdf:type owl:Class ;
 	rdfs:label "Note" ;
 	rdfs:subClassOf hi:Enrichment.
@@ -86,12 +83,6 @@ vg:hasTranslation rdf:type owl:ObjectProperty ;
 	rdfs:range vg:Translation;
 	rdfs:label "hasTranslation" ;
 	rdfs:comment "Adds translation to creative object";
-	rdfs:subPropertyOf hi:hasEnrichment.
-vg:hasMetadataItem rdf:type owl:ObjectProperty ;
-	rdfs:domain hi:CreativeWork;
-	rdfs:range vg:MetadataItem;
-	rdfs:label "hasMetadataItem" ;
-	rdfs:comment "Adds any type of MetadataItem to creative object";
 	rdfs:subPropertyOf hi:hasEnrichment.
 vg:hasEssay rdf:type owl:ObjectProperty ;
 	rdfs:domain hi:CreativeWork;
