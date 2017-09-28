@@ -1,601 +1,893 @@
 {
-    "collections": [
-        {
-            "id": "urn:uuid:d5551442-83aa-4f59-b53f-9abf3a8cd993",
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "AnnotationCollection",
-            "creator": "marijn",
-            "label": "Test",
-            "modified": "2017-07-11T08:32:44.945564+00:00",
-            "created": "2017-07-11T08:14:21.496754+00:00",
-            "total": 0,
-            "items": []
-        }
-    ],
     "annotations": [
         {
-            "id": "urn:uuid:6ec7e1ed-8ad3-465d-a01c-3e5c0ede977b",
-            "motivation": null,
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "Annotation",
-            "creator": "marijn",
-            "created": "2017-05-10T08:50:49.055647+00:00",
             "body": [
                 {
+                    "value": "Underline",
+                    "type": "classification",
+                    "vocabulary": "DBpedia",
+                    "id": "http://dbpedia.org/resource/Underline",
+                    "purpose": "classifying"
+                },
+                {
+                    "value": "benauwd",
                     "format": "text/plain",
-                    "value": "auction broker",
-                    "purpose": "tagging",
-                    "type": "tag"
-                },
-                {
-                    "vocabulary": "DBpedia",
-                    "value": "Broker",
-                    "purpose": "classifying",
-                    "id": "http://dbpedia.org/resource/Broker",
-                    "type": "classification"
-                },
-                {
-                    "vocabulary": "DBpedia",
-                    "value": "person",
-                    "purpose": "classifying",
-                    "id": "http://dbpedia.org/resource/Broker",
-                    "type": "classification"
+                    "purpose": "transcribing",
+                    "type": "transcription"
                 }
             ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "motivation": null,
             "target": [
                 {
-                    "selector": [
-                        {
-                            "end": 39,
-                            "start": 28,
-                            "type": "TextPositionSelector"
+                    "selector": {
+                        "value": "#xywh=151,341,115,32",
+                        "rect": {
+                            "y": 341,
+                            "w": 115,
+                            "x": 151,
+                            "h": 32
                         },
-                        {
-                            "suffix": ", J. STEEN HOFF, A. ",
-                            "exact": "G. DE VRIES",
-                            "prefix": "IJ.1J. J. STAEDfcL, ",
-                            "type": "TextQuoteSelector"
-                        }
-                    ],
-                    "type": "Text",
-                    "source": "ddd:010072441:mpeg21:a0030:paragraph.1"
+                        "type": "FragmentSelector",
+                        "conformsTo": "http://www.w3.org/TR/media-frags/"
+                    },
+                    "source": "urn:vangogh:let001:page.1",
+                    "type": "Image"
                 }
-            ]
+            ],
+            "id": "urn:uuid:0cc78c13-e0be-4141-a02a-913e0b86d1cc",
+            "created": "2017-08-11T15:10:35.201517+00:00",
+            "creator": "marijn",
+            "type": "Annotation"
         },
         {
-            "id": "urn:uuid:984ea33d-3d70-44e6-ac1a-f523c179c2ac",
-            "motivation": null,
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "Annotation",
-            "creator": "marijn",
-            "created": "2017-05-10T08:50:49.056103+00:00",
             "body": [
                 {
-                    "vocabulary": "DBpedia",
-                    "value": "date",
+                    "value": "Shot (filmmaking)",
                     "purpose": "classifying",
-                    "id": null,
-                    "type": "classification"
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Shot_(filmmaking)",
+                    "vocabulary": "DBpedia"
                 },
                 {
+                    "value": "text",
                     "format": "text/plain",
-                    "value": "auction date",
-                    "purpose": "tagging",
-                    "type": "tag"
+                    "type": "tag",
+                    "purpose": "tagging"
                 }
             ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:61304ffd-0eaf-4f60-9a84-bfa48f0d7f90",
+            "target": [
+                {
+                    "selector": {
+                        "value": "#t=16.8780400667572,23.152943826431276",
+                        "conformsTo": "http://www.w3.org/TR/media-frags/",
+                        "type": "FragmentSelector",
+                        "interval": {
+                            "start": 16.8780400667572,
+                            "end": 23.152943826431276
+                        }
+                    },
+                    "source": "https://www.youtube.com/watch?v=/e3YOHBk3Y_c",
+                    "type": "Video"
+                }
+            ],
+            "motivation": null,
+            "creator": "marijn",
+            "created": "2017-08-09T14:51:29.125585+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "Calendar date",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Calendar_date",
+                    "vocabulary": "DBpedia"
+                },
+                {
+                    "value": "OCR error",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Calendar_date",
+                    "vocabulary": "custom"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:2fa47b98-dd41-44a9-bfa0-7d85e30c2f00",
             "target": [
                 {
                     "selector": [
                         {
-                            "end": 128,
-                            "start": 107,
-                            "type": "TextPositionSelector"
+                            "start": 106,
+                            "type": "TextPositionSelector",
+                            "end": 128
                         },
                         {
+                            "prefix": "Makelaars, zullen op",
+                            "exact": " Woensdag 2 Maart 1812",
                             "suffix": ", des avonds len hal",
-                            "exact": "Woensdag 2 Maart 1812",
-                            "prefix": "akelaars, zullen op ",
                             "type": "TextQuoteSelector"
                         }
                     ],
-                    "type": "Text",
-                    "source": "ddd:010072441:mpeg21:a0030:paragraph.1"
+                    "source": "ddd:010072441:mpeg21:a0030:paragraph.1",
+                    "type": "Text"
                 }
-            ]
+            ],
+            "motivation": null,
+            "creator": "marijn",
+            "created": "2017-07-20T10:50:41.035884+00:00",
+            "type": "Annotation"
         },
         {
-            "id": "urn:uuid:6f699a97-f67a-4a90-89bd-4aaea586cd36",
-            "motivation": null,
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "Annotation",
-            "creator": "marijn",
-            "created": "2017-05-10T08:50:49.055566+00:00",
             "body": [
                 {
-                    "vocabulary": "DBpedia",
+                    "value": "Shot (filmmaking)",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Shot_(filmmaking)",
+                    "vocabulary": "DBpedia"
+                },
+                {
+                    "value": "opening",
+                    "format": "text/plain",
+                    "type": "tag",
+                    "purpose": "tagging"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:ff71618e-ced3-43dc-a8e4-032d00365606",
+            "target": [
+                {
+                    "selector": {
+                        "value": "#t=0.2540481373291016,2.9522658741149903",
+                        "conformsTo": "http://www.w3.org/TR/media-frags/",
+                        "type": "FragmentSelector",
+                        "interval": {
+                            "start": 0.2540481373291016,
+                            "end": 2.9522658741149903
+                        }
+                    },
+                    "source": "https://www.youtube.com/watch?v=/e3YOHBk3Y_c",
+                    "type": "Video"
+                }
+            ],
+            "motivation": null,
+            "creator": "marijn",
+            "created": "2017-08-09T14:48:45.444265+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
                     "value": "Oisterwijk",
                     "purpose": "classifying",
+                    "type": "classification",
                     "id": "http://dbpedia.org/resource/Oisterwijk",
-                    "type": "classification"
+                    "vocabulary": "DBpedia"
+                },
+                {
+                    "value": "Geographic location",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Geographic_location",
+                    "vocabulary": "DBpedia"
                 }
             ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:94ae75ac-1bd8-4532-81a1-5b72a7609402",
             "target": [
                 {
                     "selector": [
                         {
-                            "end": 86,
                             "start": 76,
-                            "type": "TextPositionSelector"
+                            "type": "TextPositionSelector",
+                            "end": 86
                         },
                         {
-                            "suffix": ". Gisteren is het ha",
-                            "exact": "Oisterwijk",
                             "prefix": "je wandelingen naar ",
-                            "type": "TextQuoteSelector"
-                        }
-                    ],
-                    "type": "Text",
-                    "source": "urn:vangogh:testletter:p.5"
-                }
-            ]
-        },
-        {
-            "id": "urn:uuid:38f9ab17-71b0-46de-a1bc-f029a757e771",
-            "motivation": null,
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "Annotation",
-            "creator": "marijn",
-            "created": 1499763125969,
-            "body": [
-                {
-                    "vocabulary": "DBpedia",
-                    "value": "Horse racing",
-                    "purpose": "classifying",
-                    "id": "http://dbpedia.org/resource/Horse_racing",
-                    "type": "classification"
-                }
-            ],
-            "target": [
-                {
-                    "selector": [
-                        {
-                            "end": 117,
-                            "start": 105,
-                            "type": "TextPositionSelector"
-                        },
-                        {
-                            "suffix": " geweest ter gelegen",
-                            "exact": "harddraverij",
-                            "prefix": "k.1 Gisteren is het ",
-                            "type": "TextQuoteSelector"
-                        }
-                    ],
-                    "type": "Text",
-                    "source": "urn:vangogh:testletter:p.5"
-                }
-            ]
-        },
-        {
-            "id": "urn:uuid:685b6d95-f4ce-4ba7-9204-63fea8bbae6b",
-            "motivation": null,
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "Annotation",
-            "creator": "marijn",
-            "created": "2017-05-10T08:50:49.056329+00:00",
-            "body": [
-                {
-                    "vocabulary": "DBpedia",
-                    "value": "Nieuwendijk",
-                    "purpose": "classifying",
-                    "id": "http://dbpedia.org/resource/Nieuwendijk",
-                    "type": "classification"
-                },
-                {
-                    "format": "text/plain",
-                    "value": "auction location",
-                    "purpose": "tagging",
-                    "type": "tag"
-                }
-            ],
-            "target": [
-                {
-                    "selector": [
-                        {
-                            "end": 198,
-                            "start": 162,
-                            "type": "TextPositionSelector"
-                        },
-                        {
-                            "suffix": ", verkoopen : 159 Ce",
-                            "exact": "de Witte Zwaan , op den Nieuw-endijk",
-                            "prefix": "en half zes ure, in ",
-                            "type": "TextQuoteSelector"
-                        }
-                    ],
-                    "type": "Text",
-                    "source": "ddd:010072441:mpeg21:a0030:paragraph.1"
-                }
-            ]
-        },
-        {
-            "id": "urn:uuid:3712b26f-6366-48f5-be76-a91afcfa6485",
-            "motivation": null,
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "Annotation",
-            "creator": "marijn",
-            "created": "2017-05-10T17:20:51.292673+00:00",
-            "body": [
-                {
-                    "vocabulary": "DBpedia",
-                    "value": "Salutation",
-                    "purpose": "classifying",
-                    "id": "http://dbpedia.org/resource/Salutation",
-                    "type": "classification"
-                }
-            ],
-            "target": [
-                {
-                    "selector": [
-                        {
-                            "end": 6,
-                            "start": 0,
-                            "type": "TextPositionSelector"
-                        },
-                        {
-                            "suffix": " Theo,",
-                            "exact": "Waarde",
-                            "prefix": "",
-                            "type": "TextQuoteSelector"
-                        }
-                    ],
-                    "type": "Text",
-                    "source": "urn:vangogh:let001:p.2"
-                }
-            ]
-        },
-        {
-            "id": "urn:uuid:6273d09b-0ec2-4d90-955b-90aeece1aecd",
-            "motivation": null,
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "Annotation",
-            "creator": "marijn",
-            "created": "2017-05-10T08:50:49.055950+00:00",
-            "body": [
-                {
-                    "vocabulary": "DBpedia",
-                    "value": "Theo van Gogh (art dealer)",
-                    "purpose": "classifying",
-                    "id": "http://dbpedia.org/resource/Theo_van_Gogh_(art_dealer)",
-                    "type": "classification"
-                }
-            ],
-            "target": [
-                {
-                    "selector": null,
-                    "type": "Text",
-                    "source": "urn:vangogh:testletter.receiver"
-                }
-            ]
-        },
-        {
-            "id": "urn:uuid:f439f600-5b0b-4877-93ff-d32968ab2a33",
-            "motivation": null,
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "Annotation",
-            "creator": "marijn",
-            "created": "2017-05-11T09:38:26.087151+00:00",
-            "body": [
-                {
-                    "vocabulary": "DBpedia",
-                    "value": "Location (geography)",
-                    "purpose": "classifying",
-                    "id": "http://dbpedia.org/resource/Location_(geography)",
-                    "type": "classification"
-                }
-            ],
-            "target": [
-                {
-                    "selector": [
-                        {
-                            "end": 86,
-                            "start": 76,
-                            "type": "TextPositionSelector"
-                        },
-                        {
-                            "suffix": ". Gisteren is het ha",
                             "exact": "Oisterwijk",
-                            "prefix": "je wandelingen naar ",
+                            "suffix": ".1 Gisteren is het h",
                             "type": "TextQuoteSelector"
                         }
                     ],
-                    "type": "Text",
-                    "source": "urn:vangogh:let001:p.5"
-                }
-            ]
-        },
-        {
-            "id": "urn:uuid:bba274ca-0030-496b-bb20-07a52652dbcb",
-            "motivation": null,
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "Annotation",
-            "creator": "marijn",
-            "created": "2017-05-10T08:50:49.056177+00:00",
-            "body": [
-                {
-                    "format": "text/plain",
-                    "value": "auction peruvian bark",
-                    "purpose": "tagging",
-                    "type": "tag"
+                    "source": "urn:vangogh:let001:p.5",
+                    "type": "Text"
                 }
             ],
-            "target": [
-                {
-                    "selector": null,
-                    "type": null,
-                    "source": "urn:uuid:e70abf9d-0d28-40a9-97db-51894657dda8"
-                },
-                {
-                    "selector": null,
-                    "type": null,
-                    "source": "urn:uuid:f2f7b552-252d-4d94-828d-62c760293a5e"
-                },
-                {
-                    "selector": null,
-                    "type": null,
-                    "source": "urn:uuid:dc7ebd57-eaf5-46d0-8c02-61ffe665f8ab"
-                },
-                {
-                    "selector": null,
-                    "type": null,
-                    "source": "urn:uuid:a25561bb-a1a2-4d8d-bc51-5908d8dfca66"
-                },
-                {
-                    "selector": null,
-                    "type": null,
-                    "source": "urn:uuid:ceb8757f-10d4-4dae-b452-65b11c814f02"
-                }
-            ]
+            "motivation": null,
+            "creator": "marijn",
+            "created": "2017-08-10T12:26:20.523049+00:00",
+            "type": "Annotation"
         },
         {
-            "id": "urn:uuid:aca8eb83-1b30-4856-8dce-49956459df4c",
-            "motivation": null,
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "Annotation",
-            "creator": "marijn",
-            "created": "2017-05-10T14:22:36.113151+00:00",
             "body": [
                 {
-                    "format": "text/plain",
-                    "value": "Peruvian bark auction",
-                    "purpose": "tagging",
-                    "type": "tag"
-                }
-            ],
-            "target": [
-                {
-                    "selector": null,
-                    "type": null,
-                    "source": "urn:uuid:6f6e4740-80c4-4f34-bf6c-61175cc338f9"
-                },
-                {
-                    "selector": null,
-                    "type": null,
-                    "source": "urn:uuid:6ec7e1ed-8ad3-465d-a01c-3e5c0ede977b"
-                },
-                {
-                    "selector": null,
-                    "type": null,
-                    "source": "urn:uuid:685b6d95-f4ce-4ba7-9204-63fea8bbae6b"
-                },
-                {
-                    "selector": null,
-                    "type": null,
-                    "source": "urn:uuid:984ea33d-3d70-44e6-ac1a-f523c179c2ac"
-                },
-                {
-                    "selector": null,
-                    "type": null,
-                    "source": "urn:uuid:9952f628-1ea6-4b8d-9566-5219eb7f5e4e"
-                }
-            ]
-        },
-        {
-            "id": "urn:uuid:b8d14cb0-5a6b-43bc-83a7-52dd6c3fbe03",
-            "motivation": null,
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "Annotation",
-            "creator": "marijn",
-            "created": "2017-05-10T08:50:49.056401+00:00",
-            "body": [
-                {
-                    "format": "text/plain",
-                    "value": "Test to see if IgnorableElement text is ignored",
-                    "purpose": "commenting",
-                    "type": "comment"
-                }
-            ],
-            "target": [
-                {
-                    "selector": [
-                        {
-                            "end": 92,
-                            "start": 82,
-                            "type": "TextPositionSelector"
-                        },
-                        {
-                            "suffix": "eren is het harddrav",
-                            "exact": "wijk. Gist",
-                            "prefix": "delingen naar Oister",
-                            "type": "TextQuoteSelector"
-                        }
-                    ],
-                    "type": "Text",
-                    "source": "urn:vangogh:testletter:p.5"
-                }
-            ]
-        },
-        {
-            "id": "urn:uuid:6f6e4740-80c4-4f34-bf6c-61175cc338f9",
-            "motivation": null,
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "Annotation",
-            "creator": "marijn",
-            "created": "2017-05-10T08:50:48.987732+00:00",
-            "body": [
-                {
-                    "vocabulary": "DBpedia",
-                    "value": "person",
+                    "value": "Shot (filmmaking)",
                     "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Shot_(filmmaking)",
+                    "vocabulary": "DBpedia"
+                },
+                {
+                    "value": "close-up",
+                    "format": "text/plain",
+                    "type": "tag",
+                    "purpose": "tagging"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:3bea64ff-7fe5-4f07-920d-f462bb4a63de",
+            "target": [
+                {
+                    "selector": {
+                        "value": "#t=66.020581,69.28421002670288",
+                        "conformsTo": "http://www.w3.org/TR/media-frags/",
+                        "type": "FragmentSelector",
+                        "interval": {
+                            "start": 66.020581,
+                            "end": 69.28421002670288
+                        }
+                    },
+                    "source": "https://www.youtube.com/watch?v=/e3YOHBk3Y_c",
+                    "type": "Video"
+                }
+            ],
+            "motivation": null,
+            "creator": "marijn",
+            "created": "2017-08-09T14:55:08.546678+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "Recording studio",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Recording_studio",
+                    "vocabulary": "DBpedia"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:ae1c86da-466d-4412-909b-f770eaa5f790",
+            "target": [
+                {
+                    "selector": {
+                        "value": "#xywh=880,238,664,468",
+                        "rect": {
+                            "y": 238,
+                            "h": 468,
+                            "x": 880,
+                            "w": 664
+                        },
+                        "type": "FragmentSelector",
+                        "conformsTo": "http://www.w3.org/TR/media-frags/"
+                    },
+                    "source": "urn:program:587759@program:thumbnail.1",
+                    "type": "Image"
+                }
+            ],
+            "motivation": null,
+            "creator": "marijn",
+            "created": "2017-07-19T13:11:23.384742+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "Shot (filmmaking)",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Shot_(filmmaking)",
+                    "vocabulary": "DBpedia"
+                },
+                {
+                    "value": "indoors",
+                    "format": "text/plain",
+                    "type": "tag",
+                    "purpose": "tagging"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:4c7ec537-1ece-452c-8f12-d7311ae84120",
+            "target": [
+                {
+                    "selector": {
+                        "value": "#t=69.800651,88.50707411444091",
+                        "conformsTo": "http://www.w3.org/TR/media-frags/",
+                        "type": "FragmentSelector",
+                        "interval": {
+                            "start": 69.800651,
+                            "end": 88.50707411444091
+                        }
+                    },
+                    "source": "https://www.youtube.com/watch?v=/e3YOHBk3Y_c",
+                    "type": "Video"
+                }
+            ],
+            "motivation": null,
+            "creator": "marijn",
+            "created": "2017-08-09T14:59:54.091347+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "Shot (filmmaking)",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Shot_(filmmaking)",
+                    "vocabulary": "DBpedia"
+                },
+                {
+                    "value": "text",
+                    "format": "text/plain",
+                    "type": "tag",
+                    "purpose": "tagging"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:e4cd7426-af2a-4ada-88ce-505ca43623f9",
+            "target": [
+                {
+                    "selector": {
+                        "value": "#t=112.498241,122.09417603623963",
+                        "conformsTo": "http://www.w3.org/TR/media-frags/",
+                        "type": "FragmentSelector",
+                        "interval": {
+                            "start": 112.498241,
+                            "end": 122.09417603623963
+                        }
+                    },
+                    "source": "https://www.youtube.com/watch?v=/e3YOHBk3Y_c",
+                    "type": "Video"
+                }
+            ],
+            "motivation": null,
+            "creator": "marijn",
+            "created": "2017-08-09T15:02:05.745839+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "Shot (filmmaking)",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Shot_(filmmaking)",
+                    "vocabulary": "DBpedia"
+                },
+                {
+                    "value": "text",
+                    "format": "text/plain",
+                    "type": "tag",
+                    "purpose": "tagging"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:fef26fbc-eafe-4711-9267-16f751fed270",
+            "target": [
+                {
+                    "selector": {
+                        "value": "#t=3.079550807357788,16.678503022888183",
+                        "conformsTo": "http://www.w3.org/TR/media-frags/",
+                        "type": "FragmentSelector",
+                        "interval": {
+                            "start": 3.079550807357788,
+                            "end": 16.678503022888183
+                        }
+                    },
+                    "source": "https://www.youtube.com/watch?v=/e3YOHBk3Y_c",
+                    "type": "Video"
+                }
+            ],
+            "motivation": null,
+            "creator": "marijn",
+            "created": "2017-08-09T14:50:53.283873+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "Shot (filmmaking)",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Shot_(filmmaking)",
+                    "vocabulary": "DBpedia"
+                },
+                {
+                    "value": "outdoors",
+                    "format": "text/plain",
+                    "type": "tag",
+                    "purpose": "tagging"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:fc12d111-0145-4837-b667-d63d462d185e",
+            "target": [
+                {
+                    "selector": {
+                        "value": "#t=88.529574,112.44044712207031",
+                        "conformsTo": "http://www.w3.org/TR/media-frags/",
+                        "type": "FragmentSelector",
+                        "interval": {
+                            "start": 88.529574,
+                            "end": 112.44044712207031
+                        }
+                    },
+                    "source": "https://www.youtube.com/watch?v=/e3YOHBk3Y_c",
+                    "type": "Video"
+                }
+            ],
+            "motivation": null,
+            "creator": "marijn",
+            "created": "2017-08-09T15:00:49.566335+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "homoe",
+                    "type": "classification",
+                    "vocabulary": "DBpedia",
                     "id": null,
-                    "type": "classification"
+                    "purpose": "classifying"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "motivation": null,
+            "target": [
+                {
+                    "selector": {
+                        "value": "#xywh=109,209,65,25",
+                        "rect": {
+                            "y": 209,
+                            "w": 65,
+                            "x": 109,
+                            "h": 25
+                        },
+                        "type": "FragmentSelector",
+                        "conformsTo": "http://www.w3.org/TR/media-frags/"
+                    },
+                    "source": "urn:vangogh:let001:page.1",
+                    "type": "Image"
+                }
+            ],
+            "id": "urn:uuid:1d9bd337-6be6-404c-be30-5077565b4fe7",
+            "created": "2017-08-21T14:33:46.496101+00:00",
+            "creator": "marijn",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "Vincent van Gogh",
+                    "purpose": "classifying",
+                    "type": "Classifying",
+                    "id": "http://dbpedia.org/resource/Vincent_van_Gogh",
+                    "vocabulary": "DBpedia"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:3689ad73-ca1e-4eb2-84a7-e85b31d1b4b1",
+            "target": [
+                {
+                    "selector": null,
+                    "source": "urn:vangogh:testletter.receiver",
+                    "type": "Text"
+                }
+            ],
+            "creator": "marijn",
+            "modified": "2017-07-20T18:26:26.794132+00:00",
+            "created": "2017-07-20T18:26:26.779026+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "Peruvian bark",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Peruvian_bark",
+                    "vocabulary": "DBpedia"
                 },
                 {
-                    "vocabulary": "DBpedia",
+                    "value": "Good (economics)",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Good_(economics)",
+                    "vocabulary": "DBpedia"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:d8c4219c-3dcc-44dc-afa6-6cead264f05a",
+            "target": [
+                {
+                    "selector": [
+                        {
+                            "start": 212,
+                            "type": "TextPositionSelector",
+                            "end": 242
+                        },
+                        {
+                            "prefix": "endijk, verkoopen : ",
+                            "exact": "159 Ceroenen CORT. CHINA CHINA",
+                            "suffix": ". Liggende en te zie",
+                            "type": "TextQuoteSelector"
+                        }
+                    ],
+                    "source": "ddd:010072441:mpeg21:a0030:paragraph.1",
+                    "type": "Text"
+                }
+            ],
+            "motivation": null,
+            "creator": "marijn",
+            "created": "2017-07-20T10:47:47.089550+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
                     "value": "Broker",
                     "purpose": "classifying",
+                    "type": "classification",
                     "id": "http://dbpedia.org/resource/Broker",
-                    "type": "classification"
+                    "vocabulary": "DBpedia"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:2cd6cb3d-fe04-411d-976d-4a3e77173693",
+            "target": [
+                {
+                    "selector": [
+                        {
+                            "start": 15,
+                            "type": "TextPositionSelector",
+                            "end": 84
+                        },
+                        {
+                            "prefix": "(10660) IJ.1J. ",
+                            "exact": "J. STAEDfcL, G. DE VRIES, J. STEEN HOFF, A. F STALMAN en F. M. TISSEL",
+                            "suffix": ", Makelaars, zullen ",
+                            "type": "TextQuoteSelector"
+                        }
+                    ],
+                    "source": "ddd:010072441:mpeg21:a0030:paragraph.1",
+                    "type": "Text"
+                }
+            ],
+            "motivation": null,
+            "creator": "marijn",
+            "created": "2017-07-20T10:49:30.389416+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "Shot (filmmaking)",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Shot_(filmmaking)",
+                    "vocabulary": "DBpedia"
                 },
                 {
+                    "value": "indoors",
                     "format": "text/plain",
-                    "value": "auction broker",
-                    "purpose": "tagging",
-                    "type": "tag"
-                }
-            ],
-            "target": [
-                {
-                    "selector": [
-                        {
-                            "end": 54,
-                            "start": 41,
-                            "type": "TextPositionSelector"
-                        },
-                        {
-                            "suffix": ", A. F STALMAN en F.",
-                            "exact": "J. STEEN HOFF",
-                            "prefix": "EDfcL, G. DE VRIES, ",
-                            "type": "TextQuoteSelector"
-                        }
-                    ],
-                    "type": "Text",
-                    "source": "ddd:010072441:mpeg21:a0030:paragraph.1"
-                }
-            ]
-        },
-        {
-            "id": "urn:uuid:0d41de2e-c3fb-436c-9e36-cb9658599b17",
-            "motivation": null,
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "Annotation",
-            "creator": "marijn",
-            "created": 1495489660558,
-            "body": [
-                {
-                    "vocabulary": "DBpedia",
-                    "value": "Art exhibition",
-                    "purpose": "classifying",
-                    "id": "http://dbpedia.org/resource/Art_exhibition",
-                    "type": "classification"
-                }
-            ],
-            "target": [
-                {
-                    "selector": [
-                        {
-                            "end": 163,
-                            "start": 148,
-                            "type": "TextPositionSelector"
-                        },
-                        {
-                            "suffix": ", maar de illuminati",
-                            "exact": "tentoonstelling",
-                            "prefix": " gelegenheid van de ",
-                            "type": "TextQuoteSelector"
-                        }
-                    ],
-                    "type": "Text",
-                    "source": "urn:vangogh:let001:p.5"
-                }
-            ]
-        },
-        {
-            "id": "urn:uuid:9952f628-1ea6-4b8d-9566-5219eb7f5e4e",
-            "motivation": null,
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "Annotation",
-            "creator": "marijn",
-            "created": "2017-05-10T08:50:49.055877+00:00",
-            "body": [
-                {
-                    "vocabulary": "DBpedia",
-                    "value": "Jesuit's bark",
-                    "purpose": "classifying",
-                    "id": "http://dbpedia.org/resource/Jesuit's_bark",
-                    "type": "classification"
+                    "type": "tag",
+                    "purpose": "tagging"
                 },
                 {
+                    "value": "indoors",
                     "format": "text/plain",
-                    "value": "auction goods",
-                    "purpose": "tagging",
-                    "type": "tag"
+                    "type": "tag",
+                    "purpose": "tagging"
                 }
             ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:9192938f-7430-4978-94d4-044ee50643a7",
             "target": [
                 {
-                    "selector": [
-                        {
-                            "end": 242,
-                            "start": 212,
-                            "type": "TextPositionSelector"
-                        },
-                        {
-                            "suffix": ". Liggende en te zie",
-                            "exact": "159 Ceroenen CORT. CHINA CHINA",
-                            "prefix": "endijk, verkoopen : ",
-                            "type": "TextQuoteSelector"
+                    "selector": {
+                        "value": "#t=23.179051,65.92301104577636",
+                        "conformsTo": "http://www.w3.org/TR/media-frags/",
+                        "type": "FragmentSelector",
+                        "interval": {
+                            "start": 23.179051,
+                            "end": 65.92301104577636
                         }
-                    ],
-                    "type": "Text",
-                    "source": "ddd:010072441:mpeg21:a0030:paragraph.1"
+                    },
+                    "source": "https://www.youtube.com/watch?v=/e3YOHBk3Y_c",
+                    "type": "Video"
                 }
-            ]
+            ],
+            "motivation": null,
+            "creator": "marijn",
+            "modified": "2017-08-09T14:56:18.568992+00:00",
+            "created": "2017-08-09T14:54:05.408595+00:00",
+            "type": "Annotation"
         },
         {
-            "id": "urn:uuid:c81e0a4c-6be9-45f7-9f42-dd26e576edd3",
-            "motivation": null,
-            "@context": "http://www.w3.org/ns/anno.jsonld",
-            "type": "Annotation",
-            "creator": "marijn",
-            "created": 1497369006382,
             "body": [
                 {
-                    "format": "text/plain",
-                    "value": "walk",
-                    "purpose": "commenting",
-                    "type": "comment"
+                    "value": "Vincent van Gogh",
+                    "purpose": "classifying",
+                    "type": "Classifying",
+                    "id": "http://dbpedia.org/resource/Vincent_van_Gogh",
+                    "vocabulary": "DBpedia"
                 }
             ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:69a98120-49e5-47e2-97a3-d5eba6455bb5",
+            "target": [
+                {
+                    "selector": null,
+                    "source": "urn:vangogh:testletter.receiver",
+                    "type": "Text"
+                }
+            ],
+            "creator": "marijn",
+            "modified": "2017-07-20T18:33:39.490176+00:00",
+            "created": "2017-07-20T18:33:39.469876+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "News presenter",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/News_presenter",
+                    "vocabulary": "DBpedia"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:725e7a6c-b9ec-4803-8935-1c380c5decb5",
+            "target": [
+                {
+                    "selector": {
+                        "value": "#xywh=364,172,328,900",
+                        "rect": {
+                            "y": 172,
+                            "h": 900,
+                            "x": 364,
+                            "w": 328
+                        },
+                        "type": "FragmentSelector",
+                        "conformsTo": "http://www.w3.org/TR/media-frags/"
+                    },
+                    "source": "urn:program:587759@program:thumbnail.1",
+                    "type": "Image"
+                }
+            ],
+            "motivation": null,
+            "creator": "marijn",
+            "created": "2017-07-20T09:24:00.001248+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "Vincent van Gogh",
+                    "purpose": "classifying",
+                    "type": "Classifying",
+                    "id": "http://dbpedia.org/resource/Vincent_van_Gogh",
+                    "vocabulary": "DBpedia"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:768df8a8-ab3d-496e-a2f4-b6b4cafe5950",
+            "target": [
+                {
+                    "selector": null,
+                    "source": "urn:vangogh:testletter.receiver",
+                    "type": "Text"
+                }
+            ],
+            "creator": "marijn",
+            "modified": "2017-07-20T18:29:56.288794+00:00",
+            "created": "2017-07-20T18:29:56.271632+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "Vincent van Gogh",
+                    "purpose": "classifying",
+                    "type": "Classifying",
+                    "id": "http://dbpedia.org/resource/Vincent_van_Gogh",
+                    "vocabulary": "DBpedia"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:47ab2b9e-006d-436f-81ae-ae053323e905",
+            "target": [
+                {
+                    "selector": null,
+                    "source": "urn:vangogh:testletter.receiver",
+                    "type": "Text"
+                }
+            ],
+            "creator": "marijn",
+            "modified": "2017-07-20T18:35:47.316515+00:00",
+            "created": "2017-07-20T18:35:47.296703+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "Auction",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Auction",
+                    "vocabulary": "DBpedia"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:bc4ec675-2a4b-45db-98e1-c21ce7caba57",
+            "target": [
+                {
+                    "selector": null,
+                    "source": "urn:uuid:32865ab1-4fdc-48ca-b541-9589aacb632b",
+                    "type": "Annotation"
+                },
+                {
+                    "selector": null,
+                    "source": "urn:uuid:2fa47b98-dd41-44a9-bfa0-7d85e30c2f00",
+                    "type": "Annotation"
+                },
+                {
+                    "selector": null,
+                    "source": "urn:uuid:d8c4219c-3dcc-44dc-afa6-6cead264f05a",
+                    "type": "Annotation"
+                },
+                {
+                    "selector": null,
+                    "source": "urn:uuid:2cd6cb3d-fe04-411d-976d-4a3e77173693",
+                    "type": "Annotation"
+                }
+            ],
+            "motivation": null,
+            "creator": "marijn",
+            "created": "2017-08-08T18:22:42.792414+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "sklgdhjaslkgds",
+                    "type": "classification",
+                    "vocabulary": "DBpedia",
+                    "id": null,
+                    "purpose": "classifying"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "motivation": null,
+            "target": [
+                {
+                    "selector": {
+                        "value": "#t=226.45993095040893,264.5035139732971",
+                        "interval": {
+                            "start": 226.45993095040893,
+                            "end": 264.5035139732971
+                        },
+                        "type": "FragmentSelector",
+                        "conformsTo": "http://www.w3.org/TR/media-frags/"
+                    },
+                    "source": "https://www.youtube.com/watch?v=/e3YOHBk3Y_c",
+                    "type": "Video"
+                }
+            ],
+            "id": "urn:uuid:b1196982-6a66-4bb2-abaf-858647076e50",
+            "created": "2017-08-23T14:14:14.442165+00:00",
+            "creator": "marijn",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "Fireworks",
+                    "type": "classification",
+                    "vocabulary": "DBpedia",
+                    "id": "http://dbpedia.org/resource/Fireworks",
+                    "purpose": "classifying"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "motivation": null,
             "target": [
                 {
                     "selector": [
                         {
-                            "end": 97,
-                            "start": 88,
-                            "type": "TextPositionSelector"
+                            "start": 193,
+                            "type": "TextPositionSelector",
+                            "end": 201
                         },
                         {
-                            "suffix": " & het een en ander ",
-                            "exact": "gewandeld",
-                            "prefix": "or toch nog al eens ",
+                            "prefix": "e illuminatie & het ",
+                            "exact": "vuurwerk",
+                            "suffix": " zijn uit gesteld, o",
                             "type": "TextQuoteSelector"
                         }
                     ],
-                    "type": "Text",
-                    "source": "urn:vangogh:let001:p.4"
+                    "source": "urn:vangogh:let001:p.5",
+                    "type": "Text"
                 }
-            ]
+            ],
+            "id": "urn:uuid:dac23d3a-3ed9-4d9b-b177-b8d8716fc41c",
+            "created": "2017-08-21T14:33:05.266333+00:00",
+            "creator": "marijn",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "Vincent van Gogh",
+                    "purpose": "classifying",
+                    "type": "Classifying",
+                    "id": "http://dbpedia.org/resource/Vincent_van_Gogh",
+                    "vocabulary": "DBpedia"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:6fdec627-b17e-4711-b019-1dd3076c82b4",
+            "target": [
+                {
+                    "selector": null,
+                    "source": "urn:vangogh:testletter.receiver",
+                    "type": "Text"
+                }
+            ],
+            "creator": "marijn",
+            "modified": "2017-07-20T18:35:06.949822+00:00",
+            "created": "2017-07-20T18:35:06.934355+00:00",
+            "type": "Annotation"
+        },
+        {
+            "body": [
+                {
+                    "value": "Building",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Building",
+                    "vocabulary": "DBpedia"
+                },
+                {
+                    "value": "Location identifier",
+                    "purpose": "classifying",
+                    "type": "classification",
+                    "id": "http://dbpedia.org/resource/Location_identifier",
+                    "vocabulary": "DBpedia"
+                }
+            ],
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "urn:uuid:32865ab1-4fdc-48ca-b541-9589aacb632b",
+            "target": [
+                {
+                    "selector": [
+                        {
+                            "start": 159,
+                            "type": "TextPositionSelector",
+                            "end": 198
+                        },
+                        {
+                            "prefix": "s len half zes ure, ",
+                            "exact": "in de Witte Zwaan , op den Nieuw-endijk",
+                            "suffix": ", verkoopen : 159 Ce",
+                            "type": "TextQuoteSelector"
+                        }
+                    ],
+                    "source": "ddd:010072441:mpeg21:a0030:paragraph.1",
+                    "type": "Text"
+                }
+            ],
+            "motivation": null,
+            "creator": "marijn",
+            "created": "2017-07-20T10:48:57.711542+00:00",
+            "type": "Annotation"
         }
-    ]
+    ],
+    "collections": []
 }
