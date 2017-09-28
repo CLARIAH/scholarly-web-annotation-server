@@ -155,9 +155,9 @@ class Annotation(object):
             self.in_collection.remove(collection_id)
 
 class AnnotationError(Exception):
-    status_code = 404
+    status_code = 400
 
-    def __init__(self, message, status_code=404, payload=None):
+    def __init__(self, message, status_code=400, payload=None):
         Exception.__init__(self)
         self.message = message
         self.status_code = status_code
