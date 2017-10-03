@@ -35,6 +35,74 @@ annotations = {
             }
         ]
     },
+    "vincent-subresource": {
+        "@context": "http://www.w3.org/ns/anno.jsonld",
+        "type": "Annotation",
+        "target": [
+            {
+                "source": "urn:vangogh:testletter",
+                "type": "Letter",
+                "selector": {
+                    "type": "SubresourceSelector",
+                    "value": {
+                        "subresource": {
+                            "id": "urn:vangogh:testletter.sender",
+                            "type": ["Sender", "Text"],
+                            "property": "hasMetadataItem"
+                        }
+                    }
+                }
+            }
+        ],
+        "motivation": "classifying",
+        "body": [
+            {
+                "type": "Classifying",
+                "value": "Vincent van Gogh",
+                "vocabulary": "DBpedia",
+                "id": "http://dbpedia.org/resource/Vincent_van_Gogh",
+                "purpose": "classifying"
+            }
+        ]
+    },
+    "vincent-nestedpid": {
+        "@context": "http://www.w3.org/ns/anno.jsonld",
+        "type": "Annotation",
+        "target": [
+            {
+                "source": "urn:vangogh:testletter",
+                "type": "Letter",
+                "selector": {
+                    "type": "NestedPIDSelector",
+                    "value": [
+                        {
+                            "id": "urn:vangogh:correspondence",
+                            "type": ["Correspondence"],
+                        },
+                        {
+                            "id": "urn:vangogh:testletter",
+                            "type": ["Letter"],
+                        },
+                        {
+                            "id": "urn:vangogh:testletter.sender",
+                            "type": ["Sender", "Text"],
+                            "property": "hasMetadataItem"
+                        }
+                    ]
+                }
+            }
+        ],
+        "motivation": "classifying",
+        "body": [
+            {
+                "type": "Classifying",
+                "value": "Vincent van Gogh",
+                "vocabulary": "DBpedia",
+                "id": "http://dbpedia.org/resource/Vincent_van_Gogh",
+                "purpose": "classifying"
+            }
+        ]
+    },
     "theo": {
         "@context": "http://www.w3.org/ns/anno.jsonld",
         "type": "Annotation",
