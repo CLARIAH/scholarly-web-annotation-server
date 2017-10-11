@@ -332,7 +332,12 @@ if __name__ == "__main__":
     annotation_config = {
         "collections_file": "data/annotation_collections.pickle",
         "pages_file": "data/annotation_pages.pickle",
-        "annotations_file": "data/annotations.pickle"
+        "annotations_file": "data/annotations.pickle",
+        "Elasticsearch": {
+            "host": "localhost",
+            "port": 9200,
+            "index": "swa"
+        }
     }
     annotation_store.configure(annotation_config)
     resource_store = ResourceStore(resource_config)
