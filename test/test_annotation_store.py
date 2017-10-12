@@ -224,8 +224,8 @@ class TestAnnotationStoreIndex(unittest.TestCase):
 
     def test_store_can_get_annotation_by_target_id(self):
         stored_annotation = self.store.add_annotation_es(self.example_annotation)
-        # wait for target list indexing to finish
-        time.sleep(1)
+        # refresh index to make document available for search
+        self.store.es.indices.refresh(index=self.config["index"])
         retrieved_annotations = self.store.get_annotations_by_target_es({"id": stored_annotation["target"][0]["id"]})
         self.assertEqual(len(retrieved_annotations), 1)
         self.assertEqual(retrieved_annotations[0]["id"], stored_annotation["id"])
@@ -241,7 +241,7 @@ class TestAnnotationStoreIndex(unittest.TestCase):
 
     def test_store_propagates_update_along_annotation_chain(self):
         stored_annotation = self.store.add_annotation_es(self.example_annotation)
-        retrieved_annotation = self.store.get_annotation_es(stored_annotation["id"])
+        self.store.get_annotation_es(stored_annotation["id"])
         chain_annotation = copy.copy(examples["vincent"])
         chain_annotation["target"] = {
             "id": stored_annotation["id"],
@@ -249,19 +249,22 @@ class TestAnnotationStoreIndex(unittest.TestCase):
             "selector": None
         }
         stored_chain_annotation = self.store.add_annotation_es(chain_annotation)
-        retrieved_annotation = self.store.get_annotation_es(stored_chain_annotation["id"])
-        time.sleep(1)
+        self.store.get_annotation_es(stored_chain_annotation["id"])
+        # refresh index to make document available for search
+        self.store.es.indices.refresh(index=self.config["index"])
         new_target = "urn:vangogh:differentletter"
         stored_annotation["target"][0]["id"] = new_target
-        updated_annotation = self.store.update_annotation_es(stored_annotation)
-        time.sleep(1)
+        self.store.update_annotation_es(stored_annotation)
+        # refresh index to make document available for search
+        self.store.es.indices.refresh(index=self.config["index"])
         retrieved_annotations = self.store.get_from_index_by_target({"id": new_target})
         self.assertTrue(stored_chain_annotation["id"] in [anno["id"] for anno in retrieved_annotations])
 
     def test_store_can_remove_annotation(self):
         stored_annotation = self.store.add_annotation_es(self.example_annotation)
-        removed_annotation = self.store.remove_annotation_es(stored_annotation["id"])
-        time.sleep(1)
+        self.store.remove_annotation_es(stored_annotation["id"])
+        # refresh index to make document available for search
+        self.store.es.indices.refresh(index=self.config["index"])
         error = None
         try:
             self.store.get_annotation_es(stored_annotation["id"])
@@ -271,7 +274,7 @@ class TestAnnotationStoreIndex(unittest.TestCase):
 
     def test_store_propagates_delete_along_annotation_chain(self):
         stored_annotation = self.store.add_annotation_es(self.example_annotation)
-        retrieved_annotation = self.store.get_annotation_es(stored_annotation["id"])
+        self.store.get_annotation_es(stored_annotation["id"])
         chain_annotation = copy.copy(examples["vincent"])
         chain_annotation["target"] = {
             "id": stored_annotation["id"],
@@ -279,15 +282,49 @@ class TestAnnotationStoreIndex(unittest.TestCase):
             "selector": None
         }
         stored_chain_annotation = self.store.add_annotation_es(chain_annotation)
-        retrieved_chain_annotation = self.store.get_annotation_es(stored_chain_annotation["id"])
-        time.sleep(1)
-        print("\nStored annotation")
-        print(stored_annotation["id"])
-        removed_annotation = self.store.remove_annotation_es(stored_annotation["id"])
-        time.sleep(1)
-        print("\nRetrieving annotations for target id {0}".format(stored_annotation["target"][0]["id"]))
+        self.store.get_annotation_es(stored_chain_annotation["id"])
+        # refresh index to make document available for search
+        self.store.es.indices.refresh(index=self.config["index"])
+        self.store.remove_annotation_es(stored_annotation["id"])
+        # refresh index to make document available for search
+        self.store.es.indices.refresh(index=self.config["index"])
         retrieved_annotations = self.store.get_from_index_by_target({"id": stored_annotation["target"][0]["id"]})
         self.assertEqual(len(retrieved_annotations), 0)
+
+    def test_store_can_add_annotation_collection(self):
+        collection_data = example_collections["empty_collection"]
+        collection = self.store.create_collection_es(collection_data)
+        self.assertEqual(collection["label"], collection_data["label"])
+        self.assertNotEqual(collection["id"], None)
+
+    def test_store_can_add_annotation_to_collection(self):
+        annotation = self.store.add_annotation_es(copy.copy(examples["vincent"]))
+        collection_data = example_collections["empty_collection"]
+        collection = self.store.create_collection_es(collection_data)
+        self.store.add_annotation_to_collection_es(annotation['id'], collection["id"])
+        collection = self.store.get_collection_es(collection["id"])
+        self.assertEqual(collection["total"], 1)
+        self.assertEqual(collection["items"][0], annotation["id"])
+
+    def test_store_can_remove_annotation_from_collection(self):
+        annotation = self.store.add_annotation_es(copy.copy(examples["vincent"]))
+        collection_data = example_collections["empty_collection"]
+        collection = self.store.create_collection_es(collection_data)
+        self.store.add_annotation_to_collection_es(annotation['id'], collection["id"])
+        self.store.remove_annotation_from_collection_es(annotation["id"], collection["id"])
+        collection = self.store.get_collection_es(collection["id"])
+        self.assertEqual(collection["total"], 0)
+
+    def test_store_can_remove_annotation_collection(self):
+        collection_data = example_collections["empty_collection"]
+        collection = self.store.create_collection_es(collection_data)
+        self.store.remove_collection_es(collection["id"])
+        error = None
+        try:
+            self.store.get_collection_es(collection["id"])
+        except AnnotationError as e:
+            error = e
+        self.assertNotEqual(error, None)
 
 
 if __name__ == "__main__":

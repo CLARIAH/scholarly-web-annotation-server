@@ -4,7 +4,7 @@ from collections import defaultdict
 from models.annotation import Annotation, AnnotationError
 from models.annotation_collection import AnnotationCollection
 from elasticsearch import Elasticsearch
-from elasticsearch.exceptions import NotFoundError
+#from elasticsearch.exceptions import NotFoundError
 
 class AnnotationStore(object):
 
@@ -147,11 +147,37 @@ class AnnotationStore(object):
         # create target_list for easy target-based retrieval
         anno.data["target_list"] = self.get_target_list(anno)
         # index annotation
-        res = self.add_to_index(anno.data, annotation["type"])
+        self.add_to_index(anno.data, annotation["type"])
         # remove target_list for returning annotation
         del anno.data["target_list"]
         # return annotation to caller
         return anno.data
+
+    def create_collection_es(self, collection_data):
+        # check if collection is valid, add id and timestamp
+        collection = AnnotationCollection(collection_data)
+        # if collection already has ID, check if it already exists in the index
+        if "id" in collection_data:
+            self.should_not_exist(collection_data['id'], collection_data['type'])
+        # index collection
+        self.add_to_index(collection.to_json(), collection_data["type"])
+        # return collection to caller
+        return collection.to_json()
+
+    def add_annotation_to_collection_es(self, annotation_id, collection_id):
+        # check if annotation exists
+        self.should_exist(annotation_id, "Annotation")
+        # check if collection exists
+        self.should_exist(collection_id, "AnnotationCollection")
+        # check if collection contains annotation
+        collection = self.get_from_index(collection_id, "AnnotationCollection")
+        if annotation_id in collection["items"]:
+            raise AnnotationError(message="Collection already contains this annotation")
+        # add annotation
+        collection["items"] += [annotation_id]
+        collection["total"] = len(collection["items"])
+        self.update_in_index(collection, "AnnotationCollection")
+        # return collection metadata
 
     def get_annotation_es(self, annotation_id):
         # check that annotation exists (and is not deleted)
@@ -159,12 +185,18 @@ class AnnotationStore(object):
         # get annotation from index
         annotation = self.get_from_index(annotation_id, "Annotation")
         del annotation["target_list"]
-        # return annotation to caller
         return annotation
+
+    def get_collection_es(self, collection_id):
+        # check that collection exists (and is not deleted)
+        self.should_exist(collection_id, "AnnotationCollection")
+        # get collection from index
+        collection = self.get_from_index(collection_id, "AnnotationCollection")
+        return collection
 
     def get_annotations_by_target_es(self, annotation_target):
         # get annotation from index
-        annotations = self.get_from_index_by_target(annotation_target)
+        annotations = self.get_from_index_by_target_list(annotation_target)
         for annotation in annotations:
             del annotation["target_list"]
         # return annotation to caller
@@ -180,9 +212,8 @@ class AnnotationStore(object):
         updated_anno.data["target_list"] = new_target_list
         old_annotation = self.get_from_index(updated_anno.id, "Annotation")
         # index updated annotation
-        res = self.update_in_index(updated_anno.data, updated_annotation_json["type"])
-        # if target list has changed, annotations targeting this annotation
-        # should also be updated
+        self.update_in_index(updated_anno.data, updated_annotation_json["type"])
+        # if target list has changed, annotations targeting this annotation should also be updated
         if self.target_list_changed(new_target_list, old_annotation["target_list"]):
             # updates annotations that target this updated annotation
             self.update_chained_annotations(updated_anno.id)
@@ -192,6 +223,8 @@ class AnnotationStore(object):
         return updated_anno.data
 
     def update_chained_annotations(self, annotation_id):
+        # first refresh the index
+        self.es.indices.refresh(index=self.es_config["index"])
         chain_annotations = self.get_from_index_by_target({"id": annotation_id})
         for chain_annotation in chain_annotations:
             if chain_annotation["id"] == annotation_id:
@@ -214,6 +247,37 @@ class AnnotationStore(object):
         # updates annotations that target this deletd annotation
         self.update_chained_annotations(annotation_id)
         return deleted_annotation
+
+    def remove_annotation_from_collection_es(self, annotation_id, collection_id):
+        # check if annotation exists
+        self.should_exist(annotation_id, "Annotation")
+        # check if collection exists
+        self.should_exist(collection_id, "AnnotationCollection")
+        # check if collection contains annotation
+        collection = self.get_from_index(collection_id, "AnnotationCollection")
+        # remove annotation
+        try:
+            collection["items"].remove(annotation_id)
+        except ValueError:
+            raise AnnotationError(message="Collection does not contain this annotation")
+        collection["total"] = len(collection["items"])
+        self.update_in_index(collection, "AnnotationCollection")
+        # return collection metadata
+        return collection
+
+    def remove_collection_es(self, collection_id):
+        # check if collection already exists
+        self.should_exist(collection_id, "AnnotationCollection")
+        # remove collection from index
+        self.remove_from_index(collection_id, "AnnotationCollection")
+        # replace with deleted collection with same id
+        deleted_collection = {
+            "id": collection_id,
+            "type": "AnnotationCollection",
+            "status": "deleted"
+        }
+        self.add_to_index(deleted_collection, "AnnotationCollection")
+        return deleted_collection
 
     def target_list_changed(self, list1, list2):
         ids1 = set([target["id"] for target in list1])
@@ -269,9 +333,18 @@ class AnnotationStore(object):
         response = self.es.search(index=self.es_config['index'], doc_type="Annotation", body=self.make_target_list_query(target))
         return [hit["_source"] for hit in response['hits']['hits']]
 
+    def get_from_index_by_target_list(self, target):
+        response = self.es.search(index=self.es_config['index'], doc_type="Annotation", body=self.make_target_list_query(target))
+        return [hit["_source"] for hit in response['hits']['hits']]
+
+    def make_target_query(self, target):
+        target_field = list(target.keys())[0]
+        list_field = "target.%s.keyword" % target_field
+        return {"query": {"match": {list_field: target[target_field]}}}
+
     def make_target_list_query(self, target):
         target_field = list(target.keys())[0]
-        list_field = "target_list.%s" % target_field
+        list_field = "target_list.%s.keyword" % target_field
         return {"query": {"match": {list_field: target[target_field]}}}
 
     def update_in_index(self, annotation, annotation_type):
