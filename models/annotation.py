@@ -143,11 +143,16 @@ class Annotation(object):
             info = self.get_selector_info(target["selector"], info)
         return info
 
-    def get_selector_info(self, selector, info):
-        if selector["type"] == "SubresourceSelector":
-            info += self.get_subresource_info(selector["value"]["subresource"])
-        if selector["type"] == "NestedPIDSelector":
-            info = selector["value"]
+    def get_selector_info(self, selectors, info):
+        if not selectors:
+            return info
+        if type(selectors) != list:
+            selectors = [selectors]
+        for selector in selectors:
+            if selector["type"] == "SubresourceSelector":
+                info += self.get_subresource_info(selector["value"]["subresource"])
+            if selector["type"] == "NestedPIDSelector":
+                info = selector["value"]
         return info
 
     def get_subresource_info(self, subresource):
@@ -168,11 +173,18 @@ class Annotation(object):
             ids = [target['source']] + self.get_selector_ids(target["selector"])
             return ids
 
-    def get_selector_ids(self, selector):
-        if selector["type"] == "SubresourceSelector":
-            return self.get_subresource_ids(selector["value"]["subresource"])
-        if selector["type"] == "NestedPIDSelector":
-            return [resource["id"] for resource in selector["value"]]
+    def get_selector_ids(self, selectors):
+        ids = []
+        if not selectors:
+            return ids
+        if type(selectors) != list:
+            selectors = [selectors]
+        for selector in selectors:
+            if selector["type"] == "SubresourceSelector":
+                ids += self.get_subresource_ids(selector["value"]["subresource"])
+            if selector["type"] == "NestedPIDSelector":
+                ids += [resource["id"] for resource in selector["value"]]
+        return ids
 
     def get_subresource_ids(self, subresource):
         ids = [subresource["id"]]

@@ -109,10 +109,10 @@ class TestAnnotationStoreIndex(unittest.TestCase):
         self.config = {
             "host": "localhost",
             "port": 9200,
-            "index": self.temp_index_name
+            "index": self.temp_index_name,
+            "page_size": 1000
         }
         self.store.configure_index(self.config)
-        self.store.es.indices.create(index=self.temp_index_name)
         self.example_annotation = copy.copy(examples["vincent"])
 
     def tearDown(self):
