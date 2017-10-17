@@ -156,7 +156,6 @@ class AnnotationsAPI(Resource):
     def post(self):
         new_annotation = request.get_json()
         response = annotation_store.add_annotation_es(new_annotation)
-        save_annotations()
         return response
 
 @api.doc(params={'annotation_id': 'The annotation ID'}, required=False)
@@ -173,12 +172,10 @@ class AnnotationAPI(Resource):
     def put(self, annotation_id):
         annotation = request.get_json()
         response_data = annotation_store.update_annotation_es(annotation)
-        save_annotations()
         return response_data
 
     def delete(self, annotation_id):
         response_data = annotation_store.remove_annotation_es(annotation_id)
-        save_annotations()
         return response_data
 
 
@@ -237,7 +234,6 @@ class CollectionsAPI(Resource):
         prefer = interpret_header(request.headers)
         collection_data = request.get_json()
         collection = annotation_store.create_collection_es(collection_data)
-        save_annotations()
         container = AnnotationContainer(request.url, collection, view=prefer["view"])
         return container.view()
 
@@ -264,14 +260,12 @@ class CollectionAPI(Resource):
         params = interpret_header(request.headers)
         collection_data = request.get_json()
         collection = annotation_store.update_collection_es(collection_data)
-        save_annotations()
         container = AnnotationContainer(request.url, collection, view=params["view"])
         return container.view()
 
     def delete(self, collection_id):
         params = interpret_header(request.headers)
         collection = annotation_store.remove_collection_es(collection_id)
-        save_annotations()
         #container = AnnotationContainer(request.url, collection, view=params["view"])
         #return container.view()
         return collection
@@ -301,13 +295,13 @@ class CollectionAnnotationsAPI(Resource):
 class CollectionAnnotationAPI(Resource):
 
     def get(self, collection_id, annotation_id):
-        return annotation_store.get_annotation_from_collection(annotation_id, collection_id)
+        return annotation_store.get_annotation_from_collection_es(annotation_id, collection_id)
 
     def put(self, collection_id, annotation_id):
         annotation_data = request.get_json()
         if annotation_data["id"] != annotation_id:
             raise AnnotationError(message="annotation id in annotation data does not correspond with annotation id in request URL")
-        return annotation_store.update_annotation_in_collection(annotation_data, collection_id)
+        return annotation_store.update_annotation_es(annotation_data)
 
     def delete(self, collection_id, annotation_id):
         return annotation_store.remove_annotation_from_collection_es(annotation_id, collection_id)

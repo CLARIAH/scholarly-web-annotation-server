@@ -9,9 +9,9 @@ from elasticsearch import Elasticsearch
 class AnnotationStore(object):
 
     def __init__(self, annotations=[]):
-        self.annotation_index = {}
-        self.collection_index = {}
-        self.target_index = defaultdict(list)
+        #self.annotation_index = {}
+        #self.collection_index = {}
+        #self.target_index = defaultdict(list)
         for annotation in annotations:
             self.add_annotation(annotation)
 
@@ -22,6 +22,7 @@ class AnnotationStore(object):
         if not self.es.indices.exists(index=self.es_index):
             self.es.indices.create(index=self.es_index)
 
+    """
     def create_collection(self, collection_data):
         collection = AnnotationCollection(collection_data)
         self.collection_index[collection.id] = collection
@@ -139,6 +140,7 @@ class AnnotationStore(object):
         if annotation_id in self.annotation_index:
             return True
         return False
+    """
 
     def add_annotation_es(self, annotation):
         # check if annotation is valid, add id and timestamp
