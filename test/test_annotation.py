@@ -141,6 +141,48 @@ class TestAnnotation(unittest.TestCase):
         # annotation must have a 'modified' timestamp
         self.assertTrue('modified' in self.annotation.data)
 
+    def test_annotation_can_get_target_ids(self):
+        target_ids = self.annotation.get_target_ids()
+        example_target = examples["vincent"]["target"][0]
+        self.assertTrue(example_target["id"] in target_ids)
+
+    def test_annotation_can_get_subresource_target_ids(self):
+        example = copy.copy(examples["vincent-subresource"])
+        example_selector = example["target"][0]["selector"]["value"]
+        annotation = Annotation(example)
+        target_ids = annotation.get_target_ids()
+        self.assertTrue(example["target"][0]["source"] in target_ids)
+        self.assertTrue(example_selector["subresource"]["id"] in target_ids)
+
+    def test_annotation_can_get_nestedpid_target_ids(self):
+        example = copy.copy(examples["vincent-nestedpid"])
+        example_selector = example["target"][0]["selector"]["value"]
+        annotation = Annotation(example)
+        target_ids = annotation.get_target_ids()
+        for resource in example_selector:
+            self.assertTrue(resource["id"] in target_ids)
+
+    def test_annotation_can_get_targets_info(self):
+        targets_info = self.annotation.get_targets_info()
+        example_target = examples["vincent"]["target"][0]
+        self.assertTrue(example_target["id"] in targets_info[0]["id"])
+
+    def test_annotation_can_get_subresource_targets_info(self):
+        example = copy.copy(examples["vincent-subresource"])
+        example_selector = example["target"][0]["selector"]["value"]
+        annotation = Annotation(example)
+        targets_info = annotation.get_targets_info()
+        self.assertTrue(example["target"][0]["source"] in targets_info[0]["id"])
+        self.assertTrue(example_selector["subresource"]["id"] in targets_info[1]["id"])
+
+    def test_annotation_can_get_nestedpid_targets_info(self):
+        example = copy.copy(examples["vincent-nestedpid"])
+        example_selector = example["target"][0]["selector"]["value"]
+        annotation = Annotation(example)
+        targets_info = annotation.get_targets_info()
+        for index, resource in enumerate(example_selector):
+            self.assertTrue(resource["id"] in targets_info[index]["id"])
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -49,6 +49,12 @@ class TestAnnotationContainer(unittest.TestCase):
         self.assertEqual(container.num_pages, 0)
         self.assertEqual(container.metadata['label'], self.collection.label)
 
+    def test_container_can_be_initialized_with_collection_as_json(self):
+        container = AnnotationContainer(self.base_url, self.collection.to_json())
+        self.assertEqual(container.page_size, 100)
+        self.assertEqual(container.num_pages, 0)
+        self.assertEqual(container.metadata['label'], self.collection.label)
+
     def test_container_can_generate_view(self):
         container = AnnotationContainer(self.base_url, self.collection)
         view = container.view()
@@ -56,6 +62,17 @@ class TestAnnotationContainer(unittest.TestCase):
         self.assertTrue("http://www.w3.org/ns/anno.jsonld", view["@context"])
         self.assertEqual(view["total"], 0)
         self.assertTrue("first" not in view.keys())
+
+    def test_container_can_be_initialized_with_annotations(self):
+        container = AnnotationContainer(self.base_url, self.annotations)
+        self.assertEqual(container.page_size, 100)
+        self.assertEqual(container.num_pages, 1)
+
+    def test_container_can_be_initialized_with_annotations_as_json(self):
+        annotations_as_json = [anno.data for anno in self.annotations]
+        container = AnnotationContainer(self.base_url, annotations_as_json)
+        self.assertEqual(container.page_size, 100)
+        self.assertEqual(container.num_pages, 1)
 
     def test_non_empty_container_view_has_first_and_last_page_references(self):
         container = AnnotationContainer(self.base_url, self.annotations)

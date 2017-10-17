@@ -114,15 +114,26 @@ def parse_prefer_header(data):
     return parsed
 
 def interpret_header(headers):
-    prefer = {
+    params = {
         "view": "PreferMinimalContainer"
     }
     if headers.get('Prefer'):
         parsed = parse_prefer_header(headers.get('Prefer'))
         if 'return' in parsed and parsed['return'] == 'representation':
-            prefer['view'] = parsed['include'].split('#')[1]
-    return prefer
+            params['view'] = parsed['include'].split('#')[1]
+    return params
 
+def parse_query_parameters(request, params):
+    params["page"] = 0
+    page = request.args.get('page')
+    if page != None:
+        params["page "]= int(page)
+        params["view"] = "PreferContainedIRIs"
+    iris = request.args.get('iris')
+    if iris != None:
+        params["iris"] = int(iris)
+        if params["iris"] == 0:
+            params["view"] = "PreferContainedDescriptions"
 
 """--------------- Annotation endpoints ------------------"""
 
@@ -133,9 +144,10 @@ class AnnotationsAPI(Resource):
     @api.response(200, 'Success', annotation_list_response)
     @api.response(404, 'Annotation Error')
     def get(self):
-        prefer = interpret_header(request.headers)
-        annotations = annotation_store.list_annotations()
-        container = AnnotationContainer(request.url, annotations, view=prefer["view"])
+        params = interpret_header(request.headers)
+        parse_query_parameters(request, params)
+        data = annotation_store.get_annotations_es(page=params["page"])
+        container = AnnotationContainer(request.url, data["annotations"], view=params["view"], total=data["total"])
         return container.view()
 
     @api.response(200, 'Success')
@@ -143,8 +155,7 @@ class AnnotationsAPI(Resource):
     @api.expect(annotation_model)
     def post(self):
         new_annotation = request.get_json()
-        response = annotation_store.add_annotation(new_annotation)
-        save_annotations()
+        response = annotation_store.add_annotation_es(new_annotation)
         return response
 
 @api.doc(params={'annotation_id': 'The annotation ID'}, required=False)
@@ -154,19 +165,17 @@ class AnnotationAPI(Resource):
     @api.response(200, 'Success', annotation_response)
     @api.response(404, 'Annotation does not exist')
     def get(self, annotation_id):
-        annotation = annotation_store.get_annotation(annotation_id)
+        annotation = annotation_store.get_annotation_es(annotation_id)
         response_data = annotation
         return response_data
 
     def put(self, annotation_id):
         annotation = request.get_json()
-        response_data = annotation_store.update_annotation(annotation)
-        save_annotations()
+        response_data = annotation_store.update_annotation_es(annotation)
         return response_data
 
     def delete(self, annotation_id):
-        response_data = annotation_store.remove_annotation(annotation_id)
-        save_annotations()
+        response_data = annotation_store.remove_annotation_es(annotation_id)
         return response_data
 
 
@@ -224,15 +233,14 @@ class CollectionsAPI(Resource):
     def post(self):
         prefer = interpret_header(request.headers)
         collection_data = request.get_json()
-        collection = annotation_store.create_collection(collection_data)
-        save_annotations()
+        collection = annotation_store.create_collection_es(collection_data)
         container = AnnotationContainer(request.url, collection, view=prefer["view"])
         return container.view()
 
     def get(self):
         prefer = interpret_header(request.headers)
         response_data = []
-        for collection in  annotation_store.retrieve_collections():
+        for collection in  annotation_store.get_collections_es():
             container = AnnotationContainer(request.url, collection, view=prefer["view"])
             response_data.append(container.view())
         return response_data
@@ -241,25 +249,26 @@ class CollectionsAPI(Resource):
 class CollectionAPI(Resource):
 
     def get(self, collection_id):
-        prefer = interpret_header(request.headers)
-        collection = annotation_store.retrieve_collection(collection_id)
-        container = AnnotationContainer(request.url, collection, view=prefer["view"])
+        params = interpret_header(request.headers)
+        collection = annotation_store.get_collection_es(collection_id)
+        if params["view"] == "PreferContainedDescriptions":
+            collection["items"] = annotation_store.get_annotations_by_id_es(collection["items"])
+        container = AnnotationContainer(request.url, collection, view=params["view"])
         return container.view()
 
     def put(self, collection_id):
-        prefer = interpret_header(request.headers)
-        data = request.get_json()
-        collection = annotation_store.update_collection(collection_id, data)
-        save_annotations()
-        container = AnnotationContainer(request.url, collection, view=prefer["view"])
+        params = interpret_header(request.headers)
+        collection_data = request.get_json()
+        collection = annotation_store.update_collection_es(collection_data)
+        container = AnnotationContainer(request.url, collection, view=params["view"])
         return container.view()
 
     def delete(self, collection_id):
-        prefer = interpret_header(request.headers)
-        collection = annotation_store.delete_collection(collection_id)
-        save_annotations()
-        container = AnnotationContainer(request.url, collection, view=prefer["view"])
-        return container.view()
+        params = interpret_header(request.headers)
+        collection = annotation_store.remove_collection_es(collection_id)
+        #container = AnnotationContainer(request.url, collection, view=params["view"])
+        #return container.view()
+        return collection
 
 @api.route("/api/collections/<collection_id>/annotations/")
 class CollectionAnnotationsAPI(Resource):
@@ -268,35 +277,34 @@ class CollectionAnnotationsAPI(Resource):
     @api.response(404, 'Invalid Annotation Error')
     @api.expect(annotation_model)
     def post(self, collection_id):
-        prefer = interpret_header(request.headers)
+        params = interpret_header(request.headers)
         annotation_data = request.get_json()
         if 'id' not in annotation_data.keys():
-            annotation = annotation_store.add_annotation(annotation_data)
-            annotation_data = annotation.data
-        collection = annotation_store.add_annotation_to_collection(annotation_data['id'], collection_id)
-        container = AnnotationContainer(request.url, collection, view=prefer["view"])
+            annotation_data = annotation_store.add_annotation_es(annotation_data)
+        collection = annotation_store.add_annotation_to_collection_es(annotation_data['id'], collection_id)
+        container = AnnotationContainer(request.url, collection, view=params["view"])
         return container.view()
 
     def get(self, collection_id):
-        prefer = interpret_header(request.headers)
-        collection = annotation_store.retrieve_collection(collection_id)
-        container = AnnotationContainer(request.url, collection.items, view=prefer["view"])
+        params = interpret_header(request.headers)
+        collection = annotation_store.get_collection_es(collection_id)
+        container = AnnotationContainer(request.url, collection.items, view=params["view"])
         return container.view()
 
 @api.route("/api/collections/<collection_id>/annotations/<annotation_id>")
 class CollectionAnnotationAPI(Resource):
 
     def get(self, collection_id, annotation_id):
-        return annotation_store.get_annotation_from_collection(annotation_id, collection_id)
+        return annotation_store.get_annotation_from_collection_es(annotation_id, collection_id)
 
     def put(self, collection_id, annotation_id):
         annotation_data = request.get_json()
         if annotation_data["id"] != annotation_id:
             raise AnnotationError(message="annotation id in annotation data does not correspond with annotation id in request URL")
-        return annotation_store.update_annotation_in_collection(annotation_data, collection_id)
+        return annotation_store.update_annotation_es(annotation_data)
 
     def delete(self, collection_id, annotation_id):
-        return annotation_store.remove_annotation_from_collection(annotation_id, collection_id)
+        return annotation_store.remove_annotation_from_collection_es(annotation_id, collection_id)
 
 @api.route("/api/pages/<page_id>")
 class PageAPI(Resource):
@@ -323,7 +331,6 @@ app.register_blueprint(blueprint)
 if __name__ == "__main__":
     annotations_file = "data/annotations.json"
     app.config.update(DATAFILE=annotations_file)
-    load_annotations()
     resource_config = {
         "resource_file": "data/resource.pickle",
         "triple_file": "data/vocabularies.ttl",
@@ -332,9 +339,16 @@ if __name__ == "__main__":
     annotation_config = {
         "collections_file": "data/annotation_collections.pickle",
         "pages_file": "data/annotation_pages.pickle",
-        "annotations_file": "data/annotations.pickle"
+        "annotations_file": "data/annotations.pickle",
+        "Elasticsearch": {
+            "host": "localhost",
+            "port": 9200,
+            "index": "swa",
+            "page_size": 1000
+        }
     }
-    annotation_store.configure(annotation_config)
+    annotation_store.configure_index(annotation_config["Elasticsearch"])
+    load_annotations()
     resource_store = ResourceStore(resource_config)
     app.run(port=int(os.environ.get("PORT", 3000)), debug=True, threaded=True)
 

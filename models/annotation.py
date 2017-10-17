@@ -127,16 +127,70 @@ class Annotation(object):
         else:
             return [self.data['target']]
 
+    def get_targets_info(self):
+        return [target_info for target in self.get_targets() for target_info in self.get_target_info(target)]
+
+    def get_target_info(self, target):
+        info = []
+        if type(target) == str:
+            info = [{"id": target}]
+        if "id" in target:
+            info = [{"id": target["id"]}]
+            if "type" in target:
+                info[0]["type"] = target["type"]
+        if "source" in target and "selector" in target:
+            info = [{"id": target["source"], "type": target["type"]}]
+            info = self.get_selector_info(target["selector"], info)
+        return info
+
+    def get_selector_info(self, selectors, info):
+        if not selectors:
+            return info
+        if type(selectors) != list:
+            selectors = [selectors]
+        for selector in selectors:
+            if selector["type"] == "SubresourceSelector":
+                info += self.get_subresource_info(selector["value"]["subresource"])
+            if selector["type"] == "NestedPIDSelector":
+                info = selector["value"]
+        return info
+
+    def get_subresource_info(self, subresource):
+        info = [{"id": subresource["id"], "type": subresource["type"]}]
+        if "subresource" in subresource:
+            info += self.get_subresource_info(subresource["subresource"])
+        return info
+
     def get_target_ids(self):
-        return [self.get_target_id(target) for target in self.get_targets()]
+        return [target_id for target in self.get_targets() for target_id in self.get_target_id(target)]
 
     def get_target_id(self, target):
         if type(target) == str:
-            return target
-        if type(target) == dict:
-            if 'id' in target:
-                return target['id']
-            return target['source']
+            return [target]
+        if 'id' in target:
+            return [target['id']]
+        if 'source' in target and 'selector' in target:
+            ids = [target['source']] + self.get_selector_ids(target["selector"])
+            return ids
+
+    def get_selector_ids(self, selectors):
+        ids = []
+        if not selectors:
+            return ids
+        if type(selectors) != list:
+            selectors = [selectors]
+        for selector in selectors:
+            if selector["type"] == "SubresourceSelector":
+                ids += self.get_subresource_ids(selector["value"]["subresource"])
+            if selector["type"] == "NestedPIDSelector":
+                ids += [resource["id"] for resource in selector["value"]]
+        return ids
+
+    def get_subresource_ids(self, subresource):
+        ids = [subresource["id"]]
+        if "subresource" in subresource:
+            ids += self.get_subresource_ids(subresource["subresource"])
+        return ids
 
     def update(self, updated_annotation):
         self.validator.validate(updated_annotation)
