@@ -159,7 +159,7 @@ Below is an example of a full annotation using these two selectors as alternativ
 							}
 						}
 					}
-				}
+				},
 				"refinedBy": {
 					"type": "TextPositionSelector",
 					"start": 76,
@@ -168,7 +168,7 @@ Below is an example of a full annotation using these two selectors as alternativ
 			}
 		]
 	}
-]
+}
 
 ```
 
