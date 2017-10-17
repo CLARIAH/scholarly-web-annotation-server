@@ -13,7 +13,7 @@ Jaap Blom proposed a new type of selector to take care of this, called a NestedP
 Example:
 
 ```
-“target”: {
+"target": {
     "source": "urn:vangogh:testletter",
     "type": "Letter",
     "selector": {
@@ -22,12 +22,12 @@ Example:
             {
                 "id": "urn:vangogh:correspondence",
                 "type": ["Correspondence"],
-                “property”: “isPartOf”
+                "property": "isPartOf"
             },
             {
                 "id": "urn:vangogh:testletter",
                 "type": ["Letter"],
-                “property”: “hasPart”
+                "property": "hasPart"
             },
             {
                 "id": "urn:vangogh:testletter.translation",
@@ -40,10 +40,10 @@ Example:
                 "property": "hasPart"
             }
         ],
-        “refinedBy”: {
-            “type”: “TextPositionSelector”,
-            “start”: 76,
-            “end”: 86
+        "refinedBy": {
+            "type": "TextPositionSelector",
+            "start": 76,
+            "end": 86
         }
     }
 }
@@ -54,7 +54,7 @@ To select a fragment of the deepest PID, a `refinedBy` selector is added. **Note
 A more explicit alternative would be a `SubresourceSelector` that nests all subresources, again, starting from the larger `Correspondence`. 
 
 ```
-“target”: {
+"target": {
     "source": "urn:vangogh:testletter",
     "type": "Letter",
     "selector": {
@@ -62,15 +62,15 @@ A more explicit alternative would be a `SubresourceSelector` that nests all subr
         "value": {
             "id": "urn:vangogh:correspondence",
             "type": ["Correspondence"],
-            “subresource”: {
+            "subresource": {
                 "id": "urn:vangogh:testletter",
                 "type": ["Letter"],
-                “property”: “hasPart”,
-                “subresource”: {
+                "property": "hasPart",
+                "subresource": {
                     "id": "urn:vangogh:testletter.translation",
                     "type": "Translation",
                     "property": "hasTranslation",
-                    “subresource”: {
+                    "subresource": {
                         "id": "urn:vangogh:testletter:translation:p.1",
                         "type": ["Paragraphinletter", "Text"],
                         "property": "hasPart"
@@ -78,10 +78,10 @@ A more explicit alternative would be a `SubresourceSelector` that nests all subr
                 }
             },
         }
-        “refinedBy”: {
-            “type”: “TextPositionSelector”,
-            “start”: 76,
-            “end”: 86
+        "refinedBy": {
+            "type": "TextPositionSelector",
+            "start": 76,
+            "end": 86
         }
     }
 }
@@ -105,7 +105,7 @@ Below is an example of a full annotation using these two selectors as alternativ
 			"vocabulary": "DBpedia"
 		}
 	],
-	“target”: {
+	"target": {
 		"source": "urn:vangogh:testletter",
 		"type": "Letter",
 		"selector": [
@@ -115,12 +115,12 @@ Below is an example of a full annotation using these two selectors as alternativ
 					{
 						"id": "urn:vangogh:correspondence",
 						"type": ["Correspondence"],
-						“property”: “isPartOf”
+						"property": "isPartOf"
 					},
 					{
 						"id": "urn:vangogh:testletter",
 						"type": ["Letter"],
-						“property”: “hasPart”
+						"property": "hasPart"
 					},
 					{
 						"id": "urn:vangogh:testletter.translation",
@@ -133,10 +133,10 @@ Below is an example of a full annotation using these two selectors as alternativ
 						"property": "hasPart"
 					}
 				],
-				“refinedBy”: {
-					“type”: “TextPositionSelector”,
-					“start”: 76,
-					“end”: 86
+				"refinedBy": {
+					"type": "TextPositionSelector",
+					"start": 76,
+					"end": 86
 				}
 			},
 			{
@@ -144,15 +144,15 @@ Below is an example of a full annotation using these two selectors as alternativ
 				"value": {
 					"id": "urn:vangogh:correspondence",
 					"type": ["Correspondence"],
-					“subresource”: {
+					"subresource": {
 						"id": "urn:vangogh:testletter",
 						"type": ["Letter"],
-						“property”: “hasPart”,
-						“subresource”: {
+						"property": "hasPart",
+						"subresource": {
 							"id": "urn:vangogh:testletter.translation",
 							"type": "Translation",
 							"property": "hasTranslation",
-							“subresource”: {
+							"subresource": {
 								"id": "urn:vangogh:testletter:translation:p.5",
 								"type": ["Paragraphinletter", "Text"],
 								"property": "hasPart"
@@ -160,10 +160,10 @@ Below is an example of a full annotation using these two selectors as alternativ
 						}
 					}
 				}
-				“refinedBy”: {
-					“type”: “TextPositionSelector”,
-					“start”: 76,
-					“end”: 86
+				"refinedBy": {
+					"type": "TextPositionSelector",
+					"start": 76,
+					"end": 86
 				}
 			}
 		]
