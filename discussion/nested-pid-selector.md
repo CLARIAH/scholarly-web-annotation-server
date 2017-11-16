@@ -1,10 +1,15 @@
 # Proposal for a new nested resource selector
 
-The annotation server should be able to fetch all annotations that target a resource or one of its subresources. Either the annotation only contains information on the specific (sub)resource it targets, and there is a separate index in the server to keep track of how resources and subresources are related to each other, or the information on resource structure is stored in each annotation. 
+The annotation server should be able to fetch all annotations that target a resource or one of its subresources, including annotations on top of an annotation that targets the (sub)resource, whereby each (sub)resource has its own `id` and the annotations adhere to the [W3C Web Annotation data model](https://www.w3.org/TR/annotation-model/). Conceptually, the resources and annotations form a (directed acyclic) graph. There are two ways to communicate between client and server:
 
-The latter results in more replication of information (all annotations on a subsubresource of a document contain the full path from the document to the subsubresource), but has the advantages that individual annotations are easier to interpret out of context and that the server is easier to understand, as it only has an annotation index.
+1. annotations only contain information on the specific (sub)resource they target. Information about how resources and subresources are related to each other is submitted to the server separately. The server keep track of the resource structure information in a separate index.
+2. the information on resource structure is stored in each annotation, so the `target` field of an annotation contains a branch from resource to the most specific subresource of that resource that is targeted.  
+
+The latter results in more replication of information (all annotations on the same subresource of a document contain the full path from the document to the subresource), but has the advantages that individual annotations are easier to interpret out of context, as they are more verbose, and that the server is easier to understand, as the only objects that are exchanged are annotations.
 
 To make this possible, a new type of selector is needed that can store a nested resource structure information.
+
+As an example, consider a digital edition of a letter written by Vincent Van Gogh, with an annotation targeting a fragment of the first paragraph of a translated version of that letter. A second annotation targets the first annotation. When the client ask for all annotations of either 1) the letter, 2) the translated version, or 3) the first paragraph of the translated version, the server should return both annotations. 
 
 ## Selector proposals
 
@@ -87,7 +92,7 @@ A more explicit alternative would be a `SubresourceSelector` that nests all subr
 }
 ```
 
-Below is an example of a full annotation using these two selectors as alternatives:
+Below is an example of a full annotation using these two selectors as alternatives of each other:
 
 ```json
 {
@@ -153,7 +158,7 @@ Below is an example of a full annotation using these two selectors as alternativ
 							"type": "Translation",
 							"property": "hasTranslation",
 							"subresource": {
-								"id": "urn:vangogh:testletter:translation:p.5",
+								"id": "urn:vangogh:testletter:translation:p.1",
 								"type": ["Paragraphinletter", "Text"],
 								"property": "hasPart"
 							}
@@ -179,13 +184,13 @@ Requirements:
 1. fetch all annotations targeting:
     - 1a. specific resource or one of its subresources, 
     - 1b. and annotations on those annotations.
-2. when updating one annotations, ensure annotations on that annotation are updated where necessary.
+2. when updating one annotation, other annotations that target that annotation should be updated where necessary.
 
-Requirement 1 is achiedved by adding a `target_list` field in the annotation upon indexing that annotation. The `target_list` field is removed by the server when passing the annotation to a client. That is, the `target_list` is only used internally for retrieval. 
+**Note: neither of the two proposed selectors above meet requirement 1b. An annotation *a_1* that targets another annotation *a_2* does not contain information about the resources that *a_2* targets, so will not directly match requests for annotations on the targets of *a_1*.**
 
-**Note that the target list also contains a list of resources for annotations on annotations, therefore, is more powerful than the NestedPIDSelector.** An annnotation that targets the annotation example above has a target list that includes the example annotation as well as the path of (sub)resources that the example annotation targets. **The NestedPIDSelector does not meet requirement 1b.**
+Requirement 1b can be fulfilled by adding a `target_list` field in the annotation upon indexing that annotation, and adding the `id`s of all (sub)resource targets of the annotation itself to the `target_list`, as well as of all annotations that it targets and their (sub)resource targets. The `target_list` field is removed by the server when passing the annotation to a client. That is, the `target_list` is only used internally for retrieval. 
 
-The target list contains both `id` and `type` information of each (sub)resource, so that annotations can be retrieved for specific resources as well as resource types.
+The full example annotation above will have the following `target_list`:
 
 ```json
 {
@@ -210,3 +215,35 @@ The target list contains both `id` and `type` information of each (sub)resource,
 }
 ```
 
+An annotation that target the full example annotation will have the following `target_list`:
+
+```json
+{
+    "target_list": [
+    	{
+	    "id": "urn:uuid:6273d09b-0ec2-4d90-955b-90aeece1aecd",
+	    "type": ["Annotation"]
+	},
+        {
+            "id": "urn:vangogh:correspondence",
+            "type": ["Correspondence"],
+        },
+        {
+            "id": "urn:vangogh:testletter",
+            "type": ["Letter"],
+        },
+        {
+            "id": "urn:vangogh:testletter.translation",
+            "type": "Translation",
+        },
+        {
+            "id": "urn:vangogh:testletter:translation:p.1",
+            "type": ["Paragraphinletter", "Text"],
+        }
+    ]
+}
+```
+
+To be more context-independent, the `target_list` can contain not only the `id` but also `type` and `property` information of each (sub)resource and annotation, so that annotations can be retrieved for specific resources as well as for specific resource types.
+
+**Note that if the example annotation is updated with a different list of targets, the `target_list` fields of both annotations need to be updated.**
