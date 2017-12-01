@@ -6,7 +6,6 @@ import tempfile
 import annotation_server as server
 from annotation_examples import annotations as examples, annotation_collections as example_collections
 from models.annotation_store import AnnotationStore
-from models.resource import ResourceStore
 
 tempfiles = []
 
@@ -70,9 +69,9 @@ class TestAnnotationAPI(unittest.TestCase):
 
     def test_GET_annotations_returns_annotation_container(self):
         headers = {"Prefer": 'return=representation;include="http://www.w3.org/ns/oa#PreferContainedDescriptions"'}
-        example = add_example(self.app)
+        add_example(self.app)
         server.annotation_store.es.indices.refresh(self.temp_index_name)
-        response = self.app.get('/api/annotations')
+        response = self.app.get('/api/annotations', headers=headers)
         container = get_json(response)
         self.assertTrue("AnnotationContainer" in container["type"])
         self.assertEqual(container["total"], 1)

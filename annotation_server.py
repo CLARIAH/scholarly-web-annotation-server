@@ -6,7 +6,6 @@ from flask.ext.cors import CORS
 from models.annotation_store import AnnotationStore
 from models.annotation import AnnotationError
 from models.annotation_container import AnnotationContainer
-from models.resource import ResourceStore, ResourceError
 
 app = Flask(__name__, static_url_path='', static_folder='public')
 cors = CORS(app)
@@ -15,7 +14,6 @@ blueprint = Blueprint('api', __name__)
 api = Api(blueprint)
 
 annotation_store = AnnotationStore()
-resource_store = None
 
 """--------------- Error handling ------------------"""
 
@@ -36,10 +34,6 @@ class InvalidUsage(Exception):
 
 @api.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):
-    return error.to_dict(), error.status_code
-
-@api.errorhandler(ResourceError)
-def handle_invalid_resource(error):
     return error.to_dict(), error.status_code
 
 @api.errorhandler(AnnotationError)
@@ -181,48 +175,15 @@ class AnnotationAPI(Resource):
 
 """--------------- Resource endpoints ------------------"""
 
-
-@api.route("/api/resources")
-class ResourcesAPI(Resource):
-
-    def post(self):
-        resource_map = request.get_json()
-        return resource_store.register_by_map(resource_map)
-
-    def get(self):
-        return resource_store.get_resources()
-
-@api.route("/api/resources/<resource_id>")
-class ResourceAPI(Resource):
-
-    def get(self, resource_id):
-        return resource_store.get_resource(resource_id).json()
-
 @api.route('/api/resources/<resource_id>/annotations')
 class ResourceAnnotationsAPI(Resource):
 
     def get(self, resource_id):
         annotations = []
-        if resource_store.has_resource(resource_id):
-            resource_ids = resource_store.get_resource(resource_id).list_members()
-            annotations = annotation_store.get_annotations_by_targets(resource_ids)
+        annotations = annotation_store.get_annotations_by_target_es({"id": resource_id})
+        for annotation in annotations:
+            print(annotation)
         return annotations
-
-@api.route('/api/resources/<resource_id>/structure')
-class ResourceStructureAPI(Resource):
-
-    def get(self, resource_id):
-        if resource_store.has_resource(resource_id):
-            return resource_store.generate_resource_map(resource_id)
-        else:
-            raise ResourceError(message="unknown resource")
-
-    def post(self, resource_id):
-        resource_map = request.get_json()
-        if resource_map["id"] != resource_id:
-            raise ResourceError(message="resource id in map does not correspond with resource id in request URL")
-        return resource_store.register_by_map(resource_map)
-
 
 """--------------- Collection endpoints ------------------"""
 
@@ -264,7 +225,7 @@ class CollectionAPI(Resource):
         return container.view()
 
     def delete(self, collection_id):
-        params = interpret_header(request.headers)
+        #params = interpret_header(request.headers)
         collection = annotation_store.remove_collection_es(collection_id)
         #container = AnnotationContainer(request.url, collection, view=params["view"])
         #return container.view()
@@ -320,26 +281,12 @@ class LoginAPI(Resource):
         user_details = request.get_json()
         return user_details
 
-def save_annotations():
-    annotation_store.save_annotations(app.config['DATAFILE'])
-
-def load_annotations():
-    annotation_store.load_annotations(app.config['DATAFILE'])
-
 app.register_blueprint(blueprint)
 
 if __name__ == "__main__":
     annotations_file = "data/annotations.json"
     app.config.update(DATAFILE=annotations_file)
-    resource_config = {
-        "resource_file": "data/resource.pickle",
-        "triple_file": "data/vocabularies.ttl",
-        "url_file": "data/vocabulary_refs.json"
-    }
     annotation_config = {
-        "collections_file": "data/annotation_collections.pickle",
-        "pages_file": "data/annotation_pages.pickle",
-        "annotations_file": "data/annotations.pickle",
         "Elasticsearch": {
             "host": "localhost",
             "port": 9200,
@@ -348,7 +295,5 @@ if __name__ == "__main__":
         }
     }
     annotation_store.configure_index(annotation_config["Elasticsearch"])
-    load_annotations()
-    resource_store = ResourceStore(resource_config)
     app.run(port=int(os.environ.get("PORT", 3000)), debug=True, threaded=True)
 
