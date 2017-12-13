@@ -17,6 +17,22 @@ class AnnotationStore(object):
         self.es = Elasticsearch([{"host": self.es_config['host'], "port": self.es_config['port']}])
         if not self.es.indices.exists(index=self.es_index):
             self.es.indices.create(index=self.es_index)
+        self.needs_refresh = False
+
+    def index_needs_refresh(self):
+        return self.needs_refresh
+
+    def index_refresh(self):
+        self.es.indices.refresh(index=self.es_config["index"])
+        self.needs_refresh = False
+
+    def set_index_needs_refresh(self):
+        self.needs_refresh = True
+
+    def check_index_is_fresh(self):
+        # check index is up to date, refresh if needed
+        if self.index_needs_refresh():
+            self.index_refresh()
 
     def add_annotation_es(self, annotation):
         # check if annotation is valid, add id and timestamp
@@ -30,6 +46,8 @@ class AnnotationStore(object):
         self.add_to_index(anno.data, annotation["type"])
         # remove target_list for returning annotation
         del anno.data["target_list"]
+        # set index needs refresh before next GET
+        self.set_index_needs_refresh()
         # return annotation to caller
         return anno.data
 
@@ -41,6 +59,8 @@ class AnnotationStore(object):
             self.should_not_exist(collection_data['id'], collection_data['type'])
         # index collection
         self.add_to_index(collection.to_json(), collection_data["type"])
+        # set index needs refresh before next GET
+        self.set_index_needs_refresh()
         # return collection to caller
         return collection.to_json()
 
@@ -57,10 +77,14 @@ class AnnotationStore(object):
         collection["items"] += [annotation_id]
         collection["total"] = len(collection["items"])
         self.update_in_index(collection, "AnnotationCollection")
+        # set index needs refresh before next GET
+        self.set_index_needs_refresh()
         # return collection metadata
         return collection
 
     def get_annotation_es(self, annotation_id):
+        # check index is up to date, refresh if needed
+        self.check_index_is_fresh()
         # check that annotation exists (and is not deleted)
         self.should_exist(annotation_id, "Annotation")
         # get annotation from index
@@ -69,15 +93,21 @@ class AnnotationStore(object):
         return annotation
 
     def get_annotations_es(self, page=0):
+        # check index is up to date, refresh if needed
+        self.check_index_is_fresh()
         params = {"from": page * self.es_config["page_size"], "size": self.es_config["page_size"]}
         response = self.es.search(index=self.es_config['index'], doc_type="Annotation", body=params)
         return {"total": response["hits"]["total"], "annotations": [hit["_source"] for hit in response["hits"]["hits"]]}
 
     def get_annotations_by_id_es(self, annotation_ids):
+        # check index is up to date, refresh if needed
+        self.check_index_is_fresh()
         response = self.es.mget(index=self.es_config['index'], doc_type="Annotation", body={"ids": annotation_ids})
         return [hit["_source"] for hit in response["hits"]["hits"]]
 
     def get_collection_es(self, collection_id):
+        # check index is up to date, refresh if needed
+        self.check_index_is_fresh()
         # check that collection exists (and is not deleted)
         self.should_exist(collection_id, "AnnotationCollection")
         # get collection from index
@@ -89,6 +119,8 @@ class AnnotationStore(object):
         return {"total": response["hits"]["total"], "collections": [hit["_source"] for hit in response["hits"]["hits"]]}
 
     def get_annotations_by_target_es(self, annotation_target):
+        # check index is up to date, refresh if needed
+        self.check_index_is_fresh()
         # get annotation from index
         annotations = self.get_from_index_by_target_list(annotation_target)
         for annotation in annotations:
@@ -116,6 +148,8 @@ class AnnotationStore(object):
             self.update_chained_annotations(annotation.id)
         # remove target_list for returning annotation
         del annotation.data["target_list"]
+        # set index needs refresh before next GET
+        self.set_index_needs_refresh()
         # return annotation to caller
         return annotation.data
 
@@ -134,9 +168,13 @@ class AnnotationStore(object):
         collection = AnnotationCollection(self.get_from_index(collection_json["id"], "AnnotationCollection"))
         collection.update(collection_json)
         self.update_in_index(collection.to_json(), "AnnotationCollection")
+        # set index needs refresh before next GET
+        self.set_index_needs_refresh()
         return collection.to_json()
 
     def remove_annotation_es(self, annotation_id):
+        # check index is up to date, refresh if needed
+        self.check_index_is_fresh()
         # check if annotation already exists
         self.should_exist(annotation_id, "Annotation")
         # remove annotation from index
@@ -153,6 +191,8 @@ class AnnotationStore(object):
         return deleted_annotation
 
     def remove_annotation_from_collection_es(self, annotation_id, collection_id):
+        # check index is up to date, refresh if needed
+        self.check_index_is_fresh()
         # check if annotation exists
         self.should_exist(annotation_id, "Annotation")
         # check if collection exists
@@ -170,6 +210,8 @@ class AnnotationStore(object):
         return collection
 
     def remove_collection_es(self, collection_id):
+        # check index is up to date, refresh if needed
+        self.check_index_is_fresh()
         # check if collection already exists
         self.should_exist(collection_id, "AnnotationCollection")
         # remove collection from index
@@ -182,6 +224,10 @@ class AnnotationStore(object):
         }
         self.add_to_index(deleted_collection, "AnnotationCollection")
         return deleted_collection
+
+    ####################
+    # Helper functions #
+    ####################
 
     def target_list_changed(self, list1, list2):
         ids1 = set([target["id"] for target in list1])
@@ -221,6 +267,10 @@ class AnnotationStore(object):
             if type(target["type"]) == list and "Annotation" in target["type"]:
                 return True
         return False
+
+    ###################
+    # ES interactions #
+    ###################
 
     def add_to_index(self, annotation, annotation_type):
         self.should_not_exist(annotation['id'], annotation_type)
