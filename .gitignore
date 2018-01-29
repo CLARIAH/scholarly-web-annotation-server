@@ -3,6 +3,9 @@ node_modules/
 npm-debug.log
 *.pyc
 
+# never commit real settings
+settings.py
+
 # specific ignore
 experimental_server.py
 public/delpher.html
