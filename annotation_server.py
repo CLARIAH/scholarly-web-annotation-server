@@ -7,6 +7,8 @@ from models.annotation_store import AnnotationStore
 from models.annotation import AnnotationError
 from models.annotation_container import AnnotationContainer
 
+from settings import server_config
+
 app = Flask(__name__, static_url_path='', static_folder='public')
 cors = CORS(app)
 #api = Api(app)
@@ -128,6 +130,9 @@ def parse_query_parameters(request, params):
         params["iris"] = int(iris)
         if params["iris"] == 0:
             params["view"] = "PreferContainedDescriptions"
+    annotation_type = request.args.get('type')
+    if annotation_type != None:
+        params['type'] = annotation_type
 
 """--------------- Annotation endpoints ------------------"""
 
@@ -181,8 +186,6 @@ class ResourceAnnotationsAPI(Resource):
     def get(self, resource_id):
         annotations = []
         annotations = annotation_store.get_annotations_by_target_es({"id": resource_id})
-        for annotation in annotations:
-            print(annotation)
         return annotations
 
 """--------------- Collection endpoints ------------------"""
@@ -201,7 +204,8 @@ class CollectionsAPI(Resource):
     def get(self):
         prefer = interpret_header(request.headers)
         response_data = []
-        for collection in  annotation_store.get_collections_es():
+        collection_data = annotation_store.get_collections_es()
+        for collection in collection_data["collections"]:
             container = AnnotationContainer(request.url, collection, view=prefer["view"])
             response_data.append(container.view())
         return response_data
@@ -284,16 +288,6 @@ class LoginAPI(Resource):
 app.register_blueprint(blueprint)
 
 if __name__ == "__main__":
-    annotations_file = "data/annotations.json"
-    app.config.update(DATAFILE=annotations_file)
-    annotation_config = {
-        "Elasticsearch": {
-            "host": "localhost",
-            "port": 9200,
-            "index": "swa",
-            "page_size": 1000
-        }
-    }
-    annotation_store.configure_index(annotation_config["Elasticsearch"])
+    annotation_store.configure_index(server_config["Elasticsearch"])
     app.run(port=int(os.environ.get("PORT", 3000)), debug=True, threaded=True)
 
