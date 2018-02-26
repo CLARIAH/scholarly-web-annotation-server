@@ -2,6 +2,7 @@ import json
 import datetime
 import pytz
 import uuid
+import copy
 from rfc3987 import parse as parse_IRI
 
 class WebAnnotationValidator(object):
@@ -102,8 +103,37 @@ class Annotation(object):
         self.validator = WebAnnotationValidator()
         self.validator.validate(annotation)
         self.data = annotation
+        self.type = "Annotation"
         self.id = annotation['id']
         self.in_collection = []
+        self.set_permissions()
+        self.set_target_list()
+
+    def set_permissions(self):
+        if "permissions" in self.data:
+            self.permissions = self.data["permissions"]
+            del self.data["permissions"]
+        else:
+            self.permissions = None
+
+    def set_target_list(self):
+        if "target_list" in self.data:
+            self.target_list = self.data["target_list"]
+            del self.data["target_list"]
+        else:
+            self.target_list = None
+
+    def to_json(self):
+        annotation_json = copy.copy(self.data)
+        annotation_json["permissions"] = self.permissions
+        annotation_json["target_list"] = self.target_list
+        return annotation_json
+
+    def to_clean_json(self):
+        return self.data
+
+    def get_permissions(self):
+        return self.permissions
 
     def has_target(self, target_id):
         if not self.get_targets():

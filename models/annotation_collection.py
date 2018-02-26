@@ -1,6 +1,7 @@
 import uuid
 import datetime
 import pytz
+import copy
 from models.annotation import AnnotationError
 
 class AnnotationCollection(object):
@@ -25,6 +26,13 @@ class AnnotationCollection(object):
             self.items = data['items']
         else:
             self.items = []
+        self.set_permissions(data)
+
+    def set_permissions(self, data):
+        self.permissions = data["permissions"] if "permissions" in data else None
+
+    def get_permissions(self):
+        return self.permissions
 
     def update(self, data):
         self.creator = data["creator"]
@@ -55,8 +63,8 @@ class AnnotationCollection(object):
     def size(self):
         return len(self.items)
 
-    def to_json(self):
-        collection = {
+    def base_json(self):
+        return {
             "@context": "http://www.w3.org/ns/anno.jsonld",
             "id": self.id,
             "type": self.type,
@@ -66,7 +74,14 @@ class AnnotationCollection(object):
             "total": self.size(),
             "items": self.items
         }
+
+    def to_clean_json(self):
+        return self.base_json()
+
+    def to_json(self):
+        collection = self.base_json()
         if self.modified:
             collection["modified"] = self.modified
+        collection["permissions"] = copy.copy(self.permissions)
         return collection
 
