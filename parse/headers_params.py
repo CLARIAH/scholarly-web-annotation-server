@@ -14,6 +14,8 @@ def get_params(request, anon_allowed=True):
     #print("page view params parsed")
     determine_annotation_type(request, params)
     #print("annotation type params parsed")
+    determine_representation(request, params)
+    parse_search_parameters(request, params)
     return params
 
 """--------------- Parse Request Headers ------------------"""
@@ -31,13 +33,13 @@ def interpret_header(headers, params, anon_allowed):
 
 def parse_prefer_header(headers):
     prefer = {}
-    if not headers.get('Prefer'):
+    if not headers.get("Prefer"):
         return prefer
-    for part in headers.get('Prefer').strip().split(';'):
-        key, value = part.split('=')
+    for part in headers.get("Prefer").strip().split(";"):
+        key, value = part.split("=")
         prefer[key] = value.strip('"').strip("'")
-    if 'return' in prefer and prefer['return'] == 'representation':
-        prefer['view'] = prefer['include'].split('#')[1]
+    if "return" in prefer and prefer["return"] == "representation":
+        prefer["view"] = prefer["include"].split("#")[1]
     return prefer
 
 def determine_view_preference(headers):
@@ -49,16 +51,17 @@ def determine_view_preference(headers):
 
 def determine_access(request, params):
     params["access_status"] = get_access_status(request)
-    if params["access_status"] == "shared":
+    if params["access_status"] and "shared" in params["access_status"]:
         get_share_permissions(request, params)
 
 def get_access_status(request):
     status_options = ["private", "shared", "public"]
-    access_status = request.args.get('access_status')
-    if not access_status:
+    if not request.args.get("access_status"):
         return None
-    if access_status and access_status not in status_options:
-        raise InvalidUsage("'access_status' parameter should be either 'private', 'shared' or 'public'")
+    access_status = request.args.get("access_status").split(",")
+    for access_level in access_status:
+        if access_level not in status_options:
+            raise InvalidUsage("'access_status' parameter should be either 'private', 'shared' or 'public'")
     return access_status
 
 def get_share_permissions(request, params):
@@ -69,19 +72,31 @@ def get_share_permissions(request, params):
 
 def determine_page_view(request, params):
     params["page"] = 0
-    page = request.args.get('page')
+    page = request.args.get("page")
     if page != None:
         params["page "]= int(page)
         params["view"] = "PreferContainedIRIs"
-    iris = request.args.get('iris')
+    iris = request.args.get("iris")
     if iris != None:
         params["iris"] = int(iris)
         if params["iris"] == 0:
             params["view"] = "PreferContainedDescriptions"
 
 def determine_annotation_type(request, params):
-    annotation_type = request.args.get('type')
+    annotation_type = request.args.get("type")
     if annotation_type != None:
-        params['type'] = annotation_type
+        params["type"] = annotation_type
+
+def determine_representation(request, params):
+    include = request.args.get("include_permissions")
+    params["include_permissions"] = False
+    if include and include == "true":
+        params["include_permissions"] = True
+
+def parse_search_parameters(request, params):
+    if request.args.get("target_id"):
+        params["filter"] = {"target_id": request.args.get("target_id").split(",")}
+    if request.args.get("target_type"):
+        params["filter"] = {"target_type": request.args.get("target_type").split(",")}
 
 

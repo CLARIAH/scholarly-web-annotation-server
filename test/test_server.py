@@ -3,30 +3,12 @@ import base64
 import copy
 import os
 import json
-import tempfile
 from elasticsearch import Elasticsearch
 import annotation_server as server
 from annotation_examples import annotations as examples, annotation_collections as example_collections
 from models.annotation_store import AnnotationStore
 from models.user_store import UserStore
 from models.user import User
-
-tempfiles = []
-
-def make_tempfile():
-    _, fname = tempfile.mkstemp()
-    tempfiles.append(fname)
-    return fname
-
-def remove_tempfiles():
-    global tempfiles
-    for tmpfile in tempfiles:
-        try:
-            os.unlink(tmpfile)
-        except FileNotFoundError:
-            print("cannot remove temp files")
-            pass
-    tempfiles = []
 
 config = {
     "host": "localhost",
@@ -86,7 +68,6 @@ class TestAnnotationAPI(unittest.TestCase):
         #server.user_store.es.indices.delete(config["user_index"])
 
     def register_user(self):
-        print("\nregistering user")
         return self.app.post("/api/users", data=json.dumps({"username": self.testuser, "password": self.testpass}), content_type="application/json")
 
     def add_example(self, access_status=None):
@@ -133,6 +114,21 @@ class TestAnnotationAPI(unittest.TestCase):
         annotation = get_json(response)
         self.assertEqual(annotation['id'], example['id'])
 
+    def test_authorized_GET_annotation_returns_stored_annotation_without_permission_info(self):
+        example = self.add_example(access_status="private")
+        response = self.app.get("/api/annotations/" + example['id'], headers=self.headers1)
+        annotation = get_json(response)
+        self.assertEqual(annotation['id'], example['id'])
+        self.assertEqual("permissions" in annotation, False)
+
+    def test_authorized_GET_annotation_returns_stored_annotation(self):
+        example = self.add_example(access_status="private")
+        url_params = {"include_permissions": "true"}
+        response = self.app.get("/api/annotations/" + example['id'], query_string=url_params, headers=self.headers1)
+        annotation = get_json(response)
+        self.assertEqual(annotation['id'], example['id'])
+        self.assertEqual(annotation["permissions"]["owner"], config["user1"]["username"])
+
     def test_unauthorized_GET_annotation_returns_error(self):
         example = self.add_example(access_status="private")
         response = self.app.get("/api/annotations/" + example['id'], headers=self.headers2)
@@ -159,24 +155,29 @@ class TestAnnotationAPI(unittest.TestCase):
         self.assertEqual(len(container["first"]["items"]), 1)
         self.assertEqual(container["total"], 1)
 
-    def test_GET_annotations_by_unknown_target_returns_empty_container(self):
+    def test_GET_annotations_by_unknown_target_via_query_returns_empty_container(self):
         headers = copy.copy(self.headers1)
         headers["Prefer"] = 'return=representation;include="http://www.w3.org/ns/oa#PreferContainedDescriptions"'
         target_id = examples["vincent"]["target"][0]["id"]
-        response = self.app.get('/api/resources/{r}/annotations'.format(r=target_id), headers=headers)
+        url_params = {"target_id": examples["vincent"]["target"][0]["id"]}
+        response = self.app.get('/api/annotations', query_string=url_params, headers=headers)
         container = get_json(response)
         self.assertTrue("AnnotationContainer" in container["type"])
         self.assertEqual(container["total"], 0)
 
-    def test_GET_annotations_by_target_returns_container(self):
+    def test_GET_annotations_by_target_via_query_returns_container(self):
         headers = copy.copy(self.headers1)
         headers["Prefer"] = 'return=representation;include="http://www.w3.org/ns/oa#PreferContainedDescriptions"'
-        annotation = self.add_example(access_status="private")
+        annotation1 = self.add_example(access_status="private")
+        annotation2 = copy.copy(examples["theo"]) # second example, different target
+        response = self.app.post("/api/annotations", data=json.dumps(annotation2), content_type="application/json", headers=self.headers1)
+        url_params = {"target_id": annotation1["target"][0]["id"]}
         server.annotation_store.es.indices.refresh(config["annotation_index"])
-        response = self.app.get('/api/resources/{r}/annotations'.format(r=annotation["target"][0]["id"]), headers=headers)
+        response = self.app.get('/api/annotations', query_string=url_params, headers=headers)
         container = get_json(response)
         self.assertTrue("AnnotationContainer" in container["type"])
         self.assertEqual(container["total"], 1)
+        self.assertEqual(container["first"]["items"][0]["target"][0]["id"], annotation1["target"][0]["id"])
 
     def test_PUT_annotation_returns_modified_annotation(self):
         example = self.add_example()

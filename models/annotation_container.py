@@ -1,5 +1,6 @@
 import urllib
 import math
+import copy
 from models.annotation import Annotation, AnnotationError
 from models.annotation_collection import AnnotationCollection
 
@@ -180,7 +181,7 @@ class AnnotationContainer(object):
             return False
         for annotation in annotations:
             try:
-                Annotation(annotation)
+                Annotation(copy.copy(annotation)) # copy to make sure annotation is not changed
             except AnnotationError:
                 return False
         return True

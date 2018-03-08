@@ -64,6 +64,17 @@ def handle_unauthorized_api(error):
 """--------------- Annotation endpoints ------------------"""
 
 
+@api.route("/api", endpoint='api_base')
+class BasicAPI(Resource):
+
+    @api.response(200, 'Success', annotation_list_response)
+    @api.response(404, 'Annotation Error')
+    def get(self):
+        return {"message": "Annotation server online"}
+
+"""--------------- Annotation endpoints ------------------"""
+
+
 @api.route("/api/annotations", endpoint='annotation_list')
 class AnnotationsAPI(Resource):
 
@@ -115,19 +126,6 @@ class AnnotationAPI(Resource):
         response_data = annotation_store.remove_annotation_es(annotation_id, params)
         return response_data
 
-
-"""--------------- Resource endpoints ------------------"""
-
-@api.route('/api/resources/<resource_id>/annotations')
-class ResourceAnnotationsAPI(Resource):
-
-    @auth.login_required
-    def get(self, resource_id):
-        params = get_params(request)
-        annotations = []
-        annotations = annotation_store.get_annotations_by_target_es({"id": resource_id}, params)
-        container = AnnotationContainer(request.url, annotations, view=params["view"])
-        return container.view()
 
 """--------------- Collection endpoints ------------------"""
 

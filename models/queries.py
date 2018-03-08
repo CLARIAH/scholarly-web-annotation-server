@@ -9,6 +9,16 @@ def bool_should(queries):
         raise TypeError("queries parameter must be a list of queries")
     return {"bool": {"should": queries}}
 
+def make_param_filter_queries(params):
+    filter_queries = []
+    if "filter" not in params:
+        return filter_queries
+    if "target_id" in params["filter"]:
+        filter_queries += [make_target_list_query({"id": params["filter"]["target_id"]})]
+    elif "target_type" in params["filter"]:
+        filter_queries += [make_target_list_query({"type": params["filter"]["target_type"]})]
+    return filter_queries
+
 def permission_match(field, value):
     field = "permissions.{f}".format(f=field)
     return {"match": {field, value}}
@@ -41,24 +51,36 @@ def make_permission_see_query(params):
     if params["username"] and not params["access_status"]:
         # username without explicit access_status is assumed private access
         return private_match(params["username"])
-    if params["access_status"] == "private":
-        return private_match(params["username"])
-    if params["access_status"] == "shared":
-        return shared_see_match(params["username"])
-    if params["access_status"] == "public":
-        return access_match("public")
-    if "shared" in params["access_status"] and "private" in params["access_status"]:
-        return bool_should([private_match(params["username"]), shared_see_match(params["username"])])
-    return None
+    access_matches = []
+    if "private" in params["access_status"]:
+        access_matches += [private_match(params["username"])]
+    if "shared" in params["access_status"]:
+        access_matches += [shared_see_match(params["username"])]
+    if "public" in params["access_status"]:
+        access_matches += [access_match("public")]
+    if len(access_matches) == 1:
+        return bool_must(access_matches) # avoid should being interpreted as boost
+    else:
+        return bool_should(access_matches)
 
 def make_permission_edit_query(params):
-    if params["access_status"] == "private":
-        return private_match(params["username"])
-    if params["access_status"] == "shared":
-        return shared_edit_match(params["username"])
-    if params["access_status"] == "public":
-        return access_match("public")
-    if "shared" in params["access_status"] and "private" in params["access_status"]:
-        return bool_should(private_match(params["username"]), shared_edit_match(params["username"]))
-    return None
+    access_matches = []
+    if "private" in params["access_status"]:
+        access_matches += [private_match(params["username"])]
+    if "shared" in params["access_status"]:
+        access_matches += [shared_edit_match(params["username"])]
+    if "public" in params["access_status"]:
+        access_matches += [access_match("public")]
+    if len(access_matches) == 1:
+        return bool_must(access_matches) # avoid should being interpreted as boost
+    else:
+        return bool_should(access_matches)
+
+def make_target_list_query(target):
+    target_field = list(target.keys())[0]
+    list_field = "target_list.%s.keyword" % target_field
+    if type(target[target_field]) == str:
+        return {"match": {list_field: target[target_field]}}
+    elif type(target[target_field]) == list:
+        return bool_should([{"match": {list_field: target_item}} for target_item in target[target_field]])
 

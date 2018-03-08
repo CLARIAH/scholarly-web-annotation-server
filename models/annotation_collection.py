@@ -64,7 +64,7 @@ class AnnotationCollection(object):
         return len(self.items)
 
     def base_json(self):
-        return {
+        collection = {
             "@context": "http://www.w3.org/ns/anno.jsonld",
             "id": self.id,
             "type": self.type,
@@ -74,14 +74,18 @@ class AnnotationCollection(object):
             "total": self.size(),
             "items": self.items
         }
+        if self.modified:
+            collection["modified"] = self.modified
+        return collection
 
-    def to_clean_json(self):
-        return self.base_json()
+    def to_clean_json(self, params):
+        collection = self.base_json()
+        if params and "include_permissions" in params and params["include_permissions"]:
+            collection["permissions"] = copy.copy(self.permissions)
+        return collection
 
     def to_json(self):
         collection = self.base_json()
-        if self.modified:
-            collection["modified"] = self.modified
         collection["permissions"] = copy.copy(self.permissions)
         return collection
 

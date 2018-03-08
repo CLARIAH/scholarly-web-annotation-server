@@ -19,38 +19,46 @@ class TestAnnotationStore(unittest.TestCase):
         self.store.configure_index(self.config)
         self.example_annotation = copy.copy(examples["vincent"])
         self.params = {
+            "page": 0,
             "access_status": "private",
             "username": "user1"
         }
         self.private_params = {
+            "page": 0,
             "access_status": "private",
             "username": "user1"
         }
         self.private_other_params = {
+            "page": 0,
             "access_status": "private",
             "username": "user2"
         }
         self.public_params = {
+            "page": 0,
             "access_status": "public",
             "username": "user1"
         }
         self.public_other_params = {
+            "page": 0,
             "access_status": "public",
             "username": "user2"
         }
         self.shared_params = {
+            "page": 0,
             "access_status": "shared",
             "username": "user1",
             "can_see": ["user2", "user3"],
             "can_edit": ["user2"]
         }
         self.shared_other_params = {
+            "page": 0,
             "access_status": "shared",
             "username": "user2",
             "can_see": ["user3"],
             "can_edit": ["user3"]
         }
         self.anon_params = {
+            "page": 0,
             "access_status": "public",
             "username": None
         }
@@ -114,7 +122,7 @@ class TestAnnotationStore(unittest.TestCase):
         error = None
         annotation = Annotation(self.example_annotation)
         try:
-            self.store.get_from_index(annotation.id, annotation.type)
+            self.store.get_from_index_by_id(annotation.id, annotation.type)
         except AnnotationError as err:
             error = err
         self.assertNotEqual(error, None)
@@ -126,7 +134,7 @@ class TestAnnotationStore(unittest.TestCase):
         add_permissions(anno, self.private_params)
         response = self.store.add_to_index(anno.to_json(), anno.data['type'])
         self.assertEqual(response['result'], "created")
-        response = self.store.get_from_index(anno.data['id'], anno.data['type'])
+        response = self.store.get_from_index_by_id(anno.data['id'], anno.data['type'])
         self.assertEqual(response['id'], anno.data['id'])
         self.assertEqual(response['type'], anno.data['type'])
 
@@ -181,7 +189,7 @@ class TestAnnotationStore(unittest.TestCase):
         self.assertEqual(response["result"], "deleted")
         error = None
         try:
-            self.store.get_from_index(anno.data["id"], anno.data["type"])
+            self.store.get_from_index_by_id(anno.data["id"], anno.data["type"])
         except AnnotationError as err:
             error = err
         self.assertNotEqual(error, None)
@@ -231,79 +239,120 @@ class TestAnnotationStore(unittest.TestCase):
         retrieved_annotation = self.store.get_annotation_es(annotation.id, self.private_params)
         self.assertEqual(retrieved_annotation["id"], annotation.id)
 
+    def test_store_get_private_annotation_as_owner_has_no_permissions_included(self):
+        annotation = Annotation(self.example_annotation)
+        self.store.add_target_list(annotation)
+        add_permissions(annotation, self.private_params)
+        self.store.add_to_index(annotation.to_json(), annotation.data["type"])
+        retrieved_annotation = self.store.get_annotation_es(annotation.id, self.private_params)
+        self.assertEqual(retrieved_annotation["id"], annotation.id)
+        self.assertEqual("permissions" in retrieved_annotation, False)
+
+    def test_store_can_get_private_annotation_with_permissions_as_owner(self):
+        annotation = Annotation(self.example_annotation)
+        self.store.add_target_list(annotation)
+        add_permissions(annotation, self.private_params)
+        self.store.add_to_index(annotation.to_json(), annotation.data["type"])
+        params = copy.copy(self.private_params)
+        params["include_permissions"] = True
+        retrieved_annotation = self.store.get_annotation_es(annotation.id, params)
+        self.assertEqual(retrieved_annotation["id"], annotation.id)
+        self.assertEqual(retrieved_annotation["permissions"]["owner"], params["username"])
+
     def test_store_cannot_get_private_annotation_by_target_id_as_anonymous_user(self):
         stored_annotation = self.store.add_annotation_es(self.example_annotation, self.private_params)
         # refresh index to make document available for search
         self.store.es.indices.refresh(index=self.config["annotation_index"])
-        retrieved_annotations = self.store.get_annotations_by_target_es({"id": stored_annotation["target"][0]["id"]}, self.anon_params)
-        self.assertEqual(len(retrieved_annotations), 0)
+        params = copy.copy(self.anon_params)
+        params["filter"] = {"target_id": stored_annotation["target"][0]["id"]}
+        retrieved_annotations = self.store.get_annotations_es(params)
+        self.assertEqual(retrieved_annotations["total"], 0)
 
     def test_store_cannot_get_shared_annotation_by_target_id_as_anonymous_user(self):
         stored_annotation = self.store.add_annotation_es(self.example_annotation, self.shared_params)
         # refresh index to make document available for search
         self.store.es.indices.refresh(index=self.config["annotation_index"])
-        retrieved_annotations = self.store.get_annotations_by_target_es({"id": stored_annotation["target"][0]["id"]}, self.anon_params)
-        self.assertEqual(len(retrieved_annotations), 0)
+        params = copy.copy(self.anon_params)
+        params["filter"] = {"target_id": stored_annotation["target"][0]["id"]}
+        retrieved_annotations = self.store.get_annotations_es(params)
+        self.assertEqual(retrieved_annotations["total"], 0)
 
     def test_store_can_get_public_annotation_by_target_id_as_anonymous_user(self):
         stored_annotation = self.store.add_annotation_es(self.example_annotation, self.public_params)
         # refresh index to make document available for search
         self.store.es.indices.refresh(index=self.config["annotation_index"])
-        retrieved_annotations = self.store.get_annotations_by_target_es({"id": stored_annotation["target"][0]["id"]}, self.anon_params)
-        self.assertEqual(len(retrieved_annotations), 1)
+        params = copy.copy(self.anon_params)
+        params["filter"] = {"target_id": stored_annotation["target"][0]["id"]}
+        retrieved_annotations = self.store.get_annotations_es(params)
+        self.assertEqual(retrieved_annotations["total"], 1)
 
     def test_store_cannot_get_private_annotation_by_target_id_as_other_user(self):
         stored_annotation = self.store.add_annotation_es(self.example_annotation, self.private_params)
         # refresh index to make document available for search
         self.store.es.indices.refresh(index=self.config["annotation_index"])
-        retrieved_annotations = self.store.get_annotations_by_target_es({"id": stored_annotation["target"][0]["id"]}, self.private_other_params)
-        self.assertEqual(len(retrieved_annotations), 0)
+        params = copy.copy(self.private_other_params)
+        params["filter"] = {"target_id": stored_annotation["target"][0]["id"]}
+        retrieved_annotations = self.store.get_annotations_es(params)
+        self.assertEqual(retrieved_annotations["total"], 0)
 
     def test_store_can_get_shared_annotation_by_target_id_as_other_user(self):
         stored_annotation = self.store.add_annotation_es(self.example_annotation, self.shared_params)
         # refresh index to make document available for search
         self.store.es.indices.refresh(index=self.config["annotation_index"])
-        retrieved_annotations = self.store.get_annotations_by_target_es({"id": stored_annotation["target"][0]["id"]}, self.shared_other_params)
-        self.assertEqual(len(retrieved_annotations), 1)
+        params = copy.copy(self.shared_other_params)
+        params["filter"] = {"target_id": stored_annotation["target"][0]["id"]}
+        retrieved_annotations = self.store.get_annotations_es(params)
+        self.assertEqual(retrieved_annotations["total"], 1)
 
     def test_store_can_get_public_annotation_by_target_id_as_other_user(self):
         stored_annotation = self.store.add_annotation_es(self.example_annotation, self.public_params)
         # refresh index to make document available for search
         self.store.es.indices.refresh(index=self.config["annotation_index"])
-        retrieved_annotations = self.store.get_annotations_by_target_es({"id": stored_annotation["target"][0]["id"]}, self.public_other_params)
-        self.assertEqual(len(retrieved_annotations), 1)
+        params = copy.copy(self.public_other_params)
+        params["filter"] = {"target_id": stored_annotation["target"][0]["id"]}
+        retrieved_annotations = self.store.get_annotations_es(params)
+        self.assertEqual(retrieved_annotations["total"], 1)
 
     def test_store_can_get_private_annotation_by_target_id_as_owner(self):
         stored_annotation = self.store.add_annotation_es(self.example_annotation, self.private_params)
         # refresh index to make document available for search
         self.store.es.indices.refresh(index=self.config["annotation_index"])
-        retrieved_annotations = self.store.get_annotations_by_target_es({"id": stored_annotation["target"][0]["id"]}, self.private_params)
-        self.assertEqual(len(retrieved_annotations), 1)
-        self.assertEqual(retrieved_annotations[0]["id"], stored_annotation["id"])
+        params = copy.copy(self.private_params)
+        params["filter"] = {"target_id": stored_annotation["target"][0]["id"]}
+        retrieved_annotations = self.store.get_annotations_es(params)
+        self.assertEqual(retrieved_annotations["total"], 1)
+        self.assertEqual(retrieved_annotations["annotations"][0]["id"], stored_annotation["id"])
 
     def test_store_can_get_shared_annotation_by_target_id_as_owner(self):
         stored_annotation = self.store.add_annotation_es(self.example_annotation, self.shared_params)
         # refresh index to make document available for search
         self.store.es.indices.refresh(index=self.config["annotation_index"])
-        retrieved_annotations = self.store.get_annotations_by_target_es({"id": stored_annotation["target"][0]["id"]}, self.shared_params)
-        self.assertEqual(len(retrieved_annotations), 1)
-        self.assertEqual(retrieved_annotations[0]["id"], stored_annotation["id"])
+        params = copy.copy(self.shared_params)
+        params["filter"] = {"target_id": stored_annotation["target"][0]["id"]}
+        retrieved_annotations = self.store.get_annotations_es(params)
+        self.assertEqual(retrieved_annotations["total"], 1)
+        self.assertEqual(retrieved_annotations["annotations"][0]["id"], stored_annotation["id"])
 
     def test_store_can_get_public_annotation_by_target_id_as_owner(self):
         stored_annotation = self.store.add_annotation_es(self.example_annotation, self.public_params)
         # refresh index to make document available for search
         self.store.es.indices.refresh(index=self.config["annotation_index"])
-        retrieved_annotations = self.store.get_annotations_by_target_es({"id": stored_annotation["target"][0]["id"]}, self.public_params)
-        self.assertEqual(len(retrieved_annotations), 1)
-        self.assertEqual(retrieved_annotations[0]["id"], stored_annotation["id"])
+        params = copy.copy(self.public_params)
+        params["filter"] = {"target_id": stored_annotation["target"][0]["id"]}
+        retrieved_annotations = self.store.get_annotations_es(params)
+        self.assertEqual(retrieved_annotations["total"], 1)
+        self.assertEqual(retrieved_annotations["annotations"][0]["id"], stored_annotation["id"])
 
     def test_store_can_get_private_annotation_by_target_type_as_owner(self):
         stored_annotation = self.store.add_annotation_es(self.example_annotation, self.private_params)
         # refresh index to make document available for search
         self.store.es.indices.refresh(index=self.config["annotation_index"])
-        retrieved_annotations = self.store.get_annotations_by_target_es({"type": stored_annotation["target"][0]["type"]}, self.private_params)
-        self.assertEqual(retrieved_annotations[0]["id"], stored_annotation["id"])
-        self.assertEqual(retrieved_annotations[0]["type"], stored_annotation["type"])
+        params = copy.copy(self.private_params)
+        params["filter"] = {"target_type": stored_annotation["target"][0]["type"]}
+        retrieved_annotations = self.store.get_annotations_es(params)
+        self.assertEqual(retrieved_annotations["total"], 1)
+        self.assertEqual(retrieved_annotations["annotations"][0]["id"], stored_annotation["id"])
+        self.assertEqual(retrieved_annotations["annotations"][0]["type"], stored_annotation["type"])
 
     def test_store_cannot_update_private_annotation_by_anonymous_user(self):
         stored_annotation = self.store.add_annotation_es(self.example_annotation, self.private_params)

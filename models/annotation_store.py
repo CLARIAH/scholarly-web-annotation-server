@@ -52,7 +52,7 @@ class AnnotationStore(object):
         # set index needs refresh before next GET
         self.set_index_needs_refresh()
         # exclude target_list and permissions when returning annotation
-        return anno.to_clean_json()
+        return anno.to_clean_json(params)
 
     def create_collection_es(self, collection_data, params):
         # check if collection is valid, add id and timestamp
@@ -67,7 +67,7 @@ class AnnotationStore(object):
         # set index needs refresh before next GET
         self.set_index_needs_refresh()
         # return collection to caller
-        return collection.to_clean_json()
+        return collection.to_clean_json(params)
 
     def add_annotation_to_collection_es(self, annotation_id, collection_id, params):
         # check that user is allowed to edit collection
@@ -91,7 +91,7 @@ class AnnotationStore(object):
         # set index needs refresh before next GET
         self.set_index_needs_refresh()
         # return collection metadata
-        return collection.to_clean_json()
+        return collection.to_clean_json(params)
 
     def get_annotation_es(self, annotation_id, params):
         if "action" not in params:
@@ -103,19 +103,17 @@ class AnnotationStore(object):
                                                     username=params["username"],
                                                     action=params["action"],
                                                     annotation_type="Annotation")
-        return annotation.to_clean_json()
+        return annotation.to_clean_json(params)
 
     def get_annotations_es(self, params):
         # check index is up to date, refresh if needed
         self.check_index_is_fresh()
-        query = {
-            "from": params["page"] * self.es_config["page_size"],
-            "size": self.es_config["page_size"],
-            "query": query_helper.make_permission_see_query(params)
-        }
-        response = self.es.search(index=self.es_index, doc_type="Annotation", body=query)
+        response = self.get_from_index_by_filters(params, annotation_type="Annotation")
         annotations = [Annotation(hit["_source"]) for hit in response["hits"]["hits"]]
-        return {"total": response["hits"]["total"], "annotations": [annotation.to_clean_json() for annotation in annotations]}
+        return {
+            "total": response["hits"]["total"],
+            "annotations": [annotation.to_clean_json(params) for annotation in annotations]
+        }
 
     def get_annotations_by_id_es(self, annotation_ids, params):
         # check index is up to date, refresh if needed
@@ -133,27 +131,17 @@ class AnnotationStore(object):
                                                     username=params["username"],
                                                     action=params["action"],
                                                     annotation_type="AnnotationCollection")
-        return collection.to_clean_json()
+        return collection.to_clean_json(params)
 
     def get_collections_es(self, params):
         # check index is up to date, refresh if needed
         self.check_index_is_fresh()
-        query = {
-            "from": params["page"] * self.es_config["page_size"],
-            "size": self.es_config["page_size"],
-            "query": query_helper.make_permission_see_query(params)
-        }
-        response = self.es.search(index=self.es_index, doc_type="AnnotationCollection", body=query)
+        response = self.get_from_index_by_filters(params, annotation_type="AnnotationCollection")
         collections = [AnnotationCollection(hit["_source"]) for hit in response["hits"]["hits"]]
-        return {"total": response["hits"]["total"], "collections": [collection.to_clean_json() for collection in collections]}
-
-    def get_annotations_by_target_es(self, annotation_target, params):
-        # check index is up to date, refresh if needed
-        self.check_index_is_fresh()
-        # get annotation from index
-        annotations = self.get_from_index_by_target_list(annotation_target, params)
-        # remove target list and permissions and return annotations to caller
-        return [self.make_clean_annotation(annotation) for annotation in annotations]
+        return {
+            "total": response["hits"]["total"],
+            "collections": [collection.to_clean_json(params) for collection in collections]
+        }
 
     def update_annotation_es(self, updated_annotation_json, params):
         if "action" not in params:
@@ -179,7 +167,7 @@ class AnnotationStore(object):
         # set index needs refresh before next GET
         self.set_index_needs_refresh()
         # return annotation to caller
-        return self.make_clean_annotation(annotation.to_clean_json())
+        return annotation.to_clean_json(params)
 
     def update_chained_annotations(self, annotation_id):
         # first refresh the index
@@ -194,7 +182,7 @@ class AnnotationStore(object):
 
     def update_collection_es(self, collection_json):
         self.should_exist(collection_json["id"], "AnnotationCollection")
-        collection = AnnotationCollection(self.get_from_index(collection_json["id"], "AnnotationCollection"))
+        collection = AnnotationCollection(self.get_from_index_by_id(collection_json["id"], "AnnotationCollection"))
         collection.update(collection_json)
         self.update_in_index(collection.to_json(), "AnnotationCollection")
         # set index needs refresh before next GET
@@ -288,10 +276,6 @@ class AnnotationStore(object):
                 target_ids += [target["id"]]
         return target_list
 
-    def make_clean_annotation(self, annotation_json):
-        annotation = Annotation(annotation_json)
-        return annotation.to_clean_json()
-
     def add_target_list(self, annotation):
         annotation.target_list = self.get_target_list(annotation)
 
@@ -322,39 +306,39 @@ class AnnotationStore(object):
         # check that annotation exists (and is not deleted)
         self.should_exist(annotation_id, annotation_type)
         # get original annotation json
-        annotation_json = self.get_from_index(annotation_id, annotation_type)
+        annotation_json = self.get_from_index_by_id(annotation_id, annotation_type)
         annotation = Annotation(annotation_json) if annotation_json["type"] == "Annotation" else AnnotationCollection(annotation_json)
         # check if user has appropriate permissions
         if not permissions.is_allowed_action(username, action, annotation):
             raise PermissionError(message="Unauthorized access - no permission to {a} annotation".format(a=action))
         return annotation
 
-    def get_from_index(self, annotation_id, annotation_type="_all"):
+    def get_from_index_by_id(self, annotation_id, annotation_type="_all"):
         self.should_exist(annotation_id, annotation_type)
         return self.es.get(index=self.es_index, doc_type=annotation_type, id=annotation_id)['_source']
 
+    def get_from_index_by_filters(self, params, annotation_type="_all"):
+        filter_queries = query_helper.make_param_filter_queries(params)
+        filter_queries += [query_helper.make_permission_see_query(params)]
+        query = {
+            "from": params["page"] * self.es_config["page_size"],
+            "size": self.es_config["page_size"],
+            "query": query_helper.bool_must(filter_queries)
+        }
+        return self.es.search(index=self.es_index, doc_type=annotation_type, body=query)
+
     def get_from_index_by_target(self, target):
-        target_list_query = self.make_target_list_query(target)
+        target_list_query = query_helper.make_target_list_query(target)
         query = {"query": query_helper.bool_must([target_list_query])}
         response = self.es.search(index=self.es_index, doc_type="Annotation", body=query)
         return [hit["_source"] for hit in response['hits']['hits']]
 
     def get_from_index_by_target_list(self, target, params):
-        target_list_query = self.make_target_list_query(target)
+        target_list_query = query_helper.make_target_list_query(target)
         permission_query = query_helper.make_permission_see_query(params)
         query = {"query": query_helper.bool_must([target_list_query, permission_query])}
         response = self.es.search(index=self.es_index, doc_type="Annotation", body=query)
         return [hit["_source"] for hit in response['hits']['hits']]
-
-    def make_target_query(self, target):
-        target_field = list(target.keys())[0]
-        list_field = "target.%s.keyword" % target_field
-        return {"match": {list_field: target[target_field]}}
-
-    def make_target_list_query(self, target):
-        target_field = list(target.keys())[0]
-        list_field = "target_list.%s.keyword" % target_field
-        return {"match": {list_field: target[target_field]}}
 
     def update_in_index(self, annotation, annotation_type):
         self.should_have_target_list(annotation)
@@ -390,7 +374,7 @@ class AnnotationStore(object):
         # check that annotation exists (and is not deleted)
         self.should_exist(annotation_id, annotation_type)
         # get original annotation json
-        annotation_json = self.get_from_index(annotation_id, annotation_type)
+        annotation_json = self.get_from_index_by_id(annotation_id, annotation_type)
         # check if user has appropriate permissions
         if not permissions.is_allowed_action(params["username"], "edit", Annotation(annotation_json)):
             raise PermissionError(message="Unauthorized access - no permission to {a} annotation".format(a=params["action"]))
@@ -414,6 +398,14 @@ class AnnotationStore(object):
             raise AnnotationError(message="Annotation with id %s already exists" % (annotation_id))
         else:
             return True
+
+    def get_objects_from_hits(self, hits):
+        objects = []
+        for hit in hits:
+            if hit["_source"]["type"] == "Annotation":
+                objects += [Annotation(hit["_source"])]
+            elif hit["_source"]["type"] == "AnnotationCollection":
+                objects += [AnnotationCollection(hit["_source"])]
 
 
 

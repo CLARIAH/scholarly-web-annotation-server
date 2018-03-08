@@ -48,13 +48,13 @@ def is_edit_shared_with(annotation, username):
     return username in annotation.permissions["can_edit"]
 
 def is_private(annotation):
-    return annotation.permissions["access_status"] == "private"
+    return "private" in annotation.permissions["access_status"]
 
 def is_shared(annotation):
-    return annotation.permissions["access_status"] == "shared"
+    return "shared" in annotation.permissions["access_status"]
 
 def is_public(annotation):
-    return annotation.permissions["access_status"] == "public"
+    return "public" in annotation.permissions["access_status"]
 
 
 def add_permissions(annotation, params):
@@ -84,7 +84,7 @@ def add_permissions_to_new_annotation(annotation, params):
         raise PermissionError("Cannot add annotation as unknown user")
     if not params["access_status"]:
         # new annotation, no explicit acces_status, use private as default
-        params["access_status"] = "private"
+        params["access_status"] = ["private"]
     # new annotation, set access_status
     annotation.permissions = {
         "access_status": params["access_status"],

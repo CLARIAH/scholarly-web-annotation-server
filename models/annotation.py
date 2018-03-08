@@ -129,8 +129,11 @@ class Annotation(object):
         annotation_json["target_list"] = self.target_list
         return annotation_json
 
-    def to_clean_json(self):
-        return self.data
+    def to_clean_json(self, params):
+        annotation_json = copy.copy(self.data)
+        if params and "include_permissions" in params and params["include_permissions"]:
+            annotation_json["permissions"] = self.permissions
+        return annotation_json
 
     def get_permissions(self):
         return self.permissions
