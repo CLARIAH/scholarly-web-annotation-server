@@ -11,16 +11,16 @@ Clone the repository:
 git clone https://github.com/marijnkoolen/scholarly-web-annotation-server.git
 ```
 
-Install the required python packages:
+Install the required python packages (for pipenv see https://docs.pipenv.org/):
 ```
-pip install -r requirements.txt
+pipenv install
 ```
 
 ## How to run
 
 Start the server:
 ```
-python annotation_server.py
+pipenv run python annotation_server.py
 ```
 
 and point your browser to `localhost:3000`
@@ -31,5 +31,3 @@ Run all tests:
 ```
 make test_server
 ```
-
-

@@ -1,0 +1,26 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+flask = "==0.10.1"
+flask-restplus = "==0.10.1"
+pytz = "==2015.7"
+"rfc3987" = "==1.3.7"
+elasticsearch = "==5.4.0"
+flask-httpauth = "*"
+flask-cors = "*"
+passlib = "*"
+
+
+[dev-packages]
+
+
+
+[requires]
+
+python_version = "3.6"
