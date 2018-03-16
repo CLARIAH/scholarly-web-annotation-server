@@ -20,7 +20,7 @@ pipenv install
 
 Start the server:
 ```
-python annotation_server.py
+pipenv run python annotation_server.py
 ```
 
 and point your browser to `localhost:3000`
