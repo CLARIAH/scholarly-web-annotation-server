@@ -1,7 +1,7 @@
 from flask import Flask, Blueprint, request, abort, make_response, jsonify, g
 from flask_restplus import Api, Resource
 from flask_httpauth import HTTPBasicAuth
-from flask.ext.cors import CORS
+from flask_cors import CORS
 
 from models.response_models import *
 from models.error import InvalidUsage

@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from flask.ext.cors import CORS
+from flask_cors import CORS
 
 app = Flask(__name__, static_url_path='', static_folder='public')
 app.add_url_rule('/', 'root', lambda: app.send_static_file('testletter.html'))

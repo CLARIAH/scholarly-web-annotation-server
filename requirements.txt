@@ -1,5 +1,9 @@
-Flask == 0.10.1
-flask_restplus == 0.10.1
-pytz == 2015.7
-rfc3987 == 1.3.7
+pytz==2015.7
+flask_restplus==0.11.0
 elasticsearch==5.4.0
+itsdangerous==0.24
+passlib==1.7.1
+Flask==1.0.2
+Flask_HTTPAuth==3.2.4
+Flask_Cors==3.0.3
+rfc3987==1.3.7
