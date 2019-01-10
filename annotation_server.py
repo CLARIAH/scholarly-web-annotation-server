@@ -267,5 +267,7 @@ if __name__ == "__main__":
     import os
     annotation_store.configure_index(server_config["Elasticsearch"])
     user_store.configure_index(server_config["Elasticsearch"])
-    app.run(port=int(os.environ.get("PORT", 3000)), debug=True, threaded=True)
+    swas_host = server_config["SWAServer"]["host"]
+    swas_port = server_config["SWAServer"]["port"]
+    app.run(host=swas_host, port=int(os.environ.get("PORT", swas_port)), debug=True, threaded=True)
 

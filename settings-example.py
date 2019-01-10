@@ -5,6 +5,10 @@ server_config = {
         "annotation_index": "swa",
         "user_index": "swa_user",
         "page_size": 1000
+    },
+    "SWAServer": {
+        "host": "localhost",
+        "port": "3000"
     }
 }
 
