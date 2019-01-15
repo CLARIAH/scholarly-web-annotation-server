@@ -119,7 +119,7 @@ class AnnotationStore(object):
         # check index is up to date, refresh if needed
         self.check_index_is_fresh()
         response = self.es.mget(index=self.es_index, doc_type="Annotation", body={"ids": annotation_ids})
-        return [hit["_source"] for hit in response["hits"]["hits"]]
+        return [hit["_source"] for hit in response["docs"]]
 
     def get_collection_es(self, collection_id, params):
         if "action" not in params:

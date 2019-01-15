@@ -148,7 +148,8 @@ class CollectionsAPI(Resource):
         response_data = []
         collection_data = annotation_store.get_collections_es(params)
         for collection in collection_data["collections"]:
-            container = AnnotationContainer(request.url, collection, view=params["view"])
+            collection_url = request.url + "/" + collection["id"] + "/annotations/"
+            container = AnnotationContainer(collection_url, collection, view=params["view"])
             response_data.append(container.view())
         return response_data
 
@@ -160,7 +161,7 @@ class CollectionAPI(Resource):
         params = get_params(request)
         collection = annotation_store.get_collection_es(collection_id, params)
         if params["view"] == "PreferContainedDescriptions":
-            collection["items"] = annotation_store.get_annotations_by_id_es(collection["items"])
+            collection["items"] = annotation_store.get_annotations_by_id_es(collection["items"], params)
         container = AnnotationContainer(request.url, collection, view=params["view"])
         return container.view()
 
@@ -198,7 +199,10 @@ class CollectionAnnotationsAPI(Resource):
     def get(self, collection_id):
         params = get_params(request)
         collection = annotation_store.get_collection_es(collection_id, params)
-        container = AnnotationContainer(request.url, collection.items, view=params["view"])
+        if params["view"] == "PreferContainedDescriptions" or ("iris" in params and params["iris"] == 0):
+            annotations = annotation_store.get_annotations_by_id_es(collection["items"], params)
+            collection["items"] = annotations
+        container = AnnotationContainer(request.url, collection["items"], view=params["view"])
         return container.view()
 
 @api.route("/api/collections/<collection_id>/annotations/<annotation_id>")

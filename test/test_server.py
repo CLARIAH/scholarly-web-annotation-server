@@ -298,6 +298,72 @@ class TestAnnotationAPICollectionEndpoints(unittest.TestCase):
         self.assertEqual(collection_retrieved["total"], 1)
         self.assertEqual(collection_retrieved["first"]["items"][0], annotation_registered["id"])
 
+    def test_api_can_get_collection_with_annotations_via_header(self):
+        collection_raw = example_collections["empty_collection"]
+        response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json", headers=self.headers1)
+        collection_registered = get_json(response)
+        annotation_raw = copy.copy(examples["vincent"])
+        response = self.app.post("/api/annotations", data=json.dumps(annotation_raw), content_type="application/json", headers=self.headers1)
+        annotation_registered = get_json(response)
+        response = self.app.post("/api/collections/%s/annotations/" % (collection_registered["id"]), data=json.dumps(annotation_registered), content_type="application/json", headers=self.headers1)
+        headers = copy.copy(self.headers1)
+        headers["Prefer"] = 'return=representation;include="http://www.w3.org/ns/oa#PreferContainedDescriptions"'
+        response = self.app.get("/api/collections/%s" % (collection_registered["id"]), headers=headers)
+        collection_retrieved = get_json(response)
+        items = collection_retrieved["first"]["items"];
+        self.assertEqual(isinstance(items[0], dict), True)
+        self.assertEqual(items[0]["type"], "Annotation")
+        self.assertEqual(items[0]["id"], annotation_registered["id"])
+
+    def test_api_can_get_collection_with_annotations_via_url_params(self):
+        collection_raw = example_collections["empty_collection"]
+        response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json", headers=self.headers1)
+        collection_registered = get_json(response)
+        annotation_raw = copy.copy(examples["vincent"])
+        response = self.app.post("/api/annotations", data=json.dumps(annotation_raw), content_type="application/json", headers=self.headers1)
+        annotation_registered = get_json(response)
+        response = self.app.post("/api/collections/%s/annotations/" % (collection_registered["id"]), data=json.dumps(annotation_registered), content_type="application/json", headers=self.headers1)
+        url_params = {"iris": 0}
+        response = self.app.get("/api/collections/%s" % (collection_registered["id"]), query_string=url_params, headers=self.headers1)
+        collection_retrieved = get_json(response)
+        items = collection_retrieved["first"]["items"];
+        self.assertEqual(isinstance(items[0], dict), True)
+        self.assertEqual(items[0]["type"], "Annotation")
+        self.assertEqual(items[0]["id"], annotation_registered["id"])
+
+    def test_api_can_get_collection_annotations_via_header(self):
+        collection_raw = example_collections["empty_collection"]
+        response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json", headers=self.headers1)
+        collection_registered = get_json(response)
+        annotation_raw = copy.copy(examples["vincent"])
+        response = self.app.post("/api/annotations", data=json.dumps(annotation_raw), content_type="application/json", headers=self.headers1)
+        annotation_registered = get_json(response)
+        response = self.app.post("/api/collections/%s/annotations/" % (collection_registered["id"]), data=json.dumps(annotation_registered), content_type="application/json", headers=self.headers1)
+        headers = copy.copy(self.headers1)
+        headers["Prefer"] = 'return=representation;include="http://www.w3.org/ns/oa#PreferContainedDescriptions"'
+        response = self.app.get("/api/collections/%s/annotations/" % (collection_registered["id"]), headers=headers)
+        collection_retrieved = get_json(response)
+        items = collection_retrieved["first"]["items"];
+        self.assertEqual(isinstance(items[0], dict), True)
+        self.assertEqual(items[0]["type"], "Annotation")
+        self.assertEqual(items[0]["id"], annotation_registered["id"])
+
+    def test_api_can_get_collection_annotations_via_url_params(self):
+        collection_raw = example_collections["empty_collection"]
+        response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json", headers=self.headers1)
+        collection_registered = get_json(response)
+        annotation_raw = copy.copy(examples["vincent"])
+        response = self.app.post("/api/annotations", data=json.dumps(annotation_raw), content_type="application/json", headers=self.headers1)
+        annotation_registered = get_json(response)
+        response = self.app.post("/api/collections/%s/annotations/" % (collection_registered["id"]), data=json.dumps(annotation_registered), content_type="application/json", headers=self.headers1)
+        url_params = {"iris": 0}
+        response = self.app.get("/api/collections/%s/annotations/" % (collection_registered["id"]), query_string=url_params, headers=self.headers1)
+        collection_retrieved = get_json(response)
+        items = collection_retrieved["first"]["items"];
+        self.assertEqual(isinstance(items[0], dict), True)
+        self.assertEqual(items[0]["type"], "Annotation")
+        self.assertEqual(items[0]["id"], annotation_registered["id"])
+
     def test_api_can_remove_annotation_from_collection(self):
         collection_raw = example_collections["empty_collection"]
         response = self.app.post("/api/collections", data=json.dumps(collection_raw), content_type="application/json", headers=self.headers1)
