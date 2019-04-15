@@ -167,13 +167,17 @@ class Annotation(object):
         info = []
         if type(target) == str:
             info = [{"id": target}]
-        if "id" in target:
-            info = [{"id": target["id"]}]
-            if "type" in target:
-                info[0]["type"] = target["type"]
-        if "source" in target and "selector" in target:
+        elif "id" in target:
+            if "type" not in target:
+                raise AnnotationError("target requires a type property")
+            info = [{"id": target["id"], "type": target["type"]}]
+        elif "source" in target and "selector" in target:
+            if "type" not in target:
+                raise AnnotationError("target requires a type property")
             info = [{"id": target["source"], "type": target["type"]}]
             info = self.get_selector_info(target["selector"], info)
+        else:
+            raise AnnotationError("target requires an id or source property")
         return info
 
     def get_selector_info(self, selectors, info):
