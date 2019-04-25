@@ -11,6 +11,7 @@ from elasticsearch import Elasticsearch
 class AnnotationStore(object):
 
     def __init__(self, annotations=[]):
+        self.needs_refresh = False
         for annotation in annotations:
             self.add_annotation(annotation)
 
