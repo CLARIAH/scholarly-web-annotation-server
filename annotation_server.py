@@ -22,8 +22,8 @@ api = Api(blueprint)
 
 auth = HTTPBasicAuth()
 
-annotation_store = AnnotationStore()
-user_store = UserStore()
+annotation_store = AnnotationStore(server_config["Elasticsearch"])
+user_store = UserStore(server_config["Elasticsearch"])
 
 @api.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):
@@ -276,9 +276,6 @@ app.register_blueprint(blueprint)
 
 if __name__ == "__main__":
     import os
-    annotation_store.configure_index(server_config["Elasticsearch"])
-    user_store.configure_index(server_config["Elasticsearch"])
     swas_host = server_config["SWAServer"]["host"]
     swas_port = server_config["SWAServer"]["port"]
     app.run(host=swas_host, port=int(os.environ.get("PORT", swas_port)), debug=True, threaded=True)
-

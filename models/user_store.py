@@ -6,17 +6,15 @@ from itsdangerous import (TimedJSONWebSignatureSerializer
 
 class UserStore(object):
 
-    def __init__(self, configuration=None):
+    def __init__(self, es_config):
         self.secret_key = "some combination of key words"
-        if configuration:
-            self.configure_index(configuration)
-            if "secret_key" in configuration:
-                self.secret_key = configuration["secret_key"]
+        if "secret_key" in es_config:
+            self.secret_key = es_config["secret_key"]
 
-    def configure_index(self, configuration):
-        self.es_config = configuration
-        self.es_index = configuration['user_index']
-        self.es = Elasticsearch([{"host": self.es_config['host'], "port": self.es_config['port']}])
+        #initialise ES
+        self.es_config = es_config
+        self.es_index = es_config['user_index']
+        self.es = Elasticsearch([{"host": es_config['host'], "port": es_config['port']}])
         if not self.es.indices.exists(index=self.es_index):
             self.es.indices.create(index=self.es_index)
         self.needs_refresh = False

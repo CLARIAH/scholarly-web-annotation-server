@@ -10,18 +10,19 @@ from elasticsearch import Elasticsearch
 
 class AnnotationStore(object):
 
-    def __init__(self, annotations=[]):
-        self.needs_refresh = False
-        for annotation in annotations:
-            self.add_annotation(annotation)
+    def __init__(self, es_config, annotations=[]):
+        self.es_config = es_config
 
-    def configure_index(self, configuration):
-        self.es_config = configuration
-        self.es_index = configuration['annotation_index']
-        self.es = Elasticsearch([{"host": self.es_config['host'], "port": self.es_config['port']}])
+        #initialise ES
+        self.es_index = es_config['annotation_index']
+        self.es = Elasticsearch([{"host": es_config['host'], "port": es_config['port']}])
         if not self.es.indices.exists(index=self.es_index):
             self.es.indices.create(index=self.es_index)
         self.needs_refresh = False
+
+        #add some annotations
+        for annotation in annotations:
+            self.add_annotation(annotation)
 
     def index_needs_refresh(self):
         return self.needs_refresh
