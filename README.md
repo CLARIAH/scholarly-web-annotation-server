@@ -8,7 +8,7 @@ The server uses [Elasticsearch](https://www.elastic.co/products/elasticsearch) f
 
 Clone the repository:
 ```
-git clone https://github.com/marijnkoolen/scholarly-web-annotation-server.git
+git clone https://github.com/CLARIAH/scholarly-web-annotation-server.git
 ```
 
 Install the required python packages (for pipenv see https://docs.pipenv.org/):
@@ -17,6 +17,12 @@ pipenv install
 ```
 
 ## How to run
+
+Make sure you have a `settings.py` file. This repository comes with an example settings file `setttings-exampl.py`. The simplest way to get started is to copy that file to `settings.py`:
+
+```
+cp settings-example.py settings.py
+```
 
 Start the server:
 ```
