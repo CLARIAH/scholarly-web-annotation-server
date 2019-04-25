@@ -5,18 +5,13 @@ from models.annotation import Annotation, AnnotationError
 from models.annotation_store import AnnotationStore
 from models.permissions import add_permissions
 from models.error import *
+from settings_unittest import server_config
 
 class TestAnnotationStore(unittest.TestCase):
 
     def setUp(self):
-        self.store = AnnotationStore()
-        self.config = {
-            "host": "localhost",
-            "port": 9200,
-            "annotation_index": "unittest-test-index",
-            "page_size": 1000
-        }
-        self.store.configure_index(self.config)
+        self.config = server_config["Elasticsearch"]
+        self.store = AnnotationStore(self.config)
         self.example_annotation = copy.copy(examples["vincent"])
         self.params = {
             "page": 0,

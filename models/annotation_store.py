@@ -13,7 +13,6 @@ class AnnotationStore(object):
     def __init__(self, es_config, annotations=[]):
         self.es_config = es_config
 
-        #initialise ES
         self.es_index = es_config['annotation_index']
         self.es = Elasticsearch([{"host": es_config['host'], "port": es_config['port']}])
         if not self.es.indices.exists(index=self.es_index):
