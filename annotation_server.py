@@ -35,6 +35,9 @@ def handle_annotation_error(error):
 
 @auth.verify_password
 def verify_password(token_or_username, password):
+    print('VERIFYING PASSWORD')
+    print(token_or_username)
+    print(password)
     # anonymous access is allowed, set user to None
     if not token_or_username and not password:
         g.user = None # anonymous user
@@ -52,11 +55,15 @@ def verify_password(token_or_username, password):
 
 @auth.error_handler # handled by HTTPBasicAuth
 def unauthorized():
+    print('BASIC AUTH: ERROR')
+    print(error)
     # return 403 instead of 401 to prevent browsers from displaying the default auth dialog
     return make_response(jsonify({'message': 'Unauthorized access'}), 403)
 
 @api.errorhandler # handled by Flask restplus api
 def handle_unauthorized_api(error):
+    print('RESTPLUS: ERROR')
+    print(error)
     # return 403 instead of 401 to prevent browsers from displaying the default auth dialog
     return {'message': 'Unauthorized access'}, 403
 
