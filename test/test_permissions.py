@@ -4,12 +4,13 @@ from annotation_examples import annotations as examples
 import models.permissions as permissions
 from models.annotation import Annotation
 from models.annotation_store import AnnotationStore
+from settings_unittest import server_config
 #from models.error import *
 
 class TestPermissionModel(unittest.TestCase):
 
     def setUp(self):
-        self.store = AnnotationStore()
+        self.store = AnnotationStore(server_config["Elasticsearch"])
         self.example_annotation = copy.copy(examples["vincent"])
         self.params = {
             "access_status": "private",

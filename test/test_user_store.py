@@ -5,20 +5,17 @@ from elasticsearch import Elasticsearch
 import time
 from itsdangerous import (TimedJSONWebSignatureSerializer
                         as Serializer, BadSignature, SignatureExpired)
+from settings_unittest import server_config
 
 class TestUserStore(unittest.TestCase):
 
     def setUp(self):
-        self.config = {
-            "host": "localhost",
-            "port": 9200,
-            "user_index": "unittest-test-index"
-        }
+        self.config = server_config["Elasticsearch"]
         self.remove_test_index() # make sure there is no previous test index
         self.testname = "testname"
         self.testpass = "testpass"
         self.testuser = {"username": self.testname, "password": self.testpass}
-        self.user_store = UserStore(configuration=self.config)
+        self.user_store = UserStore(self.config)
 
     def remove_test_index(self):
         es = Elasticsearch([{"host": self.config['host'], "port": self.config['port']}])

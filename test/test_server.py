@@ -9,30 +9,17 @@ from annotation_examples import annotations as examples, annotation_collections 
 from models.annotation_store import AnnotationStore
 from models.user_store import UserStore
 from models.user import User
+from settings_unittest import server_config
 
-config = {
-    "host": "localhost",
-    "port": 9200,
-    "annotation_index": "unittest-test-annotation-index",
-    "user_index": "unittest-test-user-index",
-    "page_size": 1000,
-    "user1": {
-        "username": "user1",
-        "password": "pass1"
-    },
-    "user2": {
-        "username": "user2",
-        "password": "pass2"
-    }
-}
+config = server_config["Elasticsearch"]
 
 def get_json(response):
     return json.loads(response.get_data(as_text=True))
 
 def seed_user_index():
     es = Elasticsearch([{"host": config['host'], "port": config['port']}])
-    user = User({"username": config["user1"]["username"]})
-    user.hash_password(config["user1"]["password"])
+    user = User({"username": server_config["user1"]["username"]})
+    user.hash_password(server_config["user1"]["password"])
     es.index(index=config["user_index"], doc_type="user", id=user.username, body=user.json())
     es.indices.refresh(index=config["user_index"])
 
@@ -51,15 +38,14 @@ class TestAnnotationAPI(unittest.TestCase):
         seed_user_index()
 
     def setUp(self):
-        server.annotation_store = AnnotationStore() # always start with empty store
-        server.annotation_store.configure_index(config)
-        server.user_store = UserStore(configuration=config)
+        server.annotation_store = AnnotationStore(config) # always start with empty store
+        server.user_store = UserStore(config)
         self.app = server.app.test_client()
         self.headers1 = {
-            'Authorization': 'Basic ' + base64.b64encode(bytes(config["user1"]["username"] + ":" + config["user1"]["password"], 'ascii')).decode('ascii')
+            'Authorization': 'Basic ' + base64.b64encode(bytes(server_config["user1"]["username"] + ":" + server_config["user1"]["password"], 'ascii')).decode('ascii')
         }
         self.headers2 = {
-            'Authorization': 'Basic ' + base64.b64encode(bytes(config["user2"]["username"] + ":" + config["user2"]["password"], 'ascii')).decode('ascii')
+            'Authorization': 'Basic ' + base64.b64encode(bytes(server_config["user2"]["username"] + ":" + server_config["user2"]["password"], 'ascii')).decode('ascii')
         }
 
     def tearDown(self):
@@ -127,7 +113,7 @@ class TestAnnotationAPI(unittest.TestCase):
         response = self.app.get("/api/annotations/" + example['id'], query_string=url_params, headers=self.headers1)
         annotation = get_json(response)
         self.assertEqual(annotation['id'], example['id'])
-        self.assertEqual(annotation["permissions"]["owner"], config["user1"]["username"])
+        self.assertEqual(annotation["permissions"]["owner"], server_config["user1"]["username"])
 
     def test_unauthorized_GET_annotation_returns_error(self):
         example = self.add_example(access_status="private")
@@ -200,18 +186,17 @@ class TestAnnotationAPICollectionEndpoints(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         print("\nrunning AnnotationCollection API tests")
-        server.user_store = UserStore(configuration=config)
+        server.user_store = UserStore(config)
         seed_user_index()
 
     def setUp(self):
-        server.annotation_store = AnnotationStore() # always start with empty store
-        server.annotation_store.configure_index(config)
+        server.annotation_store = AnnotationStore(config) # always start with empty store
         self.app = server.app.test_client()
         self.headers1 = {
-            'Authorization': 'Basic ' + base64.b64encode(bytes(config["user1"]["username"] + ":" + config["user1"]["password"], 'ascii')).decode('ascii')
+            'Authorization': 'Basic ' + base64.b64encode(bytes(server_config["user1"]["username"] + ":" + server_config["user1"]["password"], 'ascii')).decode('ascii')
         }
         self.headers2 = {
-            'Authorization': 'Basic ' + base64.b64encode(bytes(config["user2"]["username"] + ":" + config["user2"]["password"], 'ascii')).decode('ascii')
+            'Authorization': 'Basic ' + base64.b64encode(bytes(server_config["user2"]["username"] + ":" + server_config["user2"]["password"], 'ascii')).decode('ascii')
         }
         #self.register_user()
 
@@ -386,7 +371,7 @@ class TestUserAPI(unittest.TestCase):
 
     def setUp(self):
         self.remove_test_index() # make sure there is no previous test index
-        server.user_store = UserStore(configuration=config)
+        server.user_store = UserStore(config)
         self.app = server.app.test_client()
         self.testuser = "testuser"
         self.testpass = "testpass"
