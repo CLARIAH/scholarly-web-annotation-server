@@ -47,7 +47,7 @@ def verify_password(token_or_username, password):
     if user_store.verify_user(token_or_username, password):
         g.user = user_store.get_user(token_or_username)
         return True
-    # non-anoymous user not verified -> return error 403
+    # non-anoymous user not authenticated -> return error 403
     return False
 
 @auth.error_handler # handled by HTTPBasicAuth
@@ -253,7 +253,7 @@ class LoginApi(Resource):
         if not g.user:
             abort(403)
         token = user_store.generate_auth_token(g.user.user_id, expiration=600)
-        return {"action": "verified", "user": {"username": g.user.username, "token": token.decode('ascii')}}, 200
+        return {"action": "authenticated", "user": {"username": g.user.username, "token": token.decode('ascii')}}, 200
 
 @api.route("/api/logout")
 class LogoutApi(Resource):
