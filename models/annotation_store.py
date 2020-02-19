@@ -6,7 +6,55 @@ from models.error import *
 import models.queries as query_helper
 import models.permissions as permissions
 from elasticsearch import Elasticsearch
-#from elasticsearch.exceptions import NotFoundError
+
+
+# from elasticsearch.exceptions import NotFoundError
+
+
+def target_list_changed(list1, list2):
+    ids1 = set([target["id"] for target in list1])
+    ids2 = set([target["id"] for target in list2])
+    if len(ids1) != len(ids2): return True
+    if len(ids1.intersection(ids2)) != len(ids1): return True
+    if len(ids1.union(ids2)) != len(ids1): return True
+    return False
+
+
+def is_annotation(target):
+    if "type" in target:
+        if type(target["type"]) == str and target["type"] == "Annotation":
+            return True
+        if type(target["type"]) == list and "Annotation" in target["type"]:
+            return True
+    return False
+
+
+def should_have_target_list(annotation):
+    if "status" in annotation and annotation["status"] == "deleted":
+        return False
+    if annotation["type"] == "AnnotationCollection":
+        return False
+    if "target_list" not in annotation or not annotation["target_list"]:
+        raise AnnotationError(message="{t} should have target list".format(t=annotation["type"]))
+    return True
+
+
+def should_have_permissions(annotation):
+    if "status" in annotation and annotation["status"] == "deleted":
+        return False
+    if "permissions" not in annotation or not annotation["permissions"]:
+        raise PermissionError(message="{t} should have permission information".format(t=annotation["type"]))
+    return True
+
+
+def get_objects_from_hits(hits):
+    objects = []
+    for hit in hits:
+        if hit["_source"]["type"] == "Annotation":
+            objects += [Annotation(hit["_source"])]
+        elif hit["_source"]["type"] == "AnnotationCollection":
+            objects += [AnnotationCollection(hit["_source"])]
+
 
 class AnnotationStore(object):
 
@@ -19,7 +67,7 @@ class AnnotationStore(object):
             self.es.indices.create(index=self.es_index)
         self.needs_refresh = False
 
-        #add some annotations
+        # add some annotations
         for annotation in annotations:
             self.add_annotation(annotation)
 
@@ -81,9 +129,9 @@ class AnnotationStore(object):
             raise AnnotationError(message="Collection already contains this annotation")
         # check that user is allowed to see annotation
         self.get_from_index_if_allowed(annotation_id,
-                                                    username=params["username"],
-                                                    action="see",
-                                                    annotation_type="Annotation")
+                                       username=params["username"],
+                                       action="see",
+                                       annotation_type="Annotation")
         # add annotation
         collection.add_annotation(annotation_id)
         # add permissions for access (see) and update (edit)
@@ -162,7 +210,7 @@ class AnnotationStore(object):
         # index updated annotation
         self.update_in_index(annotation.to_json(), annotation.type)
         # if target list has changed, annotations targeting this annotation should also be updated
-        if self.target_list_changed(annotation.to_json()["target_list"], old_target_list):
+        if target_list_changed(annotation.to_json()["target_list"], old_target_list):
             # updates annotations that target this updated annotation
             self.update_chained_annotations(annotation.id)
         # set index needs refresh before next GET
@@ -217,9 +265,9 @@ class AnnotationStore(object):
             raise AnnotationError(message="Collection doesn't contain this annotation")
         # check that user is allowed to see annotation
         self.get_from_index_if_allowed(annotation_id,
-                                                    username=params["username"],
-                                                    action="see",
-                                                    annotation_type="Annotation")
+                                       username=params["username"],
+                                       action="see",
+                                       annotation_type="Annotation")
         # remove annotation
         collection.remove_annotation(annotation_id)
         self.update_in_index(collection.to_json(), "AnnotationCollection")
@@ -229,9 +277,9 @@ class AnnotationStore(object):
     def remove_collection_es(self, collection_id, params):
         # check that user is allowed to edit collection
         self.get_from_index_if_allowed(collection_id,
-                                        username=params["username"],
-                                        action="edit",
-                                        annotation_type="AnnotationCollection")
+                                       username=params["username"],
+                                       action="edit",
+                                       annotation_type="AnnotationCollection")
         # check index is up to date, refresh if needed
         self.check_index_is_fresh()
         # check if collection already exists
@@ -251,24 +299,17 @@ class AnnotationStore(object):
     # Helper functions #
     ####################
 
-    def target_list_changed(self, list1, list2):
-        ids1 = set([target["id"] for target in list1])
-        ids2 = set([target["id"] for target in list2])
-        if len(ids1) != len(ids2): return True
-        if len(ids1.intersection(ids2)) != len(ids1): return True
-        if len(ids1.union(ids2)) != len(ids1): return True
-        return False
-
     def get_target_list(self, annotation):
         target_list = annotation.get_targets_info()
         deeper_targets = []
         for target in target_list:
-            if self.is_annotation(target):
+            if is_annotation(target):
                 if target["id"] == annotation.id:
                     raise AnnotationError(message="Annotation cannot target itself")
                 if self.is_deleted(target["id"]):
                     continue
-                target_annotation = self.get_annotation_es(target['id'], params={"username": None, "action": "traverse"})
+                target_annotation = self.get_annotation_es(target['id'],
+                                                           params={"username": None, "action": "traverse"})
                 deeper_targets += self.get_target_list(Annotation(target_annotation))
         target_ids = [target["id"] for target in target_list]
         for target in deeper_targets:
@@ -280,21 +321,13 @@ class AnnotationStore(object):
     def add_target_list(self, annotation):
         annotation.target_list = self.get_target_list(annotation)
 
-    def is_annotation(self, target):
-        if "type" in target:
-            if type(target["type"]) == str and target["type"] == "Annotation":
-                return True
-            if type(target["type"]) == list and "Annotation" in target["type"]:
-                return True
-        return False
-
     ###################
     # ES interactions #
     ###################
 
     def add_to_index(self, annotation, annotation_type):
-        self.should_have_target_list(annotation)
-        self.should_have_permissions(annotation)
+        should_have_target_list(annotation)
+        should_have_permissions(annotation)
         self.should_not_exist(annotation['id'], annotation_type)
         return self.es.index(index=self.es_index, doc_type=annotation_type, id=annotation['id'], body=annotation)
 
@@ -308,7 +341,8 @@ class AnnotationStore(object):
         self.should_exist(annotation_id, annotation_type)
         # get original annotation json
         annotation_json = self.get_from_index_by_id(annotation_id, annotation_type)
-        annotation = Annotation(annotation_json) if annotation_json["type"] == "Annotation" else AnnotationCollection(annotation_json)
+        annotation = Annotation(annotation_json) if annotation_json["type"] == "Annotation" else AnnotationCollection(
+            annotation_json)
         # check if user has appropriate permissions
         if not permissions.is_allowed_action(username, action, annotation):
             raise PermissionError(message="Unauthorized access - no permission to {a} annotation".format(a=action))
@@ -326,42 +360,26 @@ class AnnotationStore(object):
             "size": self.es_config["page_size"],
             "query": query_helper.bool_must(filter_queries)
         }
-        return self.es.search(index=self.es_index, doc_type=annotation_type, body=query)
+        return self.es.search(index=self.es_index, body=query)
 
     def get_from_index_by_target(self, target):
         target_list_query = query_helper.make_target_list_query(target)
         query = {"query": query_helper.bool_must([target_list_query])}
-        response = self.es.search(index=self.es_index, doc_type="Annotation", body=query)
+        response = self.es.search(index=self.es_index, body=query)
         return [hit["_source"] for hit in response['hits']['hits']]
 
     def get_from_index_by_target_list(self, target, params):
         target_list_query = query_helper.make_target_list_query(target)
         permission_query = query_helper.make_permission_see_query(params)
         query = {"query": query_helper.bool_must([target_list_query, permission_query])}
-        response = self.es.search(index=self.es_index, doc_type="Annotation", body=query)
+        response = self.es.search(index=self.es_index, body=query)
         return [hit["_source"] for hit in response['hits']['hits']]
 
     def update_in_index(self, annotation, annotation_type):
-        self.should_have_target_list(annotation)
-        self.should_have_permissions(annotation)
+        should_have_target_list(annotation)
+        should_have_permissions(annotation)
         self.should_exist(annotation['id'], annotation_type)
         return self.es.index(index=self.es_index, doc_type=annotation_type, id=annotation['id'], body=annotation)
-
-    def should_have_target_list(self, annotation):
-        if "status" in annotation and annotation["status"] == "deleted":
-            return False
-        if annotation["type"] == "AnnotationCollection":
-            return False
-        if "target_list" not in annotation or not annotation["target_list"]:
-            raise AnnotationError(message="{t} should have target list".format(t=annotation["type"]))
-        return True
-
-    def should_have_permissions(self, annotation):
-        if "status" in annotation and annotation["status"] == "deleted":
-            return False
-        if "permissions" not in annotation or not annotation["permissions"]:
-            raise PermissionError(message="{t} should have permission information".format(t=annotation["type"]))
-        return True
 
     def remove_from_index(self, annotation_id, annotation_type):
         self.should_exist(annotation_id, annotation_type)
@@ -378,7 +396,8 @@ class AnnotationStore(object):
         annotation_json = self.get_from_index_by_id(annotation_id, annotation_type)
         # check if user has appropriate permissions
         if not permissions.is_allowed_action(params["username"], "edit", Annotation(annotation_json)):
-            raise PermissionError(message="Unauthorized access - no permission to {a} annotation".format(a=params["action"]))
+            raise PermissionError(
+                message="Unauthorized access - no permission to {a} annotation".format(a=params["action"]))
         return self.remove_from_index(annotation_id, "Annotation")
 
     def is_deleted(self, annotation_id, annotation_type="_all"):
@@ -392,23 +411,13 @@ class AnnotationStore(object):
         if self.es.exists(index=self.es_index, doc_type=annotation_type, id=annotation_id):
             if not self.is_deleted(annotation_id, annotation_type):
                 return True
-        raise AnnotationError(message="Annotation with id %s does not exist" % (annotation_id), status_code=404)
+        raise AnnotationError(message="Annotation with id %s does not exist" % annotation_id, status_code=404)
 
     def should_not_exist(self, annotation_id, annotation_type="_all"):
         if self.es.exists(index=self.es_index, doc_type=annotation_type, id=annotation_id):
-            raise AnnotationError(message="Annotation with id %s already exists" % (annotation_id))
+            raise AnnotationError(message="Annotation with id %s already exists" % annotation_id)
         else:
             return True
-
-    def get_objects_from_hits(self, hits):
-        objects = []
-        for hit in hits:
-            if hit["_source"]["type"] == "Annotation":
-                objects += [Annotation(hit["_source"])]
-            elif hit["_source"]["type"] == "AnnotationCollection":
-                objects += [AnnotationCollection(hit["_source"])]
-
-
 
     def list_annotation_ids(self):
         return list(self.annotation_index.keys())
@@ -436,7 +445,3 @@ class AnnotationStore(object):
                 self.create_collection_es(collection)
             except AnnotationError:
                 pass
-
-
-
-

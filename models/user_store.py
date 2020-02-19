@@ -1,8 +1,8 @@
 from models.user import User
 from models.error import UserError
 from elasticsearch import Elasticsearch
-from itsdangerous import (TimedJSONWebSignatureSerializer
-                        as Serializer, BadSignature, SignatureExpired)
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
+
 
 class UserStore(object):
 
@@ -43,7 +43,7 @@ class UserStore(object):
         return response
 
     def username_available(self, username):
-        response = self.es.search(index=self.es_index, doc_type="user", body={"query": {"match": {"username": username}}})
+        response = self.es.search(index=self.es_index, body={"query": {"match": {"username": username}}})
         return True if response["hits"]["total"] == 0 else False
 
     def get_user_from_index(self, username=None, user_id=None):
@@ -54,7 +54,7 @@ class UserStore(object):
         if user_id:
             response = self.es.get(index=self.es_index, doc_type="user", id=user_id)
             return User(response["_source"])
-        response = self.es.search(index=self.es_index, doc_type="user", body={"query": {"match": {"username": username}}})
+        response = self.es.search(index=self.es_index, body={"query": {"match": {"username": username}}})
         if response["hits"]["total"] == 0:
             raise UserError("User {u} doesn't exist".format(u=username))
         return User(response["hits"]["hits"][0]["_source"])

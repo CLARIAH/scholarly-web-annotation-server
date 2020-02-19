@@ -4,12 +4,14 @@ import pytz
 import copy
 from models.annotation import AnnotationError
 
+
 class AnnotationCollection(object):
 
     def __init__(self, data):
         self.creator = data["creator"]
         self.label = data["label"]
         self.type = "AnnotationCollection"
+        self.permissions = None
         if 'id' in data:
             self.id = data['id']
         else:
@@ -54,7 +56,8 @@ class AnnotationCollection(object):
         try:
             self.items.remove(annotation_id)
         except ValueError:
-            raise AnnotationError(message="Annotation Collection does not contain annotation with id %s" % (annotation_id))
+            message = "Annotation Collection does not contain annotation with id %s" % annotation_id
+            raise AnnotationError(message=message)
         self.modified = datetime.datetime.now(pytz.utc).isoformat()
 
     def list_annotations(self):

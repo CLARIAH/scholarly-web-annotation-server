@@ -3,15 +3,17 @@ from models.user import User, UserError
 from models.user_store import UserStore
 from elasticsearch import Elasticsearch
 import time
-from itsdangerous import (TimedJSONWebSignatureSerializer
-                        as Serializer, BadSignature, SignatureExpired)
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import SignatureExpired
 from settings_unittest import server_config
+
 
 class TestUserStore(unittest.TestCase):
 
     def setUp(self):
         self.config = server_config["Elasticsearch"]
-        self.remove_test_index() # make sure there is no previous test index
+        # make sure there is no previous test index
+        self.remove_test_index()
         self.testname = "testname"
         self.testpass = "testpass"
         self.testuser = {"username": self.testname, "password": self.testpass}
@@ -28,7 +30,8 @@ class TestUserStore(unittest.TestCase):
         return self.user_store.add_user_to_index(user)
 
     def tearDown(self):
-        self.remove_test_index() # make sure to remove test index
+        # make sure to remove test index
+        self.remove_test_index()
 
     def test_user_can_be_initialised(self):
         self.user_store = UserStore(self.config)
@@ -147,6 +150,4 @@ class TestUserStore(unittest.TestCase):
         token = self.user_store.generate_auth_token(user.user_id, expiration=0.1)
         verified_user = self.user_store.verify_auth_token(token)
         self.assertEqual(verified_user.user_id, user.user_id)
-
-
 

@@ -4,7 +4,8 @@ import unittest
 from annotation_examples import annotations as examples, annotation_collections as example_collections
 from models.annotation import Annotation, AnnotationError
 from models.annotation_collection import AnnotationCollection
-from models.annotation_container import AnnotationContainer
+from models.annotation_container import AnnotationContainer, update_url
+
 
 class TestAnnotationContainer(unittest.TestCase):
 
@@ -18,7 +19,7 @@ class TestAnnotationContainer(unittest.TestCase):
         container = AnnotationContainer(self.base_url, [], view="PreferMinimalContainer")
         self.assertEqual(container.page_size, 100)
         self.assertEqual(container.num_pages, 0)
-        self.assertEqual(container.metadata['id'], container.update_url(self.base_url, {"iris": 1}))
+        self.assertEqual(container.metadata['id'], update_url(self.base_url, {"iris": 1}))
 
     def test_container_cannot_be_initialized_with_invalid_prefer_type(self):
         error = None
@@ -84,22 +85,22 @@ class TestAnnotationContainer(unittest.TestCase):
     def test_container_calculates_page_numbers_correctly(self):
         container = AnnotationContainer(self.base_url, self.annotations, page_size=1)
         view = container.view()
-        last_url = container.update_url(self.base_url, {"iris": 1, "page": 1})
+        last_url = update_url(self.base_url, {"iris": 1, "page": 1})
         self.assertEqual(view["last"], last_url)
         container = AnnotationContainer(self.base_url, self.annotations, page_size=2)
         view = container.view()
-        last_url = container.update_url(self.base_url, {"iris": 1, "page": 0})
+        last_url = update_url(self.base_url, {"iris": 1, "page": 0})
         self.assertEqual(view["last"], last_url)
 
     def test_container_can_generate_pages(self):
         container = AnnotationContainer(self.base_url, self.annotations, page_size=1)
         view = container.view_page(page=0)
         self.assertEqual(view["@context"], "http://www.w3.org/ns/anno.jsonld")
-        self.assertEqual(view["id"], container.update_url(self.base_url, {"iris": 1, "page": 0}))
+        self.assertEqual(view["id"], update_url(self.base_url, {"iris": 1, "page": 0}))
         self.assertEqual(view["type"], "AnnotationPage")
         self.assertEqual(view["partOf"]["id"], container.base_url)
         self.assertEqual(view["startIndex"], 0)
-        self.assertEqual(view["next"], container.update_url(self.base_url, {"iris": 1, "page": 1}))
+        self.assertEqual(view["next"], update_url(self.base_url, {"iris": 1, "page": 1}))
         self.assertEqual(len(view["items"]), 1)
 
     def test_container_generate_page_referencing(self):
@@ -121,8 +122,8 @@ class TestAnnotationContainer(unittest.TestCase):
         anno_ids = [anno.id for anno in self.annotations]
         container = AnnotationContainer(self.base_url, self.annotations, view="PreferContainedIRIs", page_size=1)
         view = container.view()
-        self.assertEqual(view["first"]["id"], container.update_url(container.base_url, {"page": 0}))
-        self.assertEqual(view["first"]["next"], container.update_url(container.base_url, {"page": 1}))
+        self.assertEqual(view["first"]["id"], update_url(container.base_url, {"page": 0}))
+        self.assertEqual(view["first"]["next"], update_url(container.base_url, {"page": 1}))
         self.assertEqual(len(view["first"]["items"]), 1)
         self.assertTrue(view["first"]["items"][0] in anno_ids)
 

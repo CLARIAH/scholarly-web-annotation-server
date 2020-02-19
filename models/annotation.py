@@ -3,7 +3,8 @@ import datetime
 import pytz
 import uuid
 import copy
-from rfc3987 import parse as parse_IRI
+from rfc3987 import parse as parse_iri
+
 
 class WebAnnotationValidator(object):
 
@@ -76,7 +77,7 @@ class WebAnnotationValidator(object):
                 raise AnnotationError(message='External annotation target MUST have an IRI identifier')
             try:
                 # id must be an IRI
-                parse_IRI(target_id, rule="IRI")
+                parse_iri(target_id, rule="IRI")
             except ValueError:
                 raise AnnotationError(message='annotation target id MUST be an IRI')
 
@@ -93,6 +94,7 @@ class WebAnnotationValidator(object):
             return value
         return [value]
 
+
 class Annotation(object):
 
     def __init__(self, annotation):
@@ -106,6 +108,8 @@ class Annotation(object):
         self.type = "Annotation"
         self.id = annotation['id']
         self.in_collection = []
+        self.permissions = None
+        self.target_list = None
         self.set_permissions()
         self.set_target_list()
 
@@ -245,6 +249,7 @@ class Annotation(object):
         if collection_id in self.in_collection:
             self.in_collection.remove(collection_id)
 
+
 class AnnotationError(Exception):
     status_code = 400
 
@@ -259,6 +264,7 @@ class AnnotationError(Exception):
         rv['message'] = self.message
         rv['status_code'] = self.status_code
         return rv
+
 
 if __name__ == "__main__":
     annotations_file = "data/annotations.json"
