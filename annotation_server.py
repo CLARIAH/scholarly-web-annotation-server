@@ -1,5 +1,5 @@
 from flask import Flask, Blueprint, request, abort, make_response, jsonify, g
-from flask_restplus import Api, Resource
+from flask_restx import Api, Resource
 from flask_httpauth import HTTPBasicAuth
 from flask_cors import CORS
 
