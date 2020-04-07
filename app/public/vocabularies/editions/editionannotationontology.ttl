@@ -1,0 +1,252 @@
+#################################################################
+#
+#    Generic ontology (should be usable for any edition)
+#    
+#    This version associated to FRBROO objects
+#    For talk to be given at EADH 2018 (Galway)
+#
+#################################################################
+@prefix hi: <http://localhost:8080/ontologies/editionannotationontology.ttl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sch: <http://schema.org/> .
+@prefix ecrm: <http://erlangen-crm.org/current/> .
+@prefix efrbroo: <http://erlangen-crm.org/efrbroo/> .
+@base <http://localhost:8080/ontologies/editionannotationontology.ttl> .
+<http://localhost:8080/ontologies/editionannotationontology.ttl> rdf:type owl:Ontology .
+
+<http://localhost:8080/ontologies/editionannotationontology.ttl>  owl:imports  <https://raw.githubusercontent.com/erlangen-crm/efrbroo/releases/efrbroo_20160715.owl>.
+
+#################################################################
+#
+#    Annotatable thing and its subclasses 
+#
+#################################################################
+hi:AnnotatableThing rdf:type owl:Class ;
+	rdfs:label "AnnotatableThing" ;
+	rdfs:subClassOf ecrm:E71_Man-Made_Thing ;
+	rdfs:comment "E71 can be either E24_Physical_Man-Made_Thing (i.e. documents) or E28_Conceptual_Object (i.e. works)" .
+hi:EditableThing rdf:type owl:Class ;
+	rdfs:label "EditableThing" ;
+	rdfs:subClassOf hi:AnnotatableThing ;
+	rdfs:comment "Realm of things that can be or have been edited" .
+hi:EditionThing rdf:type owl:Class ;
+	rdfs:label "EditionThing" ;
+	rdfs:subClassOf hi:AnnotatableThing ;
+	rdfs:comment "Realm of things that result from editing" .
+
+hi:includes rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:AnnotatableThing;
+	rdfs:range hi:AnnotatableThing;
+	rdfs:label "includes" ;
+	rdfs:comment "Superproperty for all relations that are considered hierarchical".
+
+#################################################################
+#
+#    Editable things 
+#
+#################################################################
+hi:Work rdf:type owl:Class ;
+	rdfs:label "Work" ;
+	rdfs:subClassOf efrbroo:F1_Work ;
+	rdfs:subClassOf hi:EditableThing ;
+	rdfs:comment "Works that are editid" .
+hi:PartOfWork rdf:type owl:Class ;
+	rdfs:label "PartOfWork" ;
+	rdfs:subClassOf hi:EditableThing ;
+	rdfs:subClassOf ecrm:E89_Propositional_Object ;
+	rdfs:comment "Consists of parts of works that are edited" .
+hi:WorkOrPartOfWork rdf:type owl:Class ;
+	rdfs:label "WorkOrPartOfWork" ;
+	owl:unionOf (hi:Work hi:PartOfWork);
+	rdfs:comment "Consists of works that are edited and parts of them" .
+
+hi:Document rdf:type owl:Class ;
+	rdfs:label "Document" ;
+	owl:unionOf (efrbroo:F4_Manifestation_Singleton efrbroo:F5_Item);
+	rdfs:subClassOf hi:EditableThing ;
+	rdfs:comment "Consists of Manifestation Singletons (usually manuscripts) and Items (copies of a Manifestation Product Type)" .
+hi:DocumentPhysPart rdf:type owl:Class ;
+	rdfs:label "DocumentPhysPart" ;
+	rdfs:subClassOf ecrm:E84_Information_Carrier ;
+	rdfs:subClassOf hi:EditableThing ;
+	rdfs:comment "Consists of physical parts of hi:documents (connected to hi:documents through P46), eg. quires or individual pages" .
+hi:DocumentOrPhysPart rdf:type owl:Class ;
+	rdfs:label "DocumentOrPhysPart" ;
+	owl:unionOf (hi:DocumentPhysPart hi:Document);
+	rdfs:comment "Documents and physical parts of documents" .
+hi:DocumentZone rdf:type owl:Class ;
+	rdfs:label "DocumentZone" ;
+	rdfs:subClassOf efrbroo:F9_Place ;
+	rdfs:subClassOf ecrm:E84_Information_Carrier ;
+	rdfs:subClassOf hi:EditableThing ;
+	rdfs:comment "Zones on documents or physical parts of documents, connected to DocumentOrPhysPart through P59" .
+hi:DocumentOrDocPart rdf:type owl:Class ;
+	rdfs:label "DocumentOrDocPart" ;
+	owl:unionOf (hi:DocumentOrPhysPart hi:DocumentZone);
+	rdfs:comment "Anything that bears texts: Documents and physical parts of documents and zones on these documents or parts" .
+
+hi:PositionedTextFrag rdf:type owl:Class ;
+	rdfs:label "PositionedTextFrag" ;
+	rdfs:subClassOf efrbroo:F23_Expression_Fragment ;
+	rdfs:subClassOf hi:EditableThing ;
+	rdfs:comment "Fragment of text of a work as present on a DocumentOrDocPart" .
+
+#################################################################
+#
+#    Properties that connect Editable things
+#
+#################################################################
+hi:hasWorkPart rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:Work;
+	rdfs:range hi:PartOfWork;
+	rdfs:label "hasWorkPart" ;
+	rdfs:comment "Describes relation between Works and parts of Works";
+	rdfs:subPropertyOf hi:includes.
+hi:isWorkPartOf rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:PartOfWork;
+	rdfs:range hi:Work;
+	rdfs:label "isWorkPartOf" ;
+	rdfs:comment "Describes relation between parts of Works and Works";
+	owl:inverseOf hi:hasWorkPart.
+
+# Through import?
+# http://erlangen-crm.org/current/P46_is_composed_of: Document --> DocumentPhysPart
+# http://erlangen-crm.org/current/P46i_forms_part_of: DocumentPhysPart --> Document
+# http://erlangen-crm.org/current/P59_has_section: DocumentOrPhysPart --> DocumentZone
+# http://erlangen-crm.org/current/P59i_is_located_on_or_within: DocumentZone --> DocumentOrPhysPart
+# or do we need a union of these properties? 
+
+hi:hasDocPart rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:DocumentOrDocPart;
+	rdfs:range hi:DocumentOrDocPart;
+	rdfs:label "hasDocPart" ;
+	rdfs:comment "Describes inclusion relation between documents, document parts and zones on them (top-down)";
+	rdfs:subPropertyOf hi:includes.
+hi:isDocPartOf rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:DocumentOrDocPart;
+	rdfs:range hi:DocumentOrDocPart;
+	rdfs:label "isDocPartOf" ;
+	rdfs:comment "Describes inclusion relation between documents, document parts and zones on them (bottom-up)";
+	owl:inverseOf hi:hasDocPart.
+
+hi:hasFragmentIn rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:DocumentOrDocPart;
+	rdfs:range hi:PositionedTextFrag;
+	rdfs:label "hasFragmentIn"  ;
+	rdfs:comment "Connects (part of) document to the text fragment it contains";
+	rdfs:subPropertyOf hi:includes.
+hi:isFragmentIn rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:PositionedTextFrag;
+	rdfs:range hi:DocumentOrDocPart;
+	rdfs:label "isFragmentIn"  ;
+	rdfs:comment "Connects text fragment to the containing (part of the) document ";
+	owl:inverseOf hi:hasFramentIn.
+hi:hasFragmentOf rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:WorkOrPartOfWork;
+	rdfs:range hi:PositionedTextFrag;
+	rdfs:label "hasFragmentIn"  ;
+	rdfs:comment "Connects (part of) work to the text fragment that belongs to it";
+	rdfs:subPropertyOf hi:includes.
+hi:isFragmentOf rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:PositionedTextFrag;
+	rdfs:range hi:WorkOrPartOfWork;
+	rdfs:label "isFragmentIn"  ;
+	rdfs:comment "Connects text fragment to the (part of the) work that it belongs to ";
+	owl:inverseOf hi:hasFragmentOf.
+
+hi:containsFragment rdf:type owl:ObjectProperty ;
+	rdfs:range hi:PositionedTextFrag;
+	rdfs:domain hi:PositionedTextFrag;
+	rdfs:label "containsFragment"  ;
+	rdfs:comment "Describes inclusion relation between PostionedTextFrags (top-down)";
+	rdfs:subPropertyOf efrbroo:R15_has_fragment ; 
+	rdfs:subPropertyOf hi:includes.
+hi:containedInFragment rdf:type owl:ObjectProperty ;
+	rdfs:range hi:PositionedTextFrag;
+	rdfs:domain hi:PositionedTextFrag;
+	rdfs:label "containedInFragment"  ;
+	rdfs:comment "Describes inclusion relation between PostionedTextFrags (bottom-up)";
+	owl:inverseOf hi:containsFragment.
+	
+#################################################################
+#
+#    Edition things 
+#
+#################################################################
+	
+hi:EditionText rdf:type owl:Class ;
+	rdfs:label "EditionText" ;
+	rdfs:subClassOf efrbroo:F2_Expression ;
+	rdfs:subClassOf hi:EditionThing ;
+	rdfs:comment "Edition reading text" .
+hi:EditionTranscript rdf:type owl:Class ;
+	rdfs:label "EditionTranscript" ;
+	rdfs:subClassOf efrbroo:E73_Information_Object ;
+	rdfs:subClassOf hi:EditionThing ;
+	rdfs:comment "Transcription of DocumentOrDocPart" .
+hi:Image rdf:type owl:Class ;
+	rdfs:label "Image" ;
+	rdfs:subClassOf ecrm:E38_Image ;
+	rdfs:subClassOf hi:EditionThing ;
+	rdfs:comment "Image of DocumentOrDocPart" .
+	
+#################################################################
+#
+#    Properties that connect Edition things
+#
+#################################################################
+	
+hi:hasTextPart rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:Text;
+	rdfs:range hi:Text;
+	rdfs:label "hasTextPart" ;
+	rdfs:comment "Describes relation between Texts and parts of Texts";
+	rdfs:subPropertyOf hi:includes.
+hi:isTextPartOf rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:Text;
+	rdfs:range hi:Text;
+	rdfs:label "isTextPartOf" ;
+	rdfs:comment "Describes relation between parts of Texts and Texts";
+	owl:inverseOf hi:hasTextPart.
+#################################################################
+#
+#    Properties that connect Edition and Editable things
+#
+#################################################################
+hi:hasRepresentation rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:EditableThing;
+	rdfs:range hi:EditionThing;
+	rdfs:label "hasRepresentation"  ;
+	rdfs:comment "Connects an editable thing (doc, work, ptf) to its representation in the edition" ;
+	rdfs:subPropertyOf hi:includes.
+hi:isRepresentationOf rdf:type owl:ObjectProperty ;
+	rdfs:domain hi:EditionThing;
+	rdfs:range hi:EditableThing;
+	rdfs:label "isRepresentationOf"  ;
+	rdfs:comment "Connects a representation to what it represents";
+	owl:inverseOf hi:hasRepresentation.
+
+#################################################################
+#
+#    Practical stuff
+#
+#################################################################
+	
+hi:IgnorableElement rdf:type owl:Class ;
+	rdfs:label "IgnorableElement" ;
+	rdfs:subClassOf hi:AnnotatableThing ;
+	rdfs:comment "Element should be ignored in annotation".
+hi:IgnorableTag rdf:type owl:Class ;
+	rdfs:label "IgnorableContent" ;
+	rdfs:subClassOf hi:AnnotatableThing ;
+	rdfs:comment "Tags of element should be ignored in annotation (content is relevant)".
+hi:selectWholeElement rdf:type owl:DatatypeProperty ;
+	rdfs:domain hi:AnnotatableThing ;
+	rdfs:range xsd:boolean;
+	rdfs:label "hasType" ;
+	rdfs:comment "Selecting part of element is not possible".
+

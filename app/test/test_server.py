@@ -4,7 +4,7 @@ import copy
 import json
 from elasticsearch import Elasticsearch
 import annotation_server as server
-from annotation_examples import annotations as examples, annotation_collections as example_collections
+from test.annotation_examples import annotations as examples, annotation_collections as example_collections
 from models.annotation_store import AnnotationStore
 from models.user_store import UserStore
 from models.user import User
@@ -41,7 +41,8 @@ class TestAnnotationAPI(unittest.TestCase):
         seed_user_index()
 
     def setUp(self):
-        server.annotation_store = AnnotationStore(config) # always start with empty store
+        # always start with empty store
+        server.annotation_store = AnnotationStore(config)
         server.user_store = UserStore(config)
         self.app = server.app.test_client()
         user1 = bytes(server_config["user1"]["username"] + ":" + server_config["user1"]["password"], 'ascii')
@@ -144,7 +145,7 @@ class TestAnnotationAPI(unittest.TestCase):
         self.assertEqual(container["total"], 1)
 
     def test_GET_annotations_with_descriptions_returns_container_with_descriptions(self):
-        self.add_example(access_status = "private")
+        self.add_example(access_status="private")
         server.annotation_store.es.indices.refresh(config["annotation_index"])
         headers = copy.copy(self.headers1)
         headers["Prefer"] = 'return=representation;include="http://www.w3.org/ns/oa#PreferContainedDescriptions"'
@@ -167,9 +168,10 @@ class TestAnnotationAPI(unittest.TestCase):
         headers = copy.copy(self.headers1)
         headers["Prefer"] = 'return=representation;include="http://www.w3.org/ns/oa#PreferContainedDescriptions"'
         annotation1 = self.add_example(access_status="private")
-        annotation2 = copy.copy(examples["theo"]) # second example, different target
-        response = self.app.post("/api/annotations", data=json.dumps(annotation2),
-                                 content_type="application/json", headers=self.headers1)
+        # second example, different target
+        annotation2 = copy.copy(examples["theo"])
+        self.app.post("/api/annotations", data=json.dumps(annotation2),
+                      content_type="application/json", headers=self.headers1)
         url_params = {"target_id": annotation1["target"][0]["id"]}
         server.annotation_store.es.indices.refresh(config["annotation_index"])
         response = self.app.get('/api/annotations', query_string=url_params, headers=headers)
@@ -205,7 +207,8 @@ class TestAnnotationAPICollectionEndpoints(unittest.TestCase):
         seed_user_index()
 
     def setUp(self):
-        server.annotation_store = AnnotationStore(config) # always start with empty store
+        # always start with empty store
+        server.annotation_store = AnnotationStore(config)
         self.app = server.app.test_client()
         user1 = bytes(server_config["user1"]["username"] + ":" + server_config["user1"]["password"], 'ascii')
         user2 = bytes(server_config["user2"]["username"] + ":" + server_config["user2"]["password"], 'ascii')
@@ -215,7 +218,7 @@ class TestAnnotationAPICollectionEndpoints(unittest.TestCase):
         self.headers2 = {
             'Authorization': 'Basic ' + base64.b64encode(user2).decode('ascii')
         }
-        #self.register_user()
+        # self.register_user()
 
     def register_user(self):
         self.testuser = "testuser"
@@ -440,7 +443,8 @@ class TestUserAPI(unittest.TestCase):
         print("\nrunning User API tests")
 
     def setUp(self):
-        remove_test_index() # make sure there is no previous test index
+        # make sure there is no previous test index
+        remove_test_index()
         server.user_store = UserStore(config)
         self.app = server.app.test_client()
         self.testuser = "testuser"
@@ -453,7 +457,8 @@ class TestUserAPI(unittest.TestCase):
         }
 
     def tearDown(self):
-        remove_test_index() # make sure to remove test index
+        # make sure to remove test index
+        remove_test_index()
 
     def register_user(self):
         return self.app.post("/api/users", data=json.dumps({"username": self.testuser, "password": self.testpass}),
@@ -535,5 +540,3 @@ class TestUserAPI(unittest.TestCase):
 
 if __name__ == "__main__":
     pass
-
-

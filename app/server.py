@@ -1,5 +1,4 @@
-import os
-from flask import Flask, Blueprint, request, abort, make_response, jsonify, g
+from flask import Flask, Blueprint, request, abort, make_response, jsonify, g, json
 from flask_restx import Api, Resource
 from flask_httpauth import HTTPBasicAuth
 from flask_cors import CORS
@@ -17,6 +16,7 @@ from elasticsearch.exceptions import ConnectionError
 from settings import server_config
 
 app = Flask(__name__, static_url_path='', static_folder='public')
+app.add_url_rule('/ns/swao', 'swao', lambda: app.send_static_file('vocabularies/index.html'))
 app.config['SECRET_KEY'] = "some combination of key words"
 cors = CORS(app)
 #api = Api(app)
@@ -69,6 +69,16 @@ def handle_unauthorized_api(error):
     return {'message': 'Unauthorized access'}, 403
 
 
+"""--------------- Ontology endpoints ------------------"""
+
+
+@app.route("/ns/swao.jsonld", endpoint="swao-jsonld")
+def swao():
+    with open('./public/vocabularies/swao.json', 'rt') as fh:
+        swao = json.load(fh)
+        print(swao)
+        return swao
+
 """--------------- Annotation endpoints ------------------"""
 
 
@@ -90,11 +100,8 @@ class AnnotationsAPI(Resource):
     @api.response(200, 'Success', annotation_list_response)
     @api.response(404, 'Annotation Error')
     def get(self):
-        print('getting params')
         params = get_params(request)
-        print('params:', params)
         data = annotation_store.get_annotations_es(params)
-        print('data received from annotation store:', data)
         container = AnnotationContainer(request.url, data["annotations"], view=params["view"], total=data["total"])
         return container.view()
 
@@ -279,10 +286,6 @@ class LogoutApi(Resource):
 app.register_blueprint(blueprint)
 
 if __name__ == "__main__":
-    print('running in development mode')
     swas_host = server_config["SWAServer"]["host"]
     swas_port = server_config["SWAServer"]["port"]
-    print('server running on host:', swas_host)
-    print('server running in port:', swas_port)
-    #app.run(host='0.0.0.0', port=swas_port, debug=False)
     app.run(host=swas_host, port=swas_port, debug=True, threaded=True)

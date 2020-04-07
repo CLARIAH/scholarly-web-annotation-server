@@ -1,11 +1,12 @@
 import unittest
 import copy
-from annotation_examples import annotations as examples
+from test.annotation_examples import annotations as examples
 import models.permissions as permissions
 from models.annotation import Annotation
 from models.annotation_store import AnnotationStore
 from settings_unittest import server_config
 #from models.error import *
+
 
 class TestPermissionModel(unittest.TestCase):
 
@@ -34,7 +35,6 @@ class TestPermissionModel(unittest.TestCase):
             "access_status": "public",
             "username": None
         }
-
 
     def test_anonymous_user_cannot_see_private_annotation(self):
         annotation = Annotation(self.example_annotation)

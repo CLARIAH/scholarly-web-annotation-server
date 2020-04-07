@@ -7,7 +7,7 @@ api = Api(blueprint)
 
 """--------------- API request and response models ------------------"""
 
-#generic response model
+# generic response model
 response_model = Model("Response", {
     "status": fields.String(description="Status", required=True, enum=["success", "error"]),
     "message": fields.String(description="Message from server", required=True),
@@ -15,7 +15,8 @@ response_model = Model("Response", {
 
 # user created response model
 user_response = Model("Response", {
-    "action": fields.String(descrption="Update action", require=True, enum=["created", "verified", "updated", "deleted"]),
+    "action": fields.String(descrption="Update action", require=True,
+                            enum=["created", "verified", "updated", "deleted"]),
     "user": {
         "username": fields.String(description="Username", required=True)
     }
@@ -58,9 +59,11 @@ body_model = api.schema_model("AnnotationBody", {
 })
 
 annotation_model = Model("Annotation", {
-    "@context": fields.String(description="The context that determines the meaning of the JSON as an Annotation", required=True, enum=["http://www.w3.org/ns/anno.jsonld"]),
+    "@context": fields.String(description="The context that determines the meaning of the JSON as an Annotation",
+                              required=True, enum=["http://www.w3.org/ns/anno.jsonld"]),
     "id": fields.String(description="Annotation ID", required=False),
-    "type": fields.String(description="Annotation Type", required=True, enum=["Annotation", "AnnotationPage", "AnnotationCollection"]),
+    "type": fields.String(description="Annotation Type", required=True,
+                          enum=["Annotation", "AnnotationPage", "AnnotationCollection"]),
     "creator": fields.String(description="Annotation Creator", required=False),
     "body": fields.List(fields.Nested(body_model))
 })

@@ -1,4 +1,4 @@
-import urllib
+from urllib import parse as url_parser
 import math
 import copy
 import json
@@ -14,7 +14,8 @@ def is_annotation_list(annotations):
         return False
     for annotation in annotations:
         try:
-            Annotation(copy.copy(annotation)) # copy to make sure annotation is not changed
+            # copy to make sure annotation is not changed
+            Annotation(copy.copy(annotation))
         except AnnotationError:
             return False
     return True
@@ -49,11 +50,11 @@ def update_url(base_url, params):
     # https://gist.github.com/rokcarl/20b5bf8dd9b1998880b7
     # mentioned in the following discussions
     # https://stackoverflow.com/questions/2506379/add-params-to-given-url-in-python
-    url_parts = list(urllib.parse.urlparse(base_url))
-    query = dict(urllib.parse.parse_qsl(url_parts[4]))
+    url_parts = list(url_parser.urlparse(base_url))
+    query = dict(url_parser.parse_qsl(url_parts[4]))
     query.update(params)
-    url_parts[4] = urllib.parse.urlencode(query)
-    return urllib.parse.urlunparse(url_parts)
+    url_parts[4] = url_parser.urlencode(query)
+    return url_parser.urlunparse(url_parts)
 
 
 class AnnotationContainer(object):
@@ -66,6 +67,7 @@ class AnnotationContainer(object):
         self.view = {}
         self.iris = 1
         self.modified = None
+        self.items = None
         self.page_size = 0
         self.set_view(view)
         self.set_page_size(page_size)
@@ -110,7 +112,9 @@ class AnnotationContainer(object):
             self.view = self.view_contained_descriptions
             self.iris = 0
         else:
-            raise AnnotationError(message="%s is not a valid container option. Value MUST be one of PreferMinimalContainer, PreferContainedIRIs, PreferContainedDescriptions" % (view))
+            raise AnnotationError(message="%s is not a valid container option. Value MUST be one of "
+                                          "PreferMinimalContainer, PreferContainedIRIs, PreferContainedDescriptions"
+                                          % view)
         self.base_url = update_url(self.base_url, {"iris": self.iris})
 
     def view_minimal_container(self):
@@ -228,6 +232,8 @@ class AnnotationPage(object):
                     pass
                 else:
                     raise TypeError('items must be of type Annotation or JSON objects with type "Annotation"')
+        # ensure all annotations are validated and added as annotation objects
+        items = [Annotation(annotation) if isinstance(annotation, dict) else annotation for annotation in items]
         self.items: List[Annotation] = items if items else []
         # if this page is not the last in the collection, it must have 'next' property
         self.next = None
@@ -248,7 +254,7 @@ class AnnotationPage(object):
         json_data = {
             'type': self.type,
             'id': self.id,
-            'items': self.items,
+            'items': [annotation.to_json() for annotation in self.items],
         }
         if self.next:
             json_data['next'] = self.next
@@ -259,5 +265,3 @@ class AnnotationPage(object):
         if self.part_of:
             json_data['partOf'] = self.part_of
         return json_data
-
-

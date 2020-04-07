@@ -44,4 +44,3 @@ class TestIIIFManifest(unittest.TestCase):
         except AssertionError as err:
             error = err
         self.assertNotEqual(error, None)
-

@@ -1,7 +1,7 @@
 import uuid
 import copy
 import unittest
-from annotation_examples import annotations as examples
+from test.annotation_examples import annotations as examples
 from models.annotation import Annotation, WebAnnotationValidator, AnnotationError
 
 class TestAnnotationValidation(unittest.TestCase):

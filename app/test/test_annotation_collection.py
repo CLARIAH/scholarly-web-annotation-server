@@ -1,7 +1,7 @@
 import copy
 import unittest
-from annotation_examples import annotations as examples, annotation_collections as example_collections
-from models.annotation import Annotation, AnnotationError
+from test.annotation_examples import annotations as examples, annotation_collections as example_collections
+from models.annotation import Annotation
 from models.annotation_collection import AnnotationCollection
 
 class TestAnnotationCollection(unittest.TestCase):

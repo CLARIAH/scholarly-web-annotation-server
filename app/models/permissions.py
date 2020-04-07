@@ -1,12 +1,14 @@
 from models.error import PermissionError, InvalidUsage
 
+
 def is_allowed_action(username, action, annotation):
-    if action == "traverse": # traversing chained annotations requires no permissions
+    if action == "traverse":  # traversing chained annotations requires no permissions
         return True
     if action == "see":
         return is_allowed_to_see(username, annotation)
     if action == "edit":
         return is_allowed_to_edit(username, annotation)
+
 
 def is_allowed_to_see(username, annotation):
     if not username:
@@ -19,10 +21,11 @@ def is_allowed_to_see(username, annotation):
         return True
     return False
 
+
 def is_allowed_to_edit(username, annotation):
-    if not username: # anonymous users are not allowed to edit
+    if not username:  # anonymous users are not allowed to edit
         return False
-    if is_public(annotation) and not is_owned_by(annotation, username): # only owner can edit public annotation
+    if is_public(annotation) and not is_owned_by(annotation, username):  # only owner can edit public annotation
         return False
     if is_owned_by(annotation, username):
         return True
@@ -30,8 +33,10 @@ def is_allowed_to_edit(username, annotation):
         return True
     return False
 
+
 def is_owned_by(annotation, username):
     return annotation.permissions["owner"] == username
+
 
 def is_see_shared_with(annotation, username):
     if not is_shared(annotation):
@@ -40,6 +45,7 @@ def is_see_shared_with(annotation, username):
         return False
     return username in annotation.permissions["can_see"]
 
+
 def is_edit_shared_with(annotation, username):
     if not is_shared(annotation):
         return False
@@ -47,33 +53,38 @@ def is_edit_shared_with(annotation, username):
         return False
     return username in annotation.permissions["can_edit"]
 
+
 def is_private(annotation):
     return "private" in annotation.permissions["access_status"]
 
+
 def is_shared(annotation):
     return "shared" in annotation.permissions["access_status"]
+
 
 def is_public(annotation):
     return "public" in annotation.permissions["access_status"]
 
 
 def add_permissions(annotation, params):
-    if not annotation.permissions: # must be new annotation
+    if not annotation.permissions:  # must be new annotation
         add_permissions_to_new_annotation(annotation, params)
-    elif not params: # no permissions to update
+    elif not params:  # no permissions to update
         return annotation
     else:
         update_permissions_of_existing_annotation(annotation, params)
     add_share_permissions(annotation, params)
     return annotation
 
+
 def update_permissions_of_existing_annotation(annotation, params):
     if "action" in params and params["action"] == "traverse":
         return annotation
     # update of existing annotation
-    if params["access_status"] != None:
+    if params["access_status"] is not None:
         # set new access status
         annotation.permissions["access_status"] = params["access_status"]
+
 
 def add_permissions_to_new_annotation(annotation, params):
     if not params:
@@ -90,6 +101,7 @@ def add_permissions_to_new_annotation(annotation, params):
         "access_status": params["access_status"],
         "owner": params["username"]
     }
+
 
 def add_share_permissions(annotation, params):
     # private and public annotations have a no share details
@@ -109,7 +121,7 @@ def add_share_permissions(annotation, params):
             if user not in annotation.permissions["can_see"]:
                 annotation.permissions["can_see"] += [user]
 
+
 def remove_permissions(annotation):
     if "permissions" in annotation:
         del annotation.permissions
-

@@ -1,0 +1,20 @@
+{
+	"@context": {
+		"oa": "http://www.w3.org/ns/oa#",
+		"rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+		"rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+		"owl": "http://www.w3.org/2002/07/owl#",
+		"as": "http://www.w3.org/ns/activitystreams#",
+		"swao": "http://annotation.clariah.nl/ns/swao#"
+	},
+	"@graph": [
+		{
+			"comment": "NestedPIDSelector describes a hierarchically ordered list of resource identifiers, to be used in an annotation target. The hierachy consist of part-whole relationships or other hierarchal  relationships. The resource identifiers should be ordered top down, with the largest/encompassing resource first, and the smallest/deepest nested resource last. The purpose of the NestedPIDSelector is to allow annotations to be retrieved by target identifiers at different levels. For instance, an annotation on a page from a manuscript may target a specific textregion of that page. The textregion might have its own identifier, but the page and the manuscript also have identifiers. By adding all three identifiers in a NestedPIDSelector, the annotation can be retrieved for all three levels.",
+			"definedBy": "swao:",
+			"id": "swao:NestedPIDSelector",
+			"label": "NestedPIDSelector",
+			"subClassOf": "oa:Selector",
+			"type": "rdfs:Class"
+		}
+	]
+}

@@ -11,7 +11,7 @@ class UserStore(object):
         if "secret_key" in es_config:
             self.secret_key = es_config["secret_key"]
 
-        #initialise ES
+        # initialise ES
         self.es_config = es_config
         self.es_index = es_config['user_index']
         self.es = Elasticsearch([{"host": es_config['host'], "port": es_config['port']}])
@@ -36,7 +36,7 @@ class UserStore(object):
 
     def register_user(self, username, password):
         if not self.username_available(username):
-            raise UserError("User {u} already exists!".format(username))
+            raise UserError(f"User {username} already exists!")
         user = User({"username": username})
         user.hash_password(password)
         response = self.add_user_to_index(user)
@@ -99,7 +99,7 @@ class UserStore(object):
     def add_user_to_index(self, user):
         if not user.password_hash:
             raise UserError("Cannot store user without a password")
-        #action = "updated" if self.user_exists(user.username) else "created"
+        # action = "updated" if self.user_exists(user.username) else "created"
         self.es.index(index=self.es_index, doc_type="user", id=user.user_id, body=user.json())
         self.es.indices.refresh(index=self.es_index)
         return user
