@@ -23,6 +23,8 @@ cors = CORS(app)
 blueprint = Blueprint('api', __name__)
 api = Api(blueprint)
 
+print('annotation server started')
+
 auth = HTTPBasicAuth()
 
 try:

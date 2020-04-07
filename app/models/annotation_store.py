@@ -2,7 +2,7 @@ import copy
 import json
 from models.annotation import Annotation, AnnotationError
 from models.annotation_collection import AnnotationCollection
-from models.error import *
+from models.error import PermissionError
 import models.queries as query_helper
 import models.permissions as permissions
 from elasticsearch import Elasticsearch
@@ -160,7 +160,7 @@ class AnnotationStore(object):
         response = self.get_from_index_by_filters(params, annotation_type="Annotation")
         annotations = [Annotation(hit["_source"]) for hit in response["hits"]["hits"]]
         return {
-            "total": response["hits"]["total"],
+            "total": response["hits"]["total"]["value"],
             "annotations": [annotation.to_clean_json(params) for annotation in annotations]
         }
 
@@ -188,7 +188,7 @@ class AnnotationStore(object):
         response = self.get_from_index_by_filters(params, annotation_type="AnnotationCollection")
         collections = [AnnotationCollection(hit["_source"]) for hit in response["hits"]["hits"]]
         return {
-            "total": response["hits"]["total"],
+            "total": response["hits"]["total"]["value"],
             "collections": [collection.to_clean_json(params) for collection in collections]
         }
 
