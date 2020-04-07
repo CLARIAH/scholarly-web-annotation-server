@@ -1,15 +1,14 @@
-FROM tiangolo/uwsgi-nginx-flask:python3.7
+# Use the Python3.7.2 image
+FROM python:3.7.2-stretch
 
-ENV UWSGI_INI /app/uwsgi.ini
-
-ENV LISTEN_PORT 80
-
-EXPOSE 80
-
-COPY ./app /app
-
-COPY ./requirements.txt /app/requirements.txt
+# Set the working directory to /app
 WORKDIR /app
 
-RUN pip3 install -r requirements.txt
+# Copy the current directory contents into the container at /app 
+ADD app/. /app
 
+# Install the dependencies
+RUN pip install -r requirements.txt
+
+# run the command to start uWSGI
+CMD ["uwsgi", "app.ini"]
