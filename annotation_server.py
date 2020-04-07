@@ -1,22 +1,22 @@
-from flask import Flask, Blueprint, request, abort, make_response, jsonify, g
+from flask import Flask, request, abort, make_response, jsonify
 from flask_restx import Api, Resource
 from flask_httpauth import HTTPBasicAuth
 from flask_cors import CORS
 
 from models.response_models import *
-from models.error import InvalidUsage
 from parse.headers_params import *
 from models.annotation_store import AnnotationStore
 from models.user_store import UserStore
 from models.annotation import AnnotationError
 from models.annotation_container import AnnotationContainer
+import models.iiif_manifest as iiif_manifest
+from models.iiif_manifest import Manifest
 
 from settings import server_config
 
 app = Flask(__name__, static_url_path='', static_folder='public')
 app.config['SECRET_KEY'] = "some combination of key words"
 cors = CORS(app)
-#api = Api(app)
 blueprint = Blueprint('api', __name__)
 api = Api(blueprint)
 
@@ -25,19 +25,23 @@ auth = HTTPBasicAuth()
 annotation_store = AnnotationStore(server_config["Elasticsearch"])
 user_store = UserStore(server_config["Elasticsearch"])
 
+
 @api.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):
     return error.to_dict(), error.status_code
+
 
 @api.errorhandler(AnnotationError)
 def handle_annotation_error(error):
     return error.to_dict(), error.status_code
 
+
 @auth.verify_password
 def verify_password(token_or_username, password):
     # anonymous access is allowed, set user to None
     if not token_or_username and not password:
-        g.user = None # anonymous user
+        # anonymous user
+        g.user = None
         return True
     # Non-anonymous access requires authentication
     # First try to authenticate by token
@@ -47,16 +51,20 @@ def verify_password(token_or_username, password):
     if user_store.verify_user(token_or_username, password):
         g.user = user_store.get_user(token_or_username)
         return True
-    # non-anoymous user not authenticated -> return error 403
+    # non-anonymous user not authenticated -> return error 403
     return False
 
-@auth.error_handler # handled by HTTPBasicAuth
+
+@auth.error_handler
+# handled by HTTPBasicAuth
 def unauthorized():
     # return 403 instead of 401 to prevent browsers from displaying the default auth dialog
     return make_response(jsonify({'message': 'Unauthorized access'}), 403)
 
-@api.errorhandler # handled by Flask restplus api
-def handle_unauthorized_api(error):
+
+@api.errorhandler
+# handled by Flask restplus api
+def handle_unauthorized_api(_error):
     # return 403 instead of 401 to prevent browsers from displaying the default auth dialog
     return {'message': 'Unauthorized access'}, 403
 
@@ -71,6 +79,7 @@ class BasicAPI(Resource):
     @api.response(404, 'Annotation Error')
     def get(self):
         return {"message": "Annotation server online"}
+
 
 """--------------- Annotation endpoints ------------------"""
 
@@ -97,6 +106,7 @@ class AnnotationsAPI(Resource):
         response = annotation_store.add_annotation_es(new_annotation, params=params)
         return response, 201
 
+
 @api.doc(params={'annotation_id': 'The annotation ID'}, required=False)
 @api.route('/api/annotations/<annotation_id>', endpoint='annotation')
 class AnnotationAPI(Resource):
@@ -108,15 +118,17 @@ class AnnotationAPI(Resource):
         params = get_params(request)
         try:
             annotation = annotation_store.get_annotation_es(annotation_id, params)
+            response_data = annotation
+            return response_data
         except PermissionError:
             abort(403)
-        response_data = annotation
-        return response_data
 
     @auth.login_required
     def put(self, annotation_id):
         params = get_params(request, anon_allowed=False)
         annotation = request.get_json()
+        if annotation['id'] != annotation_id:
+            raise ValueError('updated annotation has different id from id in request URL')
         response_data = annotation_store.update_annotation_es(annotation, params=params)
         return response_data
 
@@ -135,7 +147,7 @@ class CollectionsAPI(Resource):
 
     @auth.login_required
     def post(self):
-        #prefer = interpret_header(request.headers)
+        # prefer = interpret_header(request.headers)
         params = get_params(request, anon_allowed=False)
         collection_data = request.get_json()
         collection = annotation_store.create_collection_es(collection_data, params)
@@ -153,6 +165,7 @@ class CollectionsAPI(Resource):
             response_data.append(container.view())
         return response_data
 
+
 @api.route("/api/collections/<collection_id>")
 class CollectionAPI(Resource):
 
@@ -169,6 +182,8 @@ class CollectionAPI(Resource):
     def put(self, collection_id):
         params = get_params(request, anon_allowed=False)
         collection_data = request.get_json()
+        if collection_data['id'] != collection_id:
+            raise ValueError('updated collection has different id from id in request URL')
         collection = annotation_store.update_collection_es(collection_data)
         container = AnnotationContainer(request.url, collection, view=params["view"])
         return container.view()
@@ -178,6 +193,7 @@ class CollectionAPI(Resource):
         params = get_params(request, anon_allowed=False)
         collection = annotation_store.remove_collection_es(collection_id, params)
         return collection
+
 
 @api.route("/api/collections/<collection_id>/annotations/")
 class CollectionAnnotationsAPI(Resource):
@@ -205,6 +221,7 @@ class CollectionAnnotationsAPI(Resource):
         container = AnnotationContainer(request.url, collection["items"], view=params["view"])
         return container.view()
 
+
 @api.route("/api/collections/<collection_id>/annotations/<annotation_id>")
 class CollectionAnnotationAPI(Resource):
 
@@ -213,15 +230,22 @@ class CollectionAnnotationAPI(Resource):
         params = get_params(request, anon_allowed=False)
         return annotation_store.remove_annotation_from_collection_es(annotation_id, collection_id, params)
 
+
+"""--------------- User endpoints ------------------"""
+
+
 @api.route("/api/users")
 class UsersApi(Resource):
 
     @api.response(201, 'Success', user_response)
     @api.response(400, 'Invalid user data')
+    @api.response(403, 'User already exists')
     def post(self):
         user_details = request.get_json()
         if "username" not in user_details or "password" not in user_details:
             return {"message": "user data requires 'username' and 'password'"}, 400
+        if user_store.user_exists(user_details['username']):
+            abort(403)
         user = user_store.register_user(user_details["username"], user_details["password"])
         token = user_store.generate_auth_token(user.user_id, expiration=600)
         return {"action": "created",  "user": {"username": user.username, "token": token.decode('ascii')}}, 201
@@ -243,17 +267,21 @@ class UsersApi(Resource):
         user_store.delete_user(g.user)
         return {}, 204
 
+
 @api.route("/api/login")
 class LoginApi(Resource):
 
     @auth.login_required
     @api.response(200, 'Success', user_response)
+    @api.response(400, 'Invalid user details received')
     @api.response(404, 'User does not exist')
     def post(self):
         if not g.user:
-            abort(403)
+            # if no user object is POSTed, this is a bad request
+            abort(400)
         token = user_store.generate_auth_token(g.user.user_id, expiration=600)
         return {"action": "authenticated", "user": {"username": g.user.username, "token": token.decode('ascii')}}, 200
+
 
 @api.route("/api/logout")
 class LogoutApi(Resource):
@@ -264,6 +292,66 @@ class LogoutApi(Resource):
     def get(self):
         # once token-based auth is implemented, remove token upon logout
         return {"action": "logged out"}, 200
+
+
+"""--------------- IIIF endpoints ------------------"""
+
+
+@api.route("/api/iiif_exchange/manifest/<resource_id>")
+class IIIFExchangeManifestApi(Resource):
+
+    @auth.login_required
+    @api.response(200, 'Success', annotation_list_response)
+    @api.response(400, 'Invalid IIIF Exchange Manifest')
+    def post(self, resource_id):
+        manifest = request.get_json()
+        annotations = iiif_manifest.web_anno_from_manifest(manifest)
+        return annotations, 200
+
+
+@api.route("/api/iiif_exchange/resource/<resource_id>")
+class IIIFExchangeResourceApi(Resource):
+
+    @auth.login_required
+    @api.response(200, 'Success', annotation_list_response)
+    @api.response(400, 'Invalid IIIF Exchange Manifest')
+    def post(self, resource_id):
+        annotations = annotation_store.get_from_index_by_target(resource_id)
+        return annotations, 200
+
+
+@api.route("/api/iiif_exchange/annotation/<annotation_id>")
+class IIIFExchangeAnnotationApi(Resource):
+
+    @auth.login_required
+    @api.response(200, 'Success', annotation_response)
+    @api.response(404, 'Annotation does not exists')
+    def get(self, annotation_id):
+        try:
+            annotation = annotation_store.get_from_index_by_id(annotation_id, "Annotation")
+            annotation['id'] = 'http://localhost:3000/api/annotations/' + annotation['id']
+            #del annotation['permissions']
+            del annotation['target_list']
+            annotation.pop('permissions', None)
+            manifests = iiif_manifest.web_anno_to_manifest([annotation])
+            print('manifests received')
+            if isinstance(manifests, Manifest):
+                response_data = manifests.to_json()
+            else:
+                response_data = [manifest.to_json() for manifest in manifests]
+            print('manifests serialized')
+            return response_data
+        except PermissionError:
+            return abort(404)
+
+    @auth.login_required
+    @api.response(200, 'Success', annotation_list_response)
+    @api.response(400, 'Invalid IIIF Exchange Manifest')
+    def post(self, resource_id):
+        manifest = request.get_json()
+        annotations = iiif_manifest.web_anno_from_manifest(manifest)
+        return annotations, 200
+
 
 app.register_blueprint(blueprint)
 
