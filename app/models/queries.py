@@ -1,13 +1,14 @@
-
 def bool_must(queries):
     if not isinstance(queries, list):
         raise TypeError("queries parameter must be a list of queries")
     return {"bool": {"must": queries}}
 
+
 def bool_should(queries):
     if not isinstance(queries, list):
         raise TypeError("queries parameter must be a list of queries")
     return {"bool": {"should": queries}}
+
 
 def make_param_filter_queries(params):
     filter_queries = []
@@ -19,30 +20,39 @@ def make_param_filter_queries(params):
         filter_queries += [make_target_list_query({"type": params["filter"]["target_type"]})]
     return filter_queries
 
+
 def permission_match(field, value):
     field = "permissions.{f}".format(f=field)
     return {"match": {field, value}}
 
+
 def access_match(value):
     return {"match": {"permissions.access_status": value}}
+
 
 def owner_match(value):
     return {"match": {"permissions.owner": value}}
 
+
 def can_see_match(value):
     return {"match": {"permissions.can_see": value}}
+
 
 def can_edit_match(value):
     return {"match": {"permissions.can_edit": value}}
 
+
 def private_match(username):
     return bool_must([access_match("private"), owner_match(username)])
+
 
 def shared_see_match(username):
     return bool_must([access_match("shared"), bool_should([owner_match(username), can_see_match(username)])])
 
+
 def shared_edit_match(username):
     return bool_must([access_match("shared"), can_edit_match(username)])
+
 
 def make_permission_see_query(params):
     if not params["username"]:
@@ -59,9 +69,11 @@ def make_permission_see_query(params):
     if "public" in params["access_status"]:
         access_matches += [access_match("public")]
     if len(access_matches) == 1:
-        return bool_must(access_matches) # avoid should being interpreted as boost
+        # avoid should being interpreted as boost
+        return bool_must(access_matches)
     else:
         return bool_should(access_matches)
+
 
 def make_permission_edit_query(params):
     access_matches = []
@@ -72,9 +84,11 @@ def make_permission_edit_query(params):
     if "public" in params["access_status"]:
         access_matches += [access_match("public")]
     if len(access_matches) == 1:
-        return bool_must(access_matches) # avoid should being interpreted as boost
+        # avoid should being interpreted as boost
+        return bool_must(access_matches)
     else:
         return bool_should(access_matches)
+
 
 def make_target_list_query(target):
     target_field = list(target.keys())[0]
@@ -83,4 +97,3 @@ def make_target_list_query(target):
         return {"match": {list_field: target[target_field]}}
     elif type(target[target_field]) == list:
         return bool_should([{"match": {list_field: target_item}} for target_item in target[target_field]])
-

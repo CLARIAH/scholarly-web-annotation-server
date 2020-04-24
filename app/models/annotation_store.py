@@ -159,8 +159,14 @@ class AnnotationStore(object):
         self.check_index_is_fresh()
         response = self.get_from_index_by_filters(params, annotation_type="Annotation")
         annotations = [Annotation(hit["_source"]) for hit in response["hits"]["hits"]]
+        if isinstance(response['hits']['total'], dict):
+            # For Elasticsearch version 6 and higher
+            total = response['hits']['total']['value']
+        else:
+            # For Elasticsearch version 5 and lower
+            total = response['hits']['total']
         return {
-            "total": response["hits"]["total"]["value"],
+            "total": total,
             "annotations": [annotation.to_clean_json(params) for annotation in annotations]
         }
 
@@ -187,8 +193,14 @@ class AnnotationStore(object):
         self.check_index_is_fresh()
         response = self.get_from_index_by_filters(params, annotation_type="AnnotationCollection")
         collections = [AnnotationCollection(hit["_source"]) for hit in response["hits"]["hits"]]
+        if isinstance(response['hits']['total'], dict):
+            # For Elasticsearch version 6 and higher
+            total = response['hits']['total']['value']
+        else:
+            # For Elasticsearch version 5 and lower
+            total = response['hits']['total']
         return {
-            "total": response["hits"]["total"]["value"],
+            "total": total,
             "collections": [collection.to_clean_json(params) for collection in collections]
         }
 

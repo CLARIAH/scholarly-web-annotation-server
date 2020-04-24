@@ -1,5 +1,6 @@
 """--------------- Error handling ------------------"""
 
+
 class InvalidUsage(Exception):
     status_code = 400
 
@@ -14,6 +15,7 @@ class InvalidUsage(Exception):
         rv = dict(self.payload or ())
         rv['message'] = self.message
         return rv
+
 
 class PermissionError(Exception):
     status_code = 403
@@ -30,6 +32,7 @@ class PermissionError(Exception):
         rv['message'] = self.message
         return rv
 
+
 class UserError(Exception):
     status_code = 400
 
@@ -44,5 +47,3 @@ class UserError(Exception):
         rv['message'] = self.message
         rv['status_code'] = self.status_code
         return rv
-
-
