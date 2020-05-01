@@ -21,6 +21,10 @@ def read_vaint_example():
 
 class TestIIIFManifest(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        print("\nrunning IIIF Manifest Model tests")
+
     def setUp(self) -> None:
         self.vaint_example = read_vaint_example()
 
@@ -28,19 +32,18 @@ class TestIIIFManifest(unittest.TestCase):
         self.assertTrue(iiif.check_canvas_items([]))
 
     def test_web_anno_to_manifest_returns_single_manifest(self):
-        manifests = iiif.web_anno_to_manifest(self.vaint_example['annotation'])
-        self.assertTrue(len(manifests) == 1)
+        manifest = iiif.web_anno_to_manifest(self.vaint_example['annotation'])
+        self.assertTrue(isinstance(manifest, Manifest))
 
     def test_web_anno_to_manifest_returns_manifest(self):
-        manifests = iiif.web_anno_to_manifest(self.vaint_example['annotation'])
-        print(manifests[0])
-        self.assertTrue(isinstance(manifests[0], Manifest))
+        manifest = iiif.web_anno_to_manifest(self.vaint_example['annotation'])
+        self.assertTrue(isinstance(manifest, Manifest))
 
     def test_manifest_add_canvas_throws_error_if_non_canvas_is_passed(self):
         manifests = iiif.web_anno_to_manifest(self.vaint_example['annotation'])
         error = None
         try:
-            manifests[0].add_canvas_items([1])
+            manifests.add_canvas_items([1])
         except AssertionError as err:
             error = err
         self.assertNotEqual(error, None)

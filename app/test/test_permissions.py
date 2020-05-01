@@ -10,6 +10,10 @@ from settings_unittest import server_config
 
 class TestPermissionModel(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        print("\nrunning Permission Model tests")
+
     def setUp(self):
         self.store = AnnotationStore(server_config["Elasticsearch"])
         self.example_annotation = copy.copy(examples["vincent"])

@@ -12,6 +12,10 @@ from settings_unittest import server_config
 
 class TestAnnotationStore(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        print("\nrunning Annotation Store tests")
+
     def setUp(self):
         self.config = server_config["Elasticsearch"]
         self.store = AnnotationStore(self.config)
@@ -142,8 +146,8 @@ class TestAnnotationStore(unittest.TestCase):
         add_permissions(anno, self.private_params)
         anno.data["target_list"] = self.store.get_target_list(anno)
         self.store.add_to_index(anno.to_json(), anno.data['type'])
-        # wait for indexing of target_list field to finish
-        time.sleep(1)
+        # refresh the index to make sure the indexed annotation is available
+        self.store.index_refresh()
         response = self.store.get_from_index_by_target({"id": anno.data["target"][0]["id"]})
         self.assertEqual(len(response), 1)
         self.assertEqual(response[0]['id'], anno.data['id'])

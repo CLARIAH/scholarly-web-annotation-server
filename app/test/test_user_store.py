@@ -10,6 +10,10 @@ from settings_unittest import server_config
 
 class TestUserStore(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        print("\nrunning User Store tests")
+
     def setUp(self):
         self.config = server_config["Elasticsearch"]
         # make sure there is no previous test index
@@ -150,4 +154,3 @@ class TestUserStore(unittest.TestCase):
         token = self.user_store.generate_auth_token(user.user_id, expiration=0.1)
         verified_user = self.user_store.verify_auth_token(token)
         self.assertEqual(verified_user.user_id, user.user_id)
-

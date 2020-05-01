@@ -4,7 +4,12 @@ import unittest
 from test.annotation_examples import annotations as examples
 from models.annotation import Annotation, WebAnnotationValidator, AnnotationError
 
+
 class TestAnnotationValidation(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        print("\nrunning Annotation Validation tests")
 
     def setUp(self):
         self.validator = WebAnnotationValidator()
@@ -119,7 +124,12 @@ class TestAnnotationValidation(unittest.TestCase):
         self.assertNotEqual(error, None)
         self.assertTrue('Non-empty collection MUST have "first" property referencing the first AnnotationPage')
 
+
 class TestAnnotation(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        print("\nrunning Annotation Model tests")
 
     def setUp(self):
         self.annotation = Annotation(copy.copy(examples["vincent"]))

@@ -1,3 +1,4 @@
+from typing import Dict, Union
 import copy
 import json
 from models.annotation import Annotation, AnnotationError
@@ -58,18 +59,21 @@ def get_objects_from_hits(hits):
 
 class AnnotationStore(object):
 
-    def __init__(self, es_config, annotations=[]):
+    def __init__(self, es_config):
         self.es_config = es_config
-
         self.es_index = es_config['annotation_index']
         self.es = Elasticsearch([{"host": es_config['host'], "port": es_config['port']}])
         if not self.es.indices.exists(index=self.es_index):
             self.es.indices.create(index=self.es_index)
         self.needs_refresh = False
 
-        # add some annotations
-        for annotation in annotations:
-            self.add_annotation(annotation)
+    def configure(self, es_config: Dict[str, Union[str, int]]):
+        self.es_config = es_config
+        self.es_index = es_config['annotation_index']
+        self.es = Elasticsearch([{"host": es_config['host'], "port": es_config['port']}])
+        if not self.es.indices.exists(index=self.es_index):
+            self.es.indices.create(index=self.es_index)
+        self.needs_refresh = False
 
     def index_needs_refresh(self):
         return self.needs_refresh

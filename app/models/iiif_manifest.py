@@ -198,23 +198,19 @@ def sort_web_annos_by_target(annotations: List[Union[Annotation, dict]]) -> Dict
     return manifest_annotations
 
 
-def web_anno_to_manifest(annotations: List[Union[Annotation, dict]]) -> Union[Manifest, List[Manifest]]:
+def web_anno_to_manifest(annotations: Union[Annotation, dict, List[Union[Annotation, dict]]]) -> Union[Manifest, List[Manifest]]:
     manifests = []
+    if isinstance(annotations, dict) or isinstance(annotations, Annotation):
+        annotations = [annotations]
     manifest_annotations = sort_web_annos_by_target(annotations)
-    print('annotations sorted')
     for target_id in manifest_annotations:
         manifest = Manifest(target_id)
-        print('manifest generated')
         annotation_page_id = manifest.id + '/page/1'
-        print('annotation_page_id created:', annotation_page_id)
         manifest.add_annotations(annotation_page_id, manifest_annotations[target_id])
-        print('annotations added to manifest')
         manifests += [manifest]
     if len(manifests) == 1:
-        print('returning manifests')
         return manifests[0]
     else:
-        print('returning manifests')
         return manifests
 
 

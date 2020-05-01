@@ -4,7 +4,12 @@ from test.annotation_examples import annotations as examples, annotation_collect
 from models.annotation import Annotation
 from models.annotation_collection import AnnotationCollection
 
+
 class TestAnnotationCollection(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        print("\nrunning Annotation Collection Model tests")
 
     def setUp(self):
         self.collection = example_collections["empty_collection"]
@@ -46,8 +51,5 @@ class TestAnnotationCollection(unittest.TestCase):
         self.assertEqual(collection_json["items"][0], annotation.id)
 
 
-
 if __name__ == "__main__":
     unittest.main()
-
-

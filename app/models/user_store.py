@@ -1,3 +1,4 @@
+from typing import Dict, Union
 from models.user import User
 from models.error import UserError
 from elasticsearch import Elasticsearch
@@ -6,12 +7,20 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSigna
 
 class UserStore(object):
 
-    def __init__(self, es_config):
+    def __init__(self, es_config: Dict[str, Union[str, int]]):
         self.secret_key = "some combination of key words"
         if "secret_key" in es_config:
             self.secret_key = es_config["secret_key"]
 
         # initialise ES
+        self.es_config = es_config
+        self.es_index = es_config['user_index']
+        self.es = Elasticsearch([{"host": es_config['host'], "port": es_config['port']}])
+        if not self.es.indices.exists(index=self.es_index):
+            self.es.indices.create(index=self.es_index)
+        self.needs_refresh = False
+
+    def configure(self, es_config: Dict[str, Union[str, int]]) -> None:
         self.es_config = es_config
         self.es_index = es_config['user_index']
         self.es = Elasticsearch([{"host": es_config['host'], "port": es_config['port']}])

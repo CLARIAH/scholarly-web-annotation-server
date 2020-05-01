@@ -8,11 +8,15 @@ from models.annotation_container import AnnotationContainer, update_url
 
 class TestAnnotationContainer(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        print("\nrunning Annotation Container Model tests")
+
     def setUp(self):
         self.collection = AnnotationCollection(copy.copy(example_collections["empty_collection"]))
         self.annotations = [Annotation(copy.copy(examples["vincent"])), Annotation(copy.copy(examples["theo"]))]
         self.label = "Some collection"
-        self.base_url = "http://localhost:3000/api/annotations"
+        self.base_url = "http://localhost:3000/api/annotations/"
 
     def test_container_can_be_initialized(self):
         container = AnnotationContainer(self.base_url, [], view="PreferMinimalContainer")
@@ -115,14 +119,14 @@ class TestAnnotationContainer(unittest.TestCase):
         self.assertEqual(view2["prev"], view1["id"])
         items = view0["items"] + view1["items"] + view2["items"]
         for anno in annotations:
-            self.assertTrue(anno.id in items)
+            self.assertTrue(self.base_url + anno.id in items)
 
     def test_container_view_can_show_first_page_as_iris(self):
-        anno_ids = [anno.id for anno in self.annotations]
+        anno_ids = [self.base_url + anno.id for anno in self.annotations]
         container = AnnotationContainer(self.base_url, self.annotations, view="PreferContainedIRIs", page_size=1)
         view = container.view()
-        self.assertEqual(view["first"]["id"], update_url(container.base_url, {"page": 0}))
-        self.assertEqual(view["first"]["next"], update_url(container.base_url, {"page": 1}))
+        self.assertEqual(view["first"]["id"], update_url(container.base_url, {"iris": 1, "page": 0}))
+        self.assertEqual(view["first"]["next"], update_url(container.base_url, {"iris": 1, "page": 1}))
         self.assertEqual(len(view["first"]["items"]), 1)
         self.assertTrue(view["first"]["items"][0] in anno_ids)
 

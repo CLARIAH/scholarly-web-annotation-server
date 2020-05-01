@@ -7,6 +7,9 @@ from rfc3987 import parse as parse_iri
 
 from models.annotation import Annotation, AnnotationError
 from models.annotation_collection import AnnotationCollection
+from settings import server_config
+
+api_url = server_config['SWAServer']['url'] + server_config['SWAServer']['api_prefix']
 
 
 def is_annotation_list(annotations):
@@ -59,7 +62,7 @@ def update_url(base_url, params):
 
 class AnnotationContainer(object):
 
-    def __init__(self, base_url, data, page_size=100, view="PreferMinimalContainer", total=None):
+    def __init__(self, base_url: str, data, page_size=100, view="PreferMinimalContainer", total=None):
         self.base_url = base_url
         self.context = ["http://www.w3.org/ns/ldp.jsonld", "http://www.w3.org/ns/anno.jsonld"]
         self.metadata = {}
@@ -73,8 +76,8 @@ class AnnotationContainer(object):
         self.set_page_size(page_size)
         self.set_container_content(data, total)
         if self.metadata["total"] > 0:
-            self.first = update_url(self.base_url, {"page": 0})
-            self.last = update_url(self.base_url, {"page": self.num_pages - 1})
+            self.first = update_url(self.base_url, {"iris": self.iris, "page": 0})
+            self.last = update_url(self.base_url, {"iris": self.iris, "page": self.num_pages - 1})
 
     def generate_metadata_from_collection(self, collection):
         self.metadata = {
@@ -95,7 +98,7 @@ class AnnotationContainer(object):
             total = len(annotations)
         self.metadata = {
             "@context": self.context,
-            "id": self.base_url,
+            "id": update_url(self.base_url, {"iris": self.iris}),
             "total": total,
             "type": ["BasicContainer", "AnnotationContainer"]
         }
@@ -115,7 +118,7 @@ class AnnotationContainer(object):
             raise AnnotationError(message="%s is not a valid container option. Value MUST be one of "
                                           "PreferMinimalContainer, PreferContainedIRIs, PreferContainedDescriptions"
                                           % view)
-        self.base_url = update_url(self.base_url, {"iris": self.iris})
+        # self.base_url = update_url(self.base_url, {"iris": self.iris})
 
     def view_minimal_container(self):
         if self.metadata["total"] > 0:
@@ -126,7 +129,7 @@ class AnnotationContainer(object):
     def view_contained_iris(self):
         if self.metadata["total"] > 0:
             self.metadata["first"] = {
-                "id": update_url(self.base_url, {"page": 0}),
+                "id": update_url(self.base_url, {"iris": self.iris, "page": 0}),
                 "type": "AnnotationPage",
                 "items": self.add_page_items(0)
             }
@@ -137,7 +140,7 @@ class AnnotationContainer(object):
     def view_contained_descriptions(self):
         if self.metadata["total"] > 0:
             self.metadata["first"] = {
-                "id": update_url(self.base_url, {"page": 0}),
+                "id": update_url(self.base_url, {"iris": self.iris, "page": 0}),
                 "type": "AnnotationPage",
                 "items": self.add_page_items(0)
             }
@@ -153,7 +156,7 @@ class AnnotationContainer(object):
     def generate_page_metadata(self, page_num):
         page_metadata = {
             "@context": "http://www.w3.org/ns/anno.jsonld",
-            "id": update_url(self.base_url, {"page": page_num}),
+            "id": update_url(self.base_url, {"iris": self.iris, "page": page_num}),
             "type": "AnnotationPage",
             "partOf": self.add_collection_ref(),
             "startIndex": self.page_size * page_num,
@@ -164,9 +167,9 @@ class AnnotationContainer(object):
 
     def add_page_refs(self, page_metadata, page_num):
         if page_num > 0:
-            page_metadata["prev"] = update_url(self.base_url, {"page": page_num-1})
+            page_metadata["prev"] = update_url(self.base_url, {"iris": self.iris, "page": page_num-1})
         if page_num < self.num_pages - 1:
-            page_metadata["next"] = update_url(self.base_url, {"page": page_num+1})
+            page_metadata["next"] = update_url(self.base_url, {"iris": self.iris, "page": page_num+1})
 
     def add_collection_ref(self):
         part_of = {
@@ -180,6 +183,11 @@ class AnnotationContainer(object):
     def add_page_items(self, page_num):
         start_index = self.page_size * page_num
         items = self.items[start_index: start_index + self.page_size]
+        if len(items) > 0 and isinstance(items[0], str):
+            items = [api_url + '/annotations/' + item for item in items]
+        else:
+            for item in items:
+                item['id'] = api_url + '/annotations/' + item['id']
         if self.iris:
             if isinstance(items[0], str):
                 return items

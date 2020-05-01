@@ -13,14 +13,19 @@ pwd_context = CryptContext(
     # replace this list with the hash(es) you wish to support.
     # this example sets pbkdf2_sha256 as the default,
     # with support for legacy des_crypt hashes.
-    schemes=["pbkdf2_sha256", "des_crypt" ],
-    #default="pbkdf2_sha256",
+    schemes=["pbkdf2_sha256", "des_crypt"],
+    # default="pbkdf2_sha256",
 
     deprecated="auto",
 
     # set the number of rounds that should be used...
-    pbkdf2_sha256__default_rounds = 80000,
+    pbkdf2_sha256__default_rounds=80000,
     )
+
+
+def generate_id():
+    return uuid.uuid4().urn
+
 
 class User(object):
 
@@ -30,14 +35,12 @@ class User(object):
         if type(user_data["username"]) != str:
             raise UserError(message="username must be a string")
         self.username = user_data["username"]
-        self.user_id = user_data["user_id"] if "user_id" in user_data else self.generate_id()
+        self.user_id = user_data["user_id"] if "user_id" in user_data else generate_id()
         self.password_hash = user_data["password_hash"] if "password_hash" in user_data else None
 
-    def generate_id(self):
-        return uuid.uuid4().urn
-
     def hash_password(self, password):
-        self.password_hash = pwd_context.encrypt(password)
+        self.password_hash = pwd_context.hash(password)
+        # self.password_hash = pwd_context.encrypt(password)
 
     def verify_password(self, password):
         return pwd_context.verify(password, self.password_hash)

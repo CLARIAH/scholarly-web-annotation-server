@@ -23,7 +23,7 @@
         }
     },
     {
-        "context": "http://www.w3.org/ns/anno.jsonld",
+        "@context": "http://www.w3.org/ns/anno.jsonld",
         "id": "http://example.com/annotations/195",
         "created": "2018-07-10T17:30:04.639Z",
         "generated": "2018-07-14T15:13:28Z",
@@ -91,7 +91,7 @@
     },
     {
         "id": "http://example.com/annotations/195#viandata",
-        "context": "http://myns.example.com/VIAN",
+        "@context": "http://myns.example.com/VIAN",
         "type": "ColorProfile",
         "body":[
             {
@@ -102,7 +102,7 @@
     },
     {
         "id": "http://example.com/annotations/195#clariahdata",
-        "context": "http://myns.example.com/CLARIAH",
+        "@context": "http://myns.example.com/CLARIAH",
         "type": "KeyValuePairs",
         "body":[
             {

@@ -2,7 +2,12 @@ import unittest
 from models.user import User, pwd_context
 from models.error import UserError
 
+
 class TestUser(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        print("\nrunning User Model tests")
 
     def setUp(self):
         self.username = "testuser"
@@ -16,7 +21,7 @@ class TestUser(unittest.TestCase):
             User()
         except TypeError as e:
             error = e
-        self.assertNotEqual(error, None) # error must be defined
+        self.assertNotEqual(error, None)
 
     def test_user_model_rejects_init_without_username(self):
         error = None
@@ -24,7 +29,7 @@ class TestUser(unittest.TestCase):
             User({})
         except UserError as e:
             error = e
-        self.assertNotEqual(error, None) # error must be defined
+        self.assertNotEqual(error, None)
         self.assertEqual(error.message, "user_data must have property 'username'")
 
     def test_user_model_rejects_init_with_non_object(self):
@@ -33,7 +38,7 @@ class TestUser(unittest.TestCase):
             User(9)
         except TypeError as e:
             error = e
-        self.assertNotEqual(error, None) # error must be defined
+        self.assertNotEqual(error, None)
 
     def test_user_model_rejects_init_with_nonstring_username(self):
         error = None
@@ -41,7 +46,7 @@ class TestUser(unittest.TestCase):
             User({"username": 9})
         except UserError as e:
             error = e
-        self.assertNotEqual(error, None) # error must be defined
+        self.assertNotEqual(error, None)
         self.assertEqual(error.message, "username must be a string")
 
     def test_user_model_accepts_init_with_username(self):
@@ -55,7 +60,7 @@ class TestUser(unittest.TestCase):
             user.hash_password(9)
         except TypeError as e:
             error = e
-        self.assertNotEqual(error, None) # error must be defined
+        self.assertNotEqual(error, None)
 
     def test_user_model_accepts_string_password(self):
         user = User({"username": self.username})
@@ -73,5 +78,3 @@ class TestUser(unittest.TestCase):
         user_json = user.json()
         self.assertEqual(user_json["username"], self.username)
         self.assertTrue("password_hash" in user_json)
-
-

@@ -1,12 +1,14 @@
-from flask import Blueprint
-from flask_restplus import Api, Model, fields
+from flask import request, abort
+from flask_restx import Namespace, Resource, fields
+from models.annotation_store import AnnotationStore
+from models.iiif_manifest import Manifest
+import models.iiif_manifest as iiif_manifest
+from settings import server_config
+from flask_httpauth import HTTPBasicAuth
 
-blueprint = Blueprint('api', __name__)
-api = Api(blueprint)
-
-"""--------------- API request and response models ------------------"""
-
-
+annotation_store = AnnotationStore(server_config["Elasticsearch"])
+api = Namespace('annotations', description='Annotation related operations')
+auth = HTTPBasicAuth()
 # generic response model
 response_model = api.model("Response", {
     "status": fields.String(description="Status", required=True, enum=["success", "error"]),
@@ -110,5 +112,59 @@ collection_list_model = api.model("AnnotationCollectionListResponse", {
     "collections": fields.List(fields.Nested(annotation_collection_model), description="List of annotation collections")
 })
 
+"""--------------- IIIF endpoints ------------------"""
 
 
+@api.route("/iiif_exchange/manifest/<resource_id>")
+class IIIFExchangeManifestApi(Resource):
+
+    @auth.login_required
+    @api.response(200, 'Success', annotation_list_response)
+    @api.response(400, 'Invalid IIIF Exchange Manifest')
+    def post(self, _resource_id):
+        manifest = request.get_json()
+        annotations = iiif_manifest.web_anno_from_manifest(manifest)
+        return annotations, 200
+
+
+@api.route("/iiif_exchange/resource/<resource_id>")
+class IIIFExchangeResourceApi(Resource):
+
+    @auth.login_required
+    @api.response(200, 'Success', annotation_list_response)
+    @api.response(400, 'Invalid IIIF Exchange Manifest')
+    def post(self, resource_id):
+        annotations = annotation_store.get_from_index_by_target(resource_id)
+        return annotations, 200
+
+
+@api.route("/iiif_exchange/annotation/<annotation_id>")
+class IIIFExchangeAnnotationApi(Resource):
+
+    @auth.login_required
+    @api.response(200, 'Success', annotation_response)
+    @api.response(404, 'Annotation does not exists')
+    def get(self, annotation_id):
+        try:
+            annotation = annotation_store.get_from_index_by_id(annotation_id, "Annotation")
+            annotation['id'] = 'http://localhost:3000/api/annotations/' + annotation['id']
+            del annotation['target_list']
+            annotation.pop('permissions', None)
+            manifests = iiif_manifest.web_anno_to_manifest([annotation])
+            print('manifests received')
+            if isinstance(manifests, Manifest):
+                response_data = manifests.to_json()
+            else:
+                response_data = [manifest.to_json() for manifest in manifests]
+            print('manifests serialized')
+            return response_data
+        except PermissionError:
+            return abort(404)
+
+    @auth.login_required
+    @api.response(200, 'Success', annotation_list_response)
+    @api.response(400, 'Invalid IIIF Exchange Manifest')
+    def post(self, _resource_id):
+        manifest = request.get_json()
+        annotations = iiif_manifest.web_anno_from_manifest(manifest)
+        return annotations, 200
