@@ -53,7 +53,10 @@ class UserStore(object):
 
     def username_available(self, username):
         response = self.es.search(index=self.es_index, body={"query": {"match": {"username": username}}})
-        return True if response["hits"]["total"] == 0 else False
+        if isinstance(response["hits"]["total"], int):
+            return True if response["hits"]["total"] == 0 else False
+        else:
+            return True if response["hits"]["total"]["value"] == 0 else False
 
     def get_user_from_index(self, username=None, user_id=None):
         if not username and not user_id:
@@ -64,7 +67,9 @@ class UserStore(object):
             response = self.es.get(index=self.es_index, doc_type="user", id=user_id)
             return User(response["_source"])
         response = self.es.search(index=self.es_index, body={"query": {"match": {"username": username}}})
-        if response["hits"]["total"] == 0:
+        if isinstance(response["hits"]["total"], int) and response["hits"]["total"] == 0:
+            raise UserError("User {u} doesn't exist".format(u=username))
+        if isinstance(response["hits"]["total"], dict) and response["hits"]["total"]["value"] == 0:
             raise UserError("User {u} doesn't exist".format(u=username))
         return User(response["hits"]["hits"][0]["_source"])
 
