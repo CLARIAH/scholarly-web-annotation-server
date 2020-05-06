@@ -369,7 +369,7 @@ class AnnotationStore(object):
         return self.es.get(index=self.es_index, doc_type=annotation_type, id=annotation_id)['_source']
 
     def get_from_index_by_filters(self, params, annotation_type="_all"):
-        filter_queries = query_helper.make_param_filter_queries(params)
+        filter_queries = query_helper.make_param_filter_queries(params, annotation_type)
         filter_queries += [query_helper.make_permission_see_query(params)]
         query = {
             "from": params["page"] * self.es_config["page_size"],

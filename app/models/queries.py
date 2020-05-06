@@ -1,3 +1,6 @@
+from typing import Dict, List
+
+
 def bool_must(queries):
     if not isinstance(queries, list):
         raise TypeError("queries parameter must be a list of queries")
@@ -10,8 +13,10 @@ def bool_should(queries):
     return {"bool": {"should": queries}}
 
 
-def make_param_filter_queries(params):
+def make_param_filter_queries(params, annotation_type: str = "_all") -> List[Dict[str, any]]:
     filter_queries = []
+    if annotation_type != "_all":
+        filter_queries += [{"match": {"type": annotation_type}}]
     if "filter" not in params:
         return filter_queries
     if "target_id" in params["filter"]:

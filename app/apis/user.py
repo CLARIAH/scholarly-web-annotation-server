@@ -1,4 +1,5 @@
 from typing import Dict, Union
+import logging
 from flask import request, abort, make_response, jsonify, g
 from flask_restx import Namespace, Resource, fields
 from models.user_store import UserStore
@@ -7,6 +8,8 @@ from flask_httpauth import HTTPBasicAuth
 
 user_store = UserStore(server_config["Elasticsearch"])
 api = Namespace('users', description='User related operations')
+fh = logging.FileHandler("v1-users.log")
+api.logger.addHandler(fh)
 auth = HTTPBasicAuth()
 
 
@@ -34,6 +37,7 @@ user_response = api.model("UserResponse", {
 def verify_password(token_or_username, password):
     # print('verifying password')
     # anonymous access is allowed, set user to None
+    api.logger.info('attempt to authenticate')
     if not token_or_username and not password:
         # anonymous user
         g.user = None
@@ -79,6 +83,7 @@ class UsersApi(Resource):
             abort(403)
         user = user_store.register_user(user_details["username"], user_details["password"])
         token = user_store.generate_auth_token(user.user_id, expiration=600)
+        api.logger.info('user with name %s created successfully', user.username)
         return {"action": "created",  "user": {"username": user.username, "token": token.decode('ascii')}}, 201
 
     @auth.login_required
@@ -93,12 +98,14 @@ class UsersApi(Resource):
         user = user_store.update_password(g.user.username, user_details["password"], user_details["new_password"])
         response = {"action": "updated", "user": user.json()}
         del response["user"]["password_hash"]
+        api.logger.info('user with name %s updated successfully', user.username)
         return response, 200
 
     @auth.login_required
     @api.response(204, 'Success', user_response)
     def delete(self):
         user_store.delete_user(g.user)
+        api.logger.info('user with name %s updated successfully', g.user.username)
         return {'message': 'user deleted'}, 204
 
 
@@ -114,6 +121,7 @@ class LoginApi(Resource):
             # if no user object is POSTed, this is a bad request
             abort(403)
         token = user_store.generate_auth_token(g.user.user_id, expiration=600)
+        api.logger.info('user with name %s logged in successfully', g.user.username)
         return {"action": "authenticated", "user": {"username": g.user.username, "token": token.decode('ascii')}}, 200
 
 
@@ -125,4 +133,5 @@ class LogoutApi(Resource):
     @api.response(404, 'User does not exist')
     def get(self):
         # once token-based auth is implemented, remove token upon logout
+        api.logger.info('user with name %s logged out successfully', 'bla')
         return {"action": "logged out"}, 200
