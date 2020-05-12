@@ -6,7 +6,7 @@
 #    For talk to be given at EADH 2018 (Galway)
 #
 #################################################################
-@prefix hi: <http://localhost:8080/ontologies/editionannotationontology.ttl#> .
+@prefix hi: <https://annotation.clariah.nl/vocabularies/editions/editionannotationontology.ttl#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
@@ -15,10 +15,10 @@
 @prefix sch: <http://schema.org/> .
 @prefix ecrm: <http://erlangen-crm.org/current/> .
 @prefix efrbroo: <http://erlangen-crm.org/efrbroo/> .
-@base <http://localhost:8080/ontologies/editionannotationontology.ttl> .
-<http://localhost:8080/ontologies/editionannotationontology.ttl> rdf:type owl:Ontology .
+@base <https://annotation.clariah.nl/vocabularies/editions/editionannotationontology.ttl> .
+<https://annotation.clariah.nl/vocabularies/editions/editionannotationontology.ttl> rdf:type owl:Ontology .
 
-<http://localhost:8080/ontologies/editionannotationontology.ttl>  owl:imports  <https://raw.githubusercontent.com/erlangen-crm/efrbroo/releases/efrbroo_20160715.owl>.
+<https://annotation.clariah.nl/vocabularies/editions/editionannotationontology.ttl>  owl:imports  <https://raw.githubusercontent.com/erlangen-crm/efrbroo/releases/efrbroo_20160715.owl>.
 
 #################################################################
 #

@@ -1,0 +1,66 @@
+{
+    "baseAnnotationOntologyURL": "http://localhost:8080/ontologies/editionannotationontology.ttl",
+    "targetObserver": {
+        "targetObserverClass": "annotation-target-observer",
+        "observeMutations": false,
+        "observerConfig": {
+            "childList": false,
+            "attributes": false,
+            "subtree": false
+            }
+        },
+    "services" : {
+        "AnnotationServer": {
+            "api_remote": "https://annotation.clariah.nl/api/v1",
+            "api_local": "http://localhost:3000/api/v1",
+            "api": "https://annotation.clariah.nl/api/v1",
+            "apix": "http://hi17.huygens.knaw.nl:9210/api"
+        },
+        "DBpedia": {
+            "api": "http://lookup.dbpedia.org/api/search.asmx/PrefixSearch?QueryClass=&MaxHits=10&QueryString="
+        }
+    },
+    "annotationTasks" : {
+        "bookmark" : {
+            "type": "bookmark",
+            "purpose": "bookmarking"
+        },
+        "classify" : {
+            "type": "classification",
+            "purpose": "classifying",
+            "vocabularies" : [
+                "DBpedia"
+            ]
+        },
+        "comment" : {
+            "type": "comment",
+            "purpose": "commenting"
+        },
+        "correct" : {
+            "type": "correction",
+            "purpose": "correcting"
+        },
+        "link" : {
+            "type": "link",
+            "purpose": "linking",
+            "apis" : [
+                {"name" : "wikidata"},
+                {"name" : "europeana"}
+            ]
+        },
+        "tag": {
+            "type": "tag",
+            "purpose": "tagging",
+            "format": "text/plain",
+            "specifies": "classify"
+        },
+        "transcribe" : {
+            "type": "transcription",
+            "purpose": "transcribing",
+            "format": "text/plain"
+        }
+    },
+    "defaults": {
+        "target": ["ParagraphInLetter", "Note", "LocationNote", "SourceNote", "TextBearer"]
+    }
+}

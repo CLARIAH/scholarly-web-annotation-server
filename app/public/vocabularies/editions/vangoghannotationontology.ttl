@@ -3,18 +3,18 @@
 #    Specialized version of ontology for Van Gogh letters 
 #
 #################################################################
-@prefix hi: <http://localhost:8080/ontologies/editionannotationontology.ttl#> .
-@prefix vg: <http://localhost:8080/ontologies/vangoghannotationontology.ttl#> .
+@prefix hi: <https://annotation.clariah.nl/vocabularies/editions/editionannotationontology.ttl#> .
+@prefix vg: <https://annotation.clariah.nl/vocabularies/editions/vangoghannotationontology.ttl#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sch: <http://schema.org/> .
-@base <http://localhost:8080/ontologies/vangoghannotationontology.ttl> .
-<http://localhost:8080/ontologies/vangoghannotationontology.ttl> rdf:type owl:Ontology .
+@base <https://annotation.clariah.nl/vocabularies/editions/vangoghannotationontology.ttl> .
+<https://annotation.clariah.nl/vocabularies/editions/vangoghannotationontology.ttl> rdf:type owl:Ontology .
 
-<http://localhost:8080/ontologies/vangoghannotationontology.ttl>  owl:imports  <http://localhost:8080/ontologies/editionannotationontology.ttl>.
+<https://annotation.clariah.nl/vocabularies/editions/vangoghannotationontology.ttl>  owl:imports  <https://annotation.clariah.nl/vocabularies/editions/editionannotationontology.ttl>.
 
 #################################################################
 #
