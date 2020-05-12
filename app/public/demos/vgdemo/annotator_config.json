@@ -1,5 +1,5 @@
 {
-    "baseAnnotationOntologyURL": "http://localhost:8080/ontologies/editionannotationontology.ttl",
+    "baseAnnotationOntologyURL": "https://annotation.clariah.nl/vocabularies/editions/editionannotationontology.ttl",
     "targetObserver": {
         "targetObserverClass": "annotation-target-observer",
         "observeMutations": false,
@@ -13,8 +13,7 @@
         "AnnotationServer": {
             "api_remote": "https://annotation.clariah.nl/api/v1",
             "api_local": "http://localhost:3000/api/v1",
-            "api": "https://annotation.clariah.nl/api/v1",
-            "apix": "http://hi17.huygens.knaw.nl:9210/api"
+            "api": "https://annotation.clariah.nl/api/v1"
         },
         "DBpedia": {
             "api": "http://lookup.dbpedia.org/api/search.asmx/PrefixSearch?QueryClass=&MaxHits=10&QueryString="
