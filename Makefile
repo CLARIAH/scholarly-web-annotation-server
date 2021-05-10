@@ -18,3 +18,14 @@ stop:
 remove:
 	#sudo docker rm annotation-uwsgi-nginx-flask
 	sudo docker rm annotation-uwsgi-flask
+
+
+clariah_demo:
+	rm -rf clariah_app
+	cp -r app clariah_app
+	cp demo_init.py clariah_app/apis/
+	mv clariah_app/apis/__init__.py clariah_app/apis/orig_init.py
+	mv clariah_app/apis/demo_init.py clariah_app/apis/__init__.py
+	cp demos_api.py clariah_app/apis/
+	mv clariah_app/apis/demos_api.py clariah_app/apis/demos.py
+	cp -r demos/* clariah_app/public/demos/
