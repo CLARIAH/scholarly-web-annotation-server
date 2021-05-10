@@ -15,9 +15,11 @@ MarkupSafe==1.1.1
 passlib==1.7.2
 pyrsistent==0.15.7
 pytz==2015.7
+requests==2.23.0
 rfc3987==1.3.7
 six==1.14.0
 urllib3==1.25.8
 uwsgi==2.0.18
 Werkzeug==0.16.1
+xmltodict==0.12.0
 zipp==3.0.0
