@@ -18,7 +18,7 @@ pytz==2015.7
 requests==2.23.0
 rfc3987==1.3.7
 six==1.14.0
-urllib3==1.25.8
+urllib3==1.26.5
 uwsgi==2.0.18
 Werkzeug==0.16.1
 xmltodict==0.12.0
